@@ -2,11 +2,26 @@ apply plugin: 'java'
 apply plugin: 'application'
 
 repositories {
-    mavenCentral();
+    ivy {
+        credentials {
+            username "ivyrepo"
+            password "r3p0s1tory"
+        }
+        layout "pattern", {
+            artifact "[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"
+        }
+        // url "https://legolas.asigner.com/repository"
+        url "file:///mnt/gimli/jpository-ivy"
+    }
+    //mavenCentral()
 }
 
 dependencies {
-//    compile "com.intellij:forms_rt:7.0.3"
+    compile group: 'org.eclipse', name: 'platform-minimal', version: '4.5.1', configuration: 'linux-gtk-x86_64'
 }
 
-mainClassName = "KidPython"
+task copyToLib(type: Copy) {
+    into "$buildDir/output/lib"
+    from configurations.runtime
+}
+mainClassName = "com.asigner.kidpython.KidPython"
