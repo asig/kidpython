@@ -1,10 +1,10 @@
 package com.asigner.kidpython.controls;
 
+import com.google.common.collect.Sets;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.LineStyleEvent;
 import org.eclipse.swt.custom.LineStyleListener;
 import org.eclipse.swt.custom.StyleRange;
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Control;
@@ -13,22 +13,21 @@ import org.eclipse.swt.widgets.Display;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
-public class JavaLineStyler implements LineStyleListener {
-    JavaScanner scanner = new JavaScanner();
+public class PythonLineStyler implements LineStyleListener {
+    PythonScanner scanner = new PythonScanner();
     int[] tokenColors;
     Color[] colors;
-    List<int[]> blockComments = new ArrayList<>();
+    List<int[]> multiLineStrings = new ArrayList<>();
 
     public static final int EOF= -1;
     public static final int EOL= 10;
 
     public static final int WORD=		0;
     public static final int WHITE=		1;
-    public static final int KEY=			2;
+    public static final int KEYWORD =			2;
     public static final int COMMENT=		3;
     public static final int STRING=		5;
     public static final int OTHER=		6;
@@ -36,9 +35,9 @@ public class JavaLineStyler implements LineStyleListener {
 
     public static final int MAXIMUM_TOKEN= 8;
 
-    public JavaLineStyler() {
+    public PythonLineStyler() {
         initializeColors();
-        scanner = new JavaScanner();
+        scanner = new PythonScanner();
     }
 
     Color getColor(int type) {
@@ -48,12 +47,12 @@ public class JavaLineStyler implements LineStyleListener {
         return colors[tokenColors[type]];
     }
 
-    boolean inBlockComment(int start, int end) {
-        for (int i=0; i<blockComments.size(); i++) {
-            int[] offsets = blockComments.get(i);
-            // start of comment in the line
+    boolean inMultiLineString(int start, int end) {
+        for (int i=0; i<multiLineStrings.size(); i++) {
+            int[] offsets = multiLineStrings.get(i);
+            // start of string in the line
             if ((offsets[0] >= start) && (offsets[0] <= end)) return true;
-            // end of comment in the line
+            // end of string in the line
             if ((offsets[1] >= start) && (offsets[1] <= end)) return true;
             if ((offsets[0] <= start) && (offsets[1] >= end)) return true;
         }
@@ -71,7 +70,7 @@ public class JavaLineStyler implements LineStyleListener {
         tokenColors= new int[MAXIMUM_TOKEN];
         tokenColors[WORD]=		0;
         tokenColors[WHITE]=		0;
-        tokenColors[KEY]=		3;
+        tokenColors[KEYWORD]=		3;
         tokenColors[COMMENT]=	1;
         tokenColors[STRING]= 	2;
         tokenColors[OTHER]=		0;
@@ -92,13 +91,12 @@ public class JavaLineStyler implements LineStyleListener {
      */
     @Override
     public void lineGetStyle(LineStyleEvent event) {
-        parseBlockComments(((StyledText)event.getSource()).getText());
         List<StyleRange> styles = new ArrayList<>();
         int token;
         StyleRange lastStyle;
         // If the line is part of a block comment, create one style for the entire line.
-        if (inBlockComment(event.lineOffset, event.lineOffset + event.lineText.length())) {
-            styles.add(new StyleRange(event.lineOffset, event.lineText.length(), getColor(COMMENT), null));
+        if (inMultiLineString(event.lineOffset, event.lineOffset + event.lineText.length())) {
+            styles.add(new StyleRange(event.lineOffset, event.lineText.length(), getColor(STRING), null));
             event.styles = styles.toArray(new StyleRange[styles.size()]);
             return;
         }
@@ -113,9 +111,9 @@ public class JavaLineStyler implements LineStyleListener {
                 // Only create a style if the token color is different than the
                 // widget's default foreground color and the token's style is not
                 // bold.  Keywords are bolded.
-                if ((!color.equals(defaultFgColor)) || (token == KEY)) {
+                if ((!color.equals(defaultFgColor)) || (token == KEYWORD)) {
                     StyleRange style = new StyleRange(scanner.getStartOffset() + event.lineOffset, scanner.getLength(), color, null);
-                    if (token == KEY) {
+                    if (token == KEYWORD) {
                         style.fontStyle = SWT.BOLD;
                     }
                     if (styles.isEmpty()) {
@@ -148,7 +146,7 @@ public class JavaLineStyler implements LineStyleListener {
     }
 
     public void parseBlockComments(String text) {
-        blockComments = new ArrayList<>();
+        multiLineStrings = new ArrayList<>();
         StringReader buffer = new StringReader(text);
         int ch;
         boolean blkComment = false;
@@ -162,7 +160,7 @@ public class JavaLineStyler implements LineStyleListener {
                     case -1 : {
                         if (blkComment) {
                             offsets[1] = cnt;
-                            blockComments.add(offsets);
+                            multiLineStrings.add(offsets);
                         }
                         done = true;
                         break;
@@ -187,7 +185,7 @@ public class JavaLineStyler implements LineStyleListener {
                             if (ch == '/') {
                                 blkComment = false;
                                 offsets[1] = cnt;
-                                blockComments.add(offsets);
+                                multiLineStrings.add(offsets);
                             }
                         }
                         cnt++;
@@ -205,55 +203,55 @@ public class JavaLineStyler implements LineStyleListener {
     }
 
     /**
-     * A simple fuzzy scanner for Java
+     * A simple fuzzy scanner for Python
      */
-    public class JavaScanner {
+    public class PythonScanner {
 
-        protected Map<String, Integer> fgKeys= null;
         protected StringBuffer fBuffer= new StringBuffer();
         protected String fDoc;
         protected int fPos;
         protected int fEnd;
         protected int fStartToken;
-        protected boolean fEofSeen= false;
 
-        private String[] fgKeywords= {
-                "abstract",
-                "boolean", "break", "byte",
-                "case", "catch", "char", "class", "continue",
-                "default", "do", "double",
-                "else", "extends",
-                "false", "final", "finally", "float", "for",
-                "if", "implements", "import", "instanceof", "int", "interface",
-                "long",
-                "native", "new", "null",
-                "package", "private", "protected", "public",
+        private Set<String> keywords = Sets.newHashSet(
+                "and",
+                "elif",
+                "is",
+                "global",
+                "as",
+                "in",
+                "if",
+                "from",
+                "raise",
+                "for",
+                "except",
+                "finally",
+                "print",
+                "import",
+                "pass",
                 "return",
-                "short", "static", "super", "switch", "synchronized",
-                "this", "throw", "throws", "transient", "true", "try",
-                "void", "volatile",
-                "while"
-        };
-
-        public JavaScanner() {
-            initialize();
-        }
+                "exec",
+                "else",
+                "break",
+                "not",
+                "with",
+                "class",
+                "assert",
+                "yield",
+                "try",
+                "while",
+                "continue",
+                "del",
+                "or",
+                "def",
+                "lambda"
+        );
 
         /**
          * Returns the ending location of the current token in the document.
          */
         public final int getLength() {
             return fPos - fStartToken;
-        }
-
-        /**
-         * Initialize the lookup table.
-         */
-        void initialize() {
-            fgKeys= new HashMap<>();
-            Integer k= Integer.valueOf(KEY);
-            for (String word : fgKeywords)
-                fgKeys.put(word, k);
         }
 
         /**
@@ -273,19 +271,14 @@ public class JavaLineStyler implements LineStyleListener {
                 switch (c= read()) {
                     case EOF:
                         return EOF;
-                    case '/':	// comment
-                        c= read();
-                        if (c == '/') {
-                            while (true) {
-                                c= read();
-                                if ((c == EOF) || (c == EOL)) {
-                                    unread(c);
-                                    return COMMENT;
-                                }
+                    case '#':	// comment
+                        while (true) {
+                            c= read();
+                            if ((c == EOF) || (c == EOL)) {
+                                unread(c);
+                                return COMMENT;
                             }
                         }
-                        unread(c);
-                        return OTHER;
                     case '\'':	// char const
                         while(true) {
                             c= read();
@@ -338,10 +331,11 @@ public class JavaLineStyler implements LineStyleListener {
                                 c= read();
                             } while(Character.isJavaIdentifierPart((char)c));
                             unread(c);
-                            Integer i= fgKeys.get(fBuffer.toString());
-                            if (i != null)
-                                return i.intValue();
-                            return WORD;
+                            if (keywords.contains(fBuffer.toString())) {
+                                return KEYWORD;
+                            } else {
+                                return WORD;
+                            }
                         }
                         return OTHER;
                 }
