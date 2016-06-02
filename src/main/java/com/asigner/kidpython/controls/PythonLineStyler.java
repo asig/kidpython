@@ -122,7 +122,7 @@ public class PythonLineStyler implements LineStyleListener {
         StyleRange lastStyle;
 
         Color defaultFgColor = ((Control)event.widget).getForeground();
-        scanner.setRange(event.lineText);
+        scanner.setRange(event.lineOffset, event.lineText);
         token = scanner.nextToken();
         while (token != EOF) {
             if (token == OTHER) {
@@ -209,6 +209,7 @@ public class PythonLineStyler implements LineStyleListener {
     public class PythonScanner {
 
         protected StringBuffer buffer = new StringBuffer();
+        private int offset;
         protected String text;
         protected int pos;
         protected int end;
@@ -268,9 +269,9 @@ public class PythonLineStyler implements LineStyleListener {
         public int nextToken() {
             int c;
             startToken = pos;
-            Range r = findMultilineString(pos);
+            Range r = findMultilineString(offset + pos);
             if (r != null) {
-                pos = r.end;
+                pos = r.end - offset;
                 return STRING;
             }
             while (true) {
@@ -358,10 +359,11 @@ public class PythonLineStyler implements LineStyleListener {
             return EOF;
         }
 
-        public void setRange(String text) {
+        public void setRange(int offset, String text) {
+            this.offset = offset;
             this.text = text;
-            pos = 0;
-            end = this.text.length() -1;
+            this.pos = 0;
+            this.end = this.text.length() -1;
         }
 
         protected void unread(int c) {
