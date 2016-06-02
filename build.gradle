@@ -1,20 +1,8 @@
+apply from: "repositories.gradle"
+
 apply plugin: 'java'
 apply plugin: 'application'
-
-repositories {
-    ivy {
-        credentials {
-            username "ivyrepo"
-            password "r3p0s1tory"
-        }
-        layout "pattern", {
-            artifact "[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"
-        }
-        // url "https://legolas.asigner.com/repository"
-        url "file:///mnt/gimli/jpository-ivy"
-    }
-    //mavenCentral()
-}
+apply plugin: 'idea'
 
 dependencies {
     compile group: 'org.eclipse', name: 'platform-minimal', version: '4.5.1', configuration: 'linux-gtk-x86_64'

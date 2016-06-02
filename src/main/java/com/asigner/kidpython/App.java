@@ -1,5 +1,7 @@
 package com.asigner.kidpython;
 
+import com.asigner.kidpython.controls.ConsoleCanvas;
+import com.asigner.kidpython.controls.SourceCodeComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -11,8 +13,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-
-import com.asigner.kidpython.controls.SourceCodeComposite;
 
 public class App {
 
@@ -91,7 +91,7 @@ public class App {
         });
 
 
-        SashForm sashForm = new SashForm(shell, SWT.NONE);
+        SashForm sashForm = new SashForm(shell, SWT.VERTICAL);
         sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
         SourceCodeComposite sourceCodeComposite = new SourceCodeComposite(sashForm, SWT.NONE);
@@ -99,6 +99,11 @@ public class App {
         ScrolledComposite scrolledComposite = new ScrolledComposite(sashForm, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         scrolledComposite.setExpandHorizontal(true);
         scrolledComposite.setExpandVertical(true);
+
+        ConsoleCanvas consoleCanvas = new ConsoleCanvas(scrolledComposite, SWT.NONE);
+
+        scrolledComposite.setContent(consoleCanvas);
+        scrolledComposite.setMinSize(consoleCanvas.computeSize(-1,-1));
 
         sashForm.setWeights(new int[] {1, 1});
 

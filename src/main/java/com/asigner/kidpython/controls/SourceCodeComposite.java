@@ -14,9 +14,13 @@ public class SourceCodeComposite extends Composite {
 
     private static final int BUTTONS = 10;
 
+    private String[] sources = new String[BUTTONS];
     private Button buttons[] = new Button[BUTTONS];
+    private StyledText styledText;
 
     private boolean selectingSource = false;
+    private int selectedSource = 0;
+
     /**
      * Create the composite.
      * @param parent
@@ -35,7 +39,7 @@ public class SourceCodeComposite extends Composite {
             final int sourceIdx = i;
             buttons[i] = new Button(composite, SWT.TOGGLE);
             buttons[i].setBounds(0, 0, 93, 29);
-            buttons[i].setText(Integer.toString(i+1));
+            buttons[i].setText(Integer.toString(i + 1));
             buttons[i].addSelectionListener(new SelectionListener() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -48,11 +52,14 @@ public class SourceCodeComposite extends Composite {
 
                 }
             });
+
+            sources[i] = "";
         }
 
-        StyledText styledText = new StyledText(this, SWT.BORDER);
+        styledText = new StyledText(this, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
         styledText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
+        selectSource(0);
     }
 
     private void selectSource(int idx) {
@@ -60,11 +67,13 @@ public class SourceCodeComposite extends Composite {
             return;
         }
         selectingSource = true;
-        for (int i = 0; i < BUTTONS; i++) {
-            if (i != idx) {
-                buttons[i].setSelection(false);
-            }
-        }
+
+        buttons[selectedSource].setSelection(false);
+        sources[selectedSource] = styledText.getText();
+        selectedSource = idx;
+        buttons[selectedSource].setSelection(true);
+        styledText.setText(sources[selectedSource]);
+
         selectingSource = false;
     }
 
