@@ -13,16 +13,46 @@ import org.eclipse.swt.widgets.Display;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class PythonLineStyler implements LineStyleListener {
+
+    private static class Range {
+        int start;
+        int end;
+
+        public Range(int start, int end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        public boolean contains(int pos) {
+            return start <= pos && pos < end;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Range range = (Range) o;
+            return start == range.start &&
+                    end == range.end;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(start, end);
+        }
+    }
+
     PythonScanner scanner = new PythonScanner();
     int[] tokenColors;
     Color[] colors;
-    List<Integer> multiLineStrings = new ArrayList<>();
+    List<Range> multiLineStrings = new ArrayList<>();
 
-    public static final int EOF= -1;
-    public static final int EOL= 10;
+    public static final int EOF = -1;
+    public static final int EOL = 10;
 
     public static final int WORD=		0;
     public static final int WHITE=		1;
@@ -46,17 +76,13 @@ public class PythonLineStyler implements LineStyleListener {
         return colors[tokenColors[type]];
     }
 
-    boolean inMultiLineString(int start, int end) {
-        for (int i=0; i<multiLineStrings.size(); i+=2) {
-            int sStart = multiLineStrings.get(i);
-            int sEnd = multiLineStrings.get(i+1);
-            // start of string in the line
-            if ((sStart >= start) && (sStart <= end)) return true;
-            // end of string in the line
-            if ((sEnd >= start) && (sEnd <= end)) return true;
-            if ((sStart <= start) && (sEnd >= end)) return true;
+    Range findMultilineString(int pos) {
+        for (Range r : multiLineStrings) {
+            if (r.contains(pos)) {
+                return r;
+            }
         }
-        return false;
+        return null;
     }
 
     void initializeColors() {
@@ -94,12 +120,7 @@ public class PythonLineStyler implements LineStyleListener {
         List<StyleRange> styles = new ArrayList<>();
         int token;
         StyleRange lastStyle;
-        // If the line is part of a multiline string, create one style for the entire line.
-        if (inMultiLineString(event.lineOffset, event.lineOffset + event.lineText.length())) {
-            styles.add(new StyleRange(event.lineOffset, event.lineText.length(), getColor(STRING), null));
-            event.styles = styles.toArray(new StyleRange[styles.size()]);
-            return;
-        }
+
         Color defaultFgColor = ((Control)event.widget).getForeground();
         scanner.setRange(event.lineText);
         token = scanner.nextToken();
@@ -146,7 +167,7 @@ public class PythonLineStyler implements LineStyleListener {
     }
 
     public boolean parseMultilineStrings(String text) {
-        List<Integer> ofs = Lists.newArrayList();
+        List<Range> ofs = Lists.newArrayList();
         text = text + "  "; // Sentinel
         char chars[] = text.toCharArray();
         boolean inString = false;
@@ -158,15 +179,13 @@ public class PythonLineStyler implements LineStyleListener {
                     begin = i;
                     inString = true;
                 } else {
-                    ofs.add(begin);
-                    ofs.add(i+3);
+                    ofs.add(new Range(begin, i+3));
                     inString = false;
                 }
             }
         }
         if (inString) {
-            ofs.add(begin);
-            ofs.add(i+3);
+            ofs.add(new Range(begin, i+3));
         }
 
         boolean changed = false;
@@ -174,7 +193,7 @@ public class PythonLineStyler implements LineStyleListener {
             changed = true;
         } else {
             for (i = 0; i < ofs.size(); i++) {
-                if (ofs.get(i) != multiLineStrings.get(i)) {
+                if (!ofs.get(i).equals(multiLineStrings.get(i))) {
                     changed = true;
                     break;
                 }
@@ -189,11 +208,11 @@ public class PythonLineStyler implements LineStyleListener {
      */
     public class PythonScanner {
 
-        protected StringBuffer fBuffer= new StringBuffer();
-        protected String fDoc;
-        protected int fPos;
-        protected int fEnd;
-        protected int fStartToken;
+        protected StringBuffer buffer = new StringBuffer();
+        protected String text;
+        protected int pos;
+        protected int end;
+        protected int startToken;
 
         private Set<String> keywords = Sets.newHashSet(
                 "and",
@@ -233,14 +252,14 @@ public class PythonLineStyler implements LineStyleListener {
          * Returns the ending location of the current token in the document.
          */
         public final int getLength() {
-            return fPos - fStartToken;
+            return pos - startToken;
         }
 
         /**
          * Returns the starting location of the current token in the document.
          */
         public final int getStartOffset() {
-            return fStartToken;
+            return startToken;
         }
 
         /**
@@ -248,7 +267,12 @@ public class PythonLineStyler implements LineStyleListener {
          */
         public int nextToken() {
             int c;
-            fStartToken= fPos;
+            startToken = pos;
+            Range r = findMultilineString(pos);
+            if (r != null) {
+                pos = r.end;
+                return STRING;
+            }
             while (true) {
                 switch (c= read()) {
                     case EOF:
@@ -307,13 +331,13 @@ public class PythonLineStyler implements LineStyleListener {
                             return WHITE;
                         }
                         if (Character.isJavaIdentifierStart((char)c)) {
-                            fBuffer.setLength(0);
+                            buffer.setLength(0);
                             do {
-                                fBuffer.append((char)c);
+                                buffer.append((char)c);
                                 c= read();
                             } while(Character.isJavaIdentifierPart((char)c));
                             unread(c);
-                            if (keywords.contains(fBuffer.toString())) {
+                            if (keywords.contains(buffer.toString())) {
                                 return KEYWORD;
                             } else {
                                 return WORD;
@@ -328,21 +352,21 @@ public class PythonLineStyler implements LineStyleListener {
          * Returns next character.
          */
         protected int read() {
-            if (fPos <= fEnd) {
-                return fDoc.charAt(fPos++);
+            if (pos <= end) {
+                return text.charAt(pos++);
             }
             return EOF;
         }
 
         public void setRange(String text) {
-            fDoc= text;
-            fPos= 0;
-            fEnd= fDoc.length() -1;
+            this.text = text;
+            pos = 0;
+            end = this.text.length() -1;
         }
 
         protected void unread(int c) {
             if (c != EOF)
-                fPos--;
+                pos--;
         }
     }
 }
