@@ -2,8 +2,12 @@ package com.asigner.kidpython.controls;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -14,12 +18,20 @@ public class SourceCodeComposite extends Composite {
 
     private static final int BUTTONS = 10;
 
-    private String[] sources = new String[BUTTONS];
+    private static class StyledTextState {
+        int caretOfs = 0;
+        String text = "";
+        Point selection;
+    }
+
+    private StyledTextState[] styledTextStates = new StyledTextState[BUTTONS];
     private Button buttons[] = new Button[BUTTONS];
     private StyledText styledText;
+    private Font font;
 
     private boolean selectingSource = false;
     private int selectedSource = 0;
+
 
     /**
      * Create the composite.
@@ -40,27 +52,33 @@ public class SourceCodeComposite extends Composite {
             buttons[i] = new Button(composite, SWT.TOGGLE);
             buttons[i].setBounds(0, 0, 93, 29);
             buttons[i].setText(Integer.toString(i + 1));
-            buttons[i].addSelectionListener(new SelectionListener() {
+            buttons[i].addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     selectSource(sourceIdx);
                 }
-
-                @Override
-                public void widgetDefaultSelected(SelectionEvent arg0) {
-                    // TODO Auto-generated method stub
-
-                }
             });
 
-            sources[i] = "";
+            styledTextStates[i] = new StyledTextState();
         }
+
+        font = new Font(parent.getDisplay(), "Mono", 10, SWT.NONE);
 
         styledText = new StyledText(this, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
         styledText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+        styledText.addLineStyleListener(new JavaLineStyler());
+        styledText.setFont(font);
 
         selectSource(0);
+
+        this.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(DisposeEvent disposeEvent) {
+                font.dispose();
+            }
+        });
     }
+
 
     private void selectSource(int idx) {
         if (selectingSource) {
@@ -69,10 +87,21 @@ public class SourceCodeComposite extends Composite {
         selectingSource = true;
 
         buttons[selectedSource].setSelection(false);
-        sources[selectedSource] = styledText.getText();
+        StyledTextState s = styledTextStates[selectedSource];
+        s.caretOfs = styledText.getCaretOffset();
+        s.selection = styledText.getSelection();
+        s.text = styledText.getText();
+
         selectedSource = idx;
+
         buttons[selectedSource].setSelection(true);
-        styledText.setText(sources[selectedSource]);
+        s = styledTextStates[selectedSource];
+        styledText.setText(s.text);
+        styledText.setCaretOffset(s.caretOfs);
+        if (s.selection != null) {
+            styledText.setSelection(s.selection);
+        }
+        styledText.setFocus();
 
         selectingSource = false;
     }
@@ -81,4 +110,6 @@ public class SourceCodeComposite extends Composite {
     protected void checkSubclass() {
         // Disable the check that prevents subclassing of SWT components
     }
+
+
 }
