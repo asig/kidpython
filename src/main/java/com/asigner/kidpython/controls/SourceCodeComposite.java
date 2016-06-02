@@ -4,6 +4,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -23,6 +25,8 @@ public class SourceCodeComposite extends Composite {
         String text = "";
         Point selection;
     }
+
+    private PythonLineStyler lineStyler;
 
     private StyledTextState[] styledTextStates = new StyledTextState[BUTTONS];
     private Button buttons[] = new Button[BUTTONS];
@@ -64,10 +68,19 @@ public class SourceCodeComposite extends Composite {
 
         font = new Font(parent.getDisplay(), "Mono", 10, SWT.NONE);
 
+        lineStyler = new PythonLineStyler();
         styledText = new StyledText(this, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
         styledText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-        styledText.addLineStyleListener(new JavaLineStyler());
+        styledText.addLineStyleListener(lineStyler);
         styledText.setFont(font);
+        styledText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent modifyEvent) {
+                if (lineStyler.parseMultilineStrings(styledText.getText())) {
+                    styledText.redraw();
+                }
+            }
+        });
 
         selectSource(0);
 

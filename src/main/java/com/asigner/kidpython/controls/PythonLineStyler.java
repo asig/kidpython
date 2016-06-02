@@ -1,5 +1,6 @@
 package com.asigner.kidpython.controls;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.LineStyleEvent;
@@ -10,8 +11,6 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -20,7 +19,7 @@ public class PythonLineStyler implements LineStyleListener {
     PythonScanner scanner = new PythonScanner();
     int[] tokenColors;
     Color[] colors;
-    List<int[]> multiLineStrings = new ArrayList<>();
+    List<Integer> multiLineStrings = new ArrayList<>();
 
     public static final int EOF= -1;
     public static final int EOL= 10;
@@ -48,13 +47,14 @@ public class PythonLineStyler implements LineStyleListener {
     }
 
     boolean inMultiLineString(int start, int end) {
-        for (int i=0; i<multiLineStrings.size(); i++) {
-            int[] offsets = multiLineStrings.get(i);
+        for (int i=0; i<multiLineStrings.size(); i+=2) {
+            int sStart = multiLineStrings.get(i);
+            int sEnd = multiLineStrings.get(i+1);
             // start of string in the line
-            if ((offsets[0] >= start) && (offsets[0] <= end)) return true;
+            if ((sStart >= start) && (sStart <= end)) return true;
             // end of string in the line
-            if ((offsets[1] >= start) && (offsets[1] <= end)) return true;
-            if ((offsets[0] <= start) && (offsets[1] >= end)) return true;
+            if ((sEnd >= start) && (sEnd <= end)) return true;
+            if ((sStart <= start) && (sEnd >= end)) return true;
         }
         return false;
     }
@@ -94,7 +94,7 @@ public class PythonLineStyler implements LineStyleListener {
         List<StyleRange> styles = new ArrayList<>();
         int token;
         StyleRange lastStyle;
-        // If the line is part of a block comment, create one style for the entire line.
+        // If the line is part of a multiline string, create one style for the entire line.
         if (inMultiLineString(event.lineOffset, event.lineOffset + event.lineText.length())) {
             styles.add(new StyleRange(event.lineOffset, event.lineText.length(), getColor(STRING), null));
             event.styles = styles.toArray(new StyleRange[styles.size()]);
@@ -145,61 +145,43 @@ public class PythonLineStyler implements LineStyleListener {
         event.styles = styles.toArray(new StyleRange[styles.size()]);
     }
 
-    public void parseBlockComments(String text) {
-        multiLineStrings = new ArrayList<>();
-        StringReader buffer = new StringReader(text);
-        int ch;
-        boolean blkComment = false;
-        int cnt = 0;
-        int[] offsets = new int[2];
-        boolean done = false;
-
-        try {
-            while (!done) {
-                switch (ch = buffer.read()) {
-                    case -1 : {
-                        if (blkComment) {
-                            offsets[1] = cnt;
-                            multiLineStrings.add(offsets);
-                        }
-                        done = true;
-                        break;
-                    }
-                    case '/' : {
-                        ch = buffer.read();
-                        if ((ch == '*') && (!blkComment)) {
-                            offsets = new int[2];
-                            offsets[0] = cnt;
-                            blkComment = true;
-                            cnt++;
-                        } else {
-                            cnt++;
-                        }
-                        cnt++;
-                        break;
-                    }
-                    case '*' : {
-                        if (blkComment) {
-                            ch = buffer.read();
-                            cnt++;
-                            if (ch == '/') {
-                                blkComment = false;
-                                offsets[1] = cnt;
-                                multiLineStrings.add(offsets);
-                            }
-                        }
-                        cnt++;
-                        break;
-                    }
-                    default : {
-                        cnt++;
-                        break;
-                    }
+    public boolean parseMultilineStrings(String text) {
+        List<Integer> ofs = Lists.newArrayList();
+        text = text + "  "; // Sentinel
+        char chars[] = text.toCharArray();
+        boolean inString = false;
+        int begin = 0;
+        int i;
+        for (i = 0; i < chars.length - 3; i++) {
+            if (chars[i] == '"' && chars[i+1] == '"' && chars[i+2] == '"') {
+                if (!inString) {
+                    begin = i;
+                    inString = true;
+                } else {
+                    ofs.add(begin);
+                    ofs.add(i+3);
+                    inString = false;
                 }
             }
-        } catch(IOException e) {
-            // ignore errors
         }
+        if (inString) {
+            ofs.add(begin);
+            ofs.add(i+3);
+        }
+
+        boolean changed = false;
+        if (ofs.size() != multiLineStrings.size()) {
+            changed = true;
+        } else {
+            for (i = 0; i < ofs.size(); i++) {
+                if (ofs.get(i) != multiLineStrings.get(i)) {
+                    changed = true;
+                    break;
+                }
+            }
+        }
+        multiLineStrings = ofs;
+        return changed;
     }
 
     /**
