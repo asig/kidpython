@@ -100,7 +100,7 @@ public class PythonLineStyler implements LineStyleListener {
         tokenColors[COMMENT]=	1;
         tokenColors[STRING]= 	2;
         tokenColors[OTHER]=		0;
-        tokenColors[NUMBER]=	0;
+        tokenColors[NUMBER]=	1;
     }
 
     void disposeColors() {
@@ -171,14 +171,16 @@ public class PythonLineStyler implements LineStyleListener {
         text = text + "  "; // Sentinel
         char chars[] = text.toCharArray();
         boolean inString = false;
+        char sep = 0;
         int begin = 0;
         int i;
         for (i = 0; i < chars.length - 3; i++) {
-            if (chars[i] == '"' && chars[i+1] == '"' && chars[i+2] == '"') {
+            if (chars[i] == '"' && chars[i+1] == '"' && chars[i+2] == '"' || chars[i] == '\'' && chars[i+1] == '\'' && chars[i+2] == '\'') {
                 if (!inString) {
+                    sep = chars[i];
                     begin = i;
                     inString = true;
-                } else {
+                } else if (sep == chars[i]) {
                     ofs.add(new Range(begin, i+3));
                     inString = false;
                 }
@@ -268,6 +270,7 @@ public class PythonLineStyler implements LineStyleListener {
          */
         public int nextToken() {
             int c;
+            int sep;
             startToken = pos;
             Range r = findMultilineString(offset + pos);
             if (r != null) {
@@ -286,43 +289,34 @@ public class PythonLineStyler implements LineStyleListener {
                                 return COMMENT;
                             }
                         }
-                    case '\'':	// char const
+                    case '\'':
+                    case '"': // string
+                        sep = c;
                         while(true) {
                             c= read();
-                            switch (c) {
-                                case '\'':
-                                    return STRING;
-                                case EOF:
-                                    unread(c);
-                                    return STRING;
-                                case '\\':
-                                    c= read();
-                                    break;
+                            if (c == sep) {
+                                return STRING;
+                            } else if (c == EOF) {
+                                unread(c);
+                                return STRING;
+                            } else if (c == '\\') {
+                                read();
                             }
                         }
 
-                    case '"':	// string
-                        while(true) {
-                            c= read();
-                            switch (c) {
-                                case '"':
-                                    return STRING;
-                                case EOF:
-                                    unread(c);
-                                    return STRING;
-                                case '\\':
-                                    c= read();
-                                    break;
-                            }
+                    case '0':
+                        c = read();
+                        if (c == 'x' || c == 'X') {
+                            // hexdigit
+                            return readHex();
+                        } else {
+                            unread(c);
+                            unread(0);
+                            return readNumber();
                         }
+                    case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
+                        return readNumber();
 
-                    case '0': case '1': case '2': case '3': case '4':
-                    case '5': case '6': case '7': case '8': case '9':
-                        do {
-                            c= read();
-                        } while(Character.isDigit((char)c));
-                        unread(c);
-                        return NUMBER;
                     default:
                         if (Character.isWhitespace((char)c)) {
                             do {
@@ -347,6 +341,58 @@ public class PythonLineStyler implements LineStyleListener {
                         return OTHER;
                 }
             }
+        }
+
+        private int readHex() {
+            int c = read();
+            while (Character.isDigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') ) {
+                c = read();
+            }
+            unread(c);
+            return NUMBER;
+        }
+
+        private int readNumber() {
+            int c = read();
+            while (Character.isDigit(c)) {
+                c = read();
+            }
+            if (c == 'l' || c == 'L') {
+                c = read();
+                unread(c);
+                if (isSeparator(c)) {
+                    return NUMBER;
+                }
+                return OTHER;
+            }
+            if (c == '.') {
+                c = read();
+                while (Character.isDigit(c)) {
+                    c = read();
+                }
+            }
+            if (c == 'e' || c == 'E') {
+                c = read();
+                if (c == '+' || c == '-') {
+                    c = read();
+                }
+                while (Character.isDigit(c)) {
+                    c = read();
+                }
+                unread(c);
+            }
+            if (c == 'j' || c =='J') {
+                c = read();
+            }
+            unread(c);
+            if (isSeparator(c)) {
+                return NUMBER;
+            }
+            return OTHER;
+        }
+
+        private boolean isSeparator(int c) {
+            return !Character.isUnicodeIdentifierPart(c);
         }
 
         /**
