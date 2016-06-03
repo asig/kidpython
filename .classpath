@@ -2,36 +2,40 @@
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.commands_3.7.0.v20150422-0725-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.contenttype_3.5.0.v20150421-2214-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.databinding_1.5.0.v20150422-0725-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.databinding.beans_1.3.0.v20150422-0725-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.databinding.observable_1.5.0.v20150422-0725-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.databinding.property_1.5.0.v20150422-0725-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.expressions_3.5.0.v20150421-2214-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.externaltools_1.0.300.v20140219-0051-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.filebuffers_3.5.500.v20140723-1040-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.filesystem_1.5.0.v20150725-1910-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.filesystem.java7_1.0.100.v20150423-0754-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.filesystem.linux.x86_64_1.2.200.v20140124-1940-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.jobs_3.7.0.v20150330-2103-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.net_1.2.300.v20141118-1725-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.net.linux.x86_64_1.1.100.v20140124-2013-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.resources_3.10.1.v20150725-1910-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.runtime_3.11.1.v20150903-1804-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.runtime.compatibility_3.2.300.v20150423-0821-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.core.variables_3.2.800.v20130819-1716-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.e4.core.commands_0.11.0.v20150422-0725-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.e4.core.contexts_1.4.0.v20150828-0818-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.e4.core.di_1.5.0.v20150421-2214-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.e4.core.di.annotations_1.4.0.v20150528-1451-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.e4.core.di.extensions_0.13.0.v20150421-2214-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.e4.core.services_2.0.0.v20150403-1912-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.jface_3.11.0.v20150602-1400-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.jface.databinding_1.7.0.v20150406-2148-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.jface.text_3.10.0.v20150603-1752-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.swt_3.104.1.v20150825-0743-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.swt.gtk.linux.x86_64_3.104.1.v20150825-0743-4.5.1.jar"/>
-	<classpathentry kind="lib" path="build/output/lib/org.eclipse.text_3.5.400.v20150505-1044-4.5.1.jar"/>
 	<classpathentry kind="output" path="build/classes/main"/>
+	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="src" path="src/main/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/fd06a81bb33880630294298150d56467c9050713/org.eclipse.core.filesystem.linux.x86_64_1.2.200.v20140124-1940-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/ed05736bab09c605d01134c9bcc732a35b1ef014/org.eclipse.core.net.linux.x86_64_1.1.100.v20140124-2013-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/451c86c47346b5b6e864202720667cb3c927b943/org.eclipse.swt.gtk.linux.x86_64_3.104.1.v20150825-0743-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/780ddc878644c2e5c9a6a350d474fd81b7e63448/org.eclipse.core.commands_3.7.0.v20150422-0725-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/b60e8a50bf037ff53a3b3d7ae75740d7165ce17f/org.eclipse.core.contenttype_3.5.0.v20150421-2214-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/3bf8a4fda6b30c89eb8bf94922ca78a03eaa3599/org.eclipse.core.databinding_1.5.0.v20150422-0725-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/36433b1493afdf957575307a0189c1653d86fbc1/org.eclipse.core.databinding.beans_1.3.0.v20150422-0725-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/cb6b6659bc43883267c4a9f51c56d458936defb/org.eclipse.core.databinding.observable_1.5.0.v20150422-0725-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/a84fa06c1a2f6930700ba1345b1ef46a38f25fba/org.eclipse.core.databinding.property_1.5.0.v20150422-0725-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/1ea8d6a7ab1551ab36b51e93d151c8dcbfd6ff18/org.eclipse.core.expressions_3.5.0.v20150421-2214-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/11c8e540ae4095c971d5a898f7eaea853e264b11/org.eclipse.core.externaltools_1.0.300.v20140219-0051-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/b39619f99450d255633210b0a20769799578b333/org.eclipse.core.filebuffers_3.5.500.v20140723-1040-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/b6d6b84ab4d9ba86c733fa4150a0f538f1ee8756/org.eclipse.core.filesystem_1.5.0.v20150725-1910-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/ec5c1f7470b0b9b115063191010b997fb4a2b2d4/org.eclipse.core.filesystem.java7_1.0.100.v20150423-0754-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/aa5732d583aaae75bfb12e2857f1bbc2cf41bbd4/org.eclipse.core.jobs_3.7.0.v20150330-2103-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/f1f865ce5de25b9cefcf82fc58ba00c82134de42/org.eclipse.core.net_1.2.300.v20141118-1725-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/9916323d87ef93c71f3f6a47d42744ebc2433a7c/org.eclipse.core.resources_3.10.1.v20150725-1910-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/950a0b5bb2e23fbbc0cbd0e82f63f735936a8346/org.eclipse.core.runtime_3.11.1.v20150903-1804-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/b8fa80c0d2001ecb0490998faf69a1bbfd715fe0/org.eclipse.core.runtime.compatibility_3.2.300.v20150423-0821-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/5c7f6b1a97b6b01ea12835c53a3df109b860db89/org.eclipse.core.variables_3.2.800.v20130819-1716-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/5c4fdcb551671824ea99e3bed9a58ec9c6b7e936/org.eclipse.e4.core.commands_0.11.0.v20150422-0725-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/920bc015b4b9468e0a2078f4380f2b34fc288cc/org.eclipse.e4.core.contexts_1.4.0.v20150828-0818-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/75bcae558c86d57139c55464877b044fe536cc47/org.eclipse.e4.core.di_1.5.0.v20150421-2214-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/c1ba5827439bb83e15555eb90b37de39ca1c48ab/org.eclipse.e4.core.di.annotations_1.4.0.v20150528-1451-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/f2216ccf7f3385c48f5f0093aa5e7469aa46d888/org.eclipse.e4.core.di.extensions_0.13.0.v20150421-2214-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/1bda079159a42238022d9e5ad0dcacd382e51dbc/org.eclipse.e4.core.services_2.0.0.v20150403-1912-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/58444e114205480762a88b218c3cf2c29b76504/org.eclipse.jface_3.11.0.v20150602-1400-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/554badfb70413444af4eb7c1c4101ac575e3b913/org.eclipse.jface.databinding_1.7.0.v20150406-2148-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/6fda84126e0ed0b1425fb11c2ff145b21c648241/org.eclipse.jface.text_3.10.0.v20150603-1752-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/c510ae49cd271f6c3f271e63b1d680b0bce118c0/org.eclipse.swt_3.104.1.v20150825-0743-4.5.1.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/fb0044984fdedcd993484fd17a1403c073b20cad/org.eclipse.text_3.5.400.v20150505-1044-4.5.1.jar" exported="true"/>
+	<classpathentry sourcepath="/home/asigner/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/19.0/91a4d115400e904f22b03a78deb355e9ea803cd4/guava-19.0-sources.jar" kind="lib" path="/home/asigner/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/19.0/6ce200f6b23222af3d8abb6b6459e6c44f4bb0e9/guava-19.0.jar" exported="true"/>
 </classpath>

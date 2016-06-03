@@ -1,18 +1,10 @@
 package com.asigner.kidpython.controls;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
@@ -20,22 +12,12 @@ public class SourceCodeComposite extends Composite {
 
     private static final int BUTTONS = 10;
 
-    private static class StyledTextState {
-        int caretOfs = 0;
-        String text = "";
-        Point selection;
-    }
-
-    private PythonLineStyler lineStyler;
-
-    private StyledTextState[] styledTextStates = new StyledTextState[BUTTONS];
+    private PythonEditor.State[] editorStates = new PythonEditor.State[BUTTONS];
     private Button buttons[] = new Button[BUTTONS];
-    private StyledText styledText;
-    private Font font;
+    private PythonEditor editor;
 
     private boolean selectingSource = false;
     private int selectedSource = 0;
-
 
     /**
      * Create the composite.
@@ -47,13 +29,13 @@ public class SourceCodeComposite extends Composite {
         setLayout(new GridLayout(1, false));
 
         Composite composite = new Composite(this, SWT.NONE);
-        composite.setLayout(new RowLayout(SWT.HORIZONTAL));
-        composite.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, true, false, 1, 1));
-
+        composite.setLayout(new GridLayout(BUTTONS, false));
+        composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 
         for (int i = 0; i < BUTTONS; i++) {
             final int sourceIdx = i;
             buttons[i] = new Button(composite, SWT.TOGGLE);
+            buttons[i].setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
             buttons[i].setBounds(0, 0, 93, 29);
             buttons[i].setText(Integer.toString(i + 1));
             buttons[i].addSelectionListener(new SelectionAdapter() {
@@ -62,34 +44,11 @@ public class SourceCodeComposite extends Composite {
                     selectSource(sourceIdx);
                 }
             });
-
-            styledTextStates[i] = new StyledTextState();
         }
 
-        font = new Font(parent.getDisplay(), "Mono", 10, SWT.NONE);
-
-        lineStyler = new PythonLineStyler();
-        styledText = new StyledText(this, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-        styledText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-        styledText.addLineStyleListener(lineStyler);
-        styledText.setFont(font);
-        styledText.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent modifyEvent) {
-                if (lineStyler.parseMultilineStrings(styledText.getText())) {
-                    styledText.redraw();
-                }
-            }
-        });
-
+        editor = new PythonEditor(this, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+        editor.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         selectSource(0);
-
-        this.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(DisposeEvent disposeEvent) {
-                font.dispose();
-            }
-        });
     }
 
 
@@ -100,21 +59,11 @@ public class SourceCodeComposite extends Composite {
         selectingSource = true;
 
         buttons[selectedSource].setSelection(false);
-        StyledTextState s = styledTextStates[selectedSource];
-        s.caretOfs = styledText.getCaretOffset();
-        s.selection = styledText.getSelection();
-        s.text = styledText.getText();
-
+        editorStates[selectedSource] = editor.saveState();
         selectedSource = idx;
-
         buttons[selectedSource].setSelection(true);
-        s = styledTextStates[selectedSource];
-        styledText.setText(s.text);
-        styledText.setCaretOffset(s.caretOfs);
-        if (s.selection != null) {
-            styledText.setSelection(s.selection);
-        }
-        styledText.setFocus();
+        editor.restoreState(editorStates[selectedSource]);
+        editor.setFocus();
 
         selectingSource = false;
     }

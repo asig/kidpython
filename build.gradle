@@ -3,6 +3,7 @@ apply from: "repositories.gradle"
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'idea'
+apply plugin: 'eclipse'
 
 dependencies {
     compile group: 'org.eclipse', name: 'platform-minimal', version: '4.5.1', configuration: 'linux-gtk-x86_64'

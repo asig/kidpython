@@ -14,9 +14,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
+import java.io.IOException;
+
 public class App {
 
     protected Shell shell;
+    protected Interpreter interpreter;
 
     /**
      * Launch the application.
@@ -27,6 +30,15 @@ public class App {
             App window = new App();
             window.open();
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public App() {
+        interpreter = new Interpreter();
+        try {
+            interpreter.start();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -78,6 +90,14 @@ public class App {
 
         ToolItem item1 = new ToolItem(toolBar, SWT.PUSH);
         item1.setText("new 1");
+        item1.addListener(SWT.Selection, event -> {
+            try {
+                interpreter.write("ls -l /home/asigner");
+                interpreter.stop();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
 
         ToolItem separator = new ToolItem(toolBar, SWT.SEPARATOR);
 
