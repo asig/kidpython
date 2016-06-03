@@ -17,7 +17,11 @@ public class PythonEditor extends StyledText {
     static class State {
         private int caretOfs = 0;
         private String text = "";
-        private Point selection;
+        private Point selection = new Point(0,0);
+
+        public State(String text) {
+            this.text = text;
+        }
     }
 
     private final PythonLineStyler lineStyler;
@@ -49,10 +53,9 @@ public class PythonEditor extends StyledText {
     }
 
     public State saveState() {
-        State s = new State();
+        State s = new State(getText());
         s.caretOfs = getCaretOffset();
         s.selection = getSelection();
-        s.text = getText();
         return s;
     }
 
