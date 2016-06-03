@@ -5,6 +5,7 @@ import com.asigner.kidpython.controls.SourceCodeComposite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
@@ -65,6 +66,8 @@ public class App {
         Display display = Display.getDefault();
         shell = new Shell(display, SWT.SHELL_TRIM | SWT.CENTER);
         shell.setLayout(new GridLayout(1, false));
+        Image icon = new Image(display, App.class.getResourceAsStream("icons/icon.png"));
+        shell.setImage(icon);
 
         Menu menuBar = new Menu(shell, SWT.BAR);
         MenuItem cascadeFileMenu = new MenuItem(menuBar, SWT.CASCADE);
