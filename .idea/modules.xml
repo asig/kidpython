@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/kidpython.iml" filepath="$PROJECT_DIR$/kidpython.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kidpython.iml" filepath="$PROJECT_DIR$/.idea/modules/kidpython.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kidpython_main.iml" filepath="$PROJECT_DIR$/.idea/modules/kidpython_main.iml" group="kidpython" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kidpython_test.iml" filepath="$PROJECT_DIR$/.idea/modules/kidpython_test.iml" group="kidpython" />
     </modules>
   </component>
 </project>
