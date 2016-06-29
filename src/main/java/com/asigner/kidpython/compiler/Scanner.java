@@ -19,30 +19,30 @@ public class Scanner {
 
     @VisibleForTesting
     char getch() {
-        if (curPos >= text.length()) {
-            curPos++;
-            return 0;
-        }
-        boolean firstOnLine = curPos > 0 && text.charAt(curPos - 1) == '\n';
-        char c = text.charAt(curPos++);
+        boolean firstOnLine = curPos > 0 && curPos <= text.length() && text.charAt(curPos - 1) == '\n';
+
+        char c = curPos >= text.length() ? 0 : text.charAt(curPos);
+        curPos++;
+
         if (firstOnLine) {
             line++;
             col = 1;
         } else {
             col++;
         }
+
         return c;
     }
 
     @VisibleForTesting
     void ungetch() {
         curPos--;
-        if (curPos >0 && curPos <= text.length() && text.charAt(curPos) == '\n') {
+        if (curPos > 0 && curPos <= text.length() && text.charAt(curPos - 1) == '\n') {
             line--;
-            int begin = curPos - 1;
+            int begin = curPos - 2;
             while (begin >= 0 && text.charAt(begin) != '\n') begin--;
-            col = curPos - begin;
-        } else if (curPos <= text.length()) {
+            col = (curPos - 1) - begin;
+        } else {
             col--;
         }
     }
