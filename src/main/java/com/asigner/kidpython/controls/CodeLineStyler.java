@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class PythonLineStyler implements LineStyleListener {
+public class CodeLineStyler implements LineStyleListener {
 
     private static class Range {
         int start;
@@ -49,7 +49,7 @@ public class PythonLineStyler implements LineStyleListener {
     PythonScanner scanner = new PythonScanner();
     int[] tokenColors;
     Color[] colors;
-    List<Range> multiLineStrings = new ArrayList<>();
+    List<Range> multiLineComments = new ArrayList<>();
 
     public static final int EOF = -1;
     public static final int EOL = 10;
@@ -64,7 +64,7 @@ public class PythonLineStyler implements LineStyleListener {
 
     public static final int MAXIMUM_TOKEN= 8;
 
-    public PythonLineStyler() {
+    public CodeLineStyler() {
         initializeColors();
         scanner = new PythonScanner();
     }
@@ -76,8 +76,8 @@ public class PythonLineStyler implements LineStyleListener {
         return colors[tokenColors[type]];
     }
 
-    Range findMultilineString(int pos) {
-        for (Range r : multiLineStrings) {
+    Range findMultiLineComment(int pos) {
+        for (Range r : multiLineComments) {
             if (r.contains(pos)) {
                 return r;
             }
@@ -166,42 +166,41 @@ public class PythonLineStyler implements LineStyleListener {
         event.styles = styles.toArray(new StyleRange[styles.size()]);
     }
 
-    public boolean parseMultilineStrings(String text) {
+    public boolean parseMultiLineComments(String text) {
         List<Range> ofs = Lists.newArrayList();
         text = text + "  "; // Sentinel
         char chars[] = text.toCharArray();
-        boolean inString = false;
+        boolean inComment = false;
         char sep = 0;
         int begin = 0;
         int i;
-        for (i = 0; i < chars.length - 3; i++) {
-            if (chars[i] == '"' && chars[i+1] == '"' && chars[i+2] == '"' || chars[i] == '\'' && chars[i+1] == '\'' && chars[i+2] == '\'') {
-                if (!inString) {
-                    sep = chars[i];
-                    begin = i;
-                    inString = true;
-                } else if (sep == chars[i]) {
-                    ofs.add(new Range(begin, i+3));
-                    inString = false;
-                }
+        for (i = 0; i < chars.length - 2; i++) {
+            if (chars[i] == '/' && chars[i+1] == '*' ) {
+                inComment = true;
+                begin = i;
+                i++; // skip both chars
+            } else if (chars[i] == '*' && chars[i+1] == '/') {
+                inComment = false;
+                ofs.add(new Range(begin, i+2));
+                i++; // skip both chars
             }
         }
-        if (inString) {
+        if (inComment) {
             ofs.add(new Range(begin, i+3));
         }
 
         boolean changed = false;
-        if (ofs.size() != multiLineStrings.size()) {
+        if (ofs.size() != multiLineComments.size()) {
             changed = true;
         } else {
             for (i = 0; i < ofs.size(); i++) {
-                if (!ofs.get(i).equals(multiLineStrings.get(i))) {
+                if (!ofs.get(i).equals(multiLineComments.get(i))) {
                     changed = true;
                     break;
                 }
             }
         }
-        multiLineStrings = ofs;
+        multiLineComments = ofs;
         return changed;
     }
 
@@ -272,23 +271,30 @@ public class PythonLineStyler implements LineStyleListener {
             int c;
             int sep;
             startToken = pos;
-            Range r = findMultilineString(offset + pos);
+            Range r = findMultiLineComment(offset + pos);
             if (r != null) {
                 pos = r.end - offset;
-                return STRING;
+                return COMMENT;
             }
             while (true) {
                 switch (c= read()) {
                     case EOF:
                         return EOF;
-                    case '#':	// comment
-                        while (true) {
-                            c= read();
-                            if ((c == EOF) || (c == EOL)) {
-                                unread(c);
-                                return COMMENT;
+                    case '/': {
+                        int c2 = read();
+                        if (c2 == '/') {
+                            while (true) {
+                                c= read();
+                                if ((c == EOF) || (c == EOL)) {
+                                    unread(c);
+                                    return COMMENT;
+                                }
                             }
+                        } else {
+                            unread(c2);
                         }
+                        break;
+                    }
                     case '\'':
                     case '"': // string
                         sep = c;
@@ -304,17 +310,7 @@ public class PythonLineStyler implements LineStyleListener {
                             }
                         }
 
-                    case '0':
-                        c = read();
-                        if (c == 'x' || c == 'X') {
-                            // hexdigit
-                            return readHex();
-                        } else {
-                            unread(c);
-                            unread(0);
-                            return readNumber();
-                        }
-                    case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
+                    case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
                         return readNumber();
 
                     default:
@@ -343,27 +339,10 @@ public class PythonLineStyler implements LineStyleListener {
             }
         }
 
-        private int readHex() {
-            int c = read();
-            while (Character.isDigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') ) {
-                c = read();
-            }
-            unread(c);
-            return NUMBER;
-        }
-
         private int readNumber() {
             int c = read();
             while (Character.isDigit(c)) {
                 c = read();
-            }
-            if (c == 'l' || c == 'L') {
-                c = read();
-                unread(c);
-                if (isSeparator(c)) {
-                    return NUMBER;
-                }
-                return OTHER;
             }
             if (c == '.') {
                 c = read();
@@ -371,24 +350,7 @@ public class PythonLineStyler implements LineStyleListener {
                     c = read();
                 }
             }
-            if (c == 'e' || c == 'E') {
-                c = read();
-                if (c == '+' || c == '-') {
-                    c = read();
-                }
-                while (Character.isDigit(c)) {
-                    c = read();
-                }
-                unread(c);
-            }
-            if (c == 'j' || c =='J') {
-                c = read();
-            }
-            unread(c);
-            if (isSeparator(c)) {
-                return NUMBER;
-            }
-            return OTHER;
+            return NUMBER;
         }
 
         private boolean isSeparator(int c) {

@@ -12,7 +12,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 
-public class PythonEditor extends StyledText {
+public class CodeEditor extends StyledText {
 
     static class State {
         private int caretOfs = 0;
@@ -24,10 +24,10 @@ public class PythonEditor extends StyledText {
         }
     }
 
-    private final PythonLineStyler lineStyler;
+    private final CodeLineStyler lineStyler;
     private Font font;
 
-    public PythonEditor(Composite parent, int style) {
+    public CodeEditor(Composite parent, int style) {
         super(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 
         font = new Font(parent.getDisplay(), "Mono", 10, SWT.NONE);
@@ -38,13 +38,13 @@ public class PythonEditor extends StyledText {
             }
         });
 
-        lineStyler = new PythonLineStyler();
+        lineStyler = new CodeLineStyler();
         addLineStyleListener(lineStyler);
         setFont(font);
         addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent modifyEvent) {
-                if (lineStyler.parseMultilineStrings(getText())) {
+                if (lineStyler.parseMultiLineComments(getText())) {
                     redraw();
                 }
             }
