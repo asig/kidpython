@@ -90,4 +90,14 @@ public class ScannerTest {
         t = scanner.next(); assertEquals(Token.Type.STRING_LIT, t.getType()); assertEquals("foo", t.getValue());
         t = scanner.next(); assertEquals(Token.Type.STRING_LIT, t.getType()); assertEquals("bar", t.getValue());
     }
+
+    @Test
+    public void testComments() throws Exception {
+        Scanner scanner = new Scanner("func // UNTIL END OF LINE\nfor /* to end if */ /* then */ elseif");
+        Token t;
+        t = scanner.next(); assertEquals(Token.Type.FUNC, t.getType());
+        t = scanner.next(); assertEquals(Token.Type.FOR, t.getType());
+        t = scanner.next(); assertEquals(Token.Type.ELSEIF, t.getType());
+    }
+
 }

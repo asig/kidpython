@@ -41,12 +41,35 @@ public class Scanner {
     }
 
     Token next() {
-        // Read over whitespace
-        while (Character.isWhitespace(getch())) ;
+        // Read over whitespace and comments
 
-        ungetch();
+        char c;
+        for(;;) {
+            // Read over whitespace
+            while (Character.isWhitespace(getch())) ;
 
-        char c = getch();
+            ungetch();
+            c = getch();
+
+            // Read over comment, if applicable
+            if (c == '/') {
+                char c2 = getch();
+                if (c2 == '/') {
+                    while (getch() != '\n');
+                } else if (c2 == '*') {
+                    while ( !((c == '*' && c2 == '/') || (c == 0 && c2 == 0))) {
+                        c = c2;
+                        c2 = getch();
+                    }
+                } else {
+                    ungetch();
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+
         int col = this.getCol();
         int line = this.getLine();
         if (Character.isLetter(c)) {
