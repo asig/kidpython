@@ -13,7 +13,6 @@ public class Scanner {
             .put("end", Token.Type.END)
             .put("if", Token.Type.IF)
             .put("then", Token.Type.THEN)
-            .put("elseif", Token.Type.ELSEIF)
             .put("else", Token.Type.ELSE)
             .put("step", Token.Type.STEP)
             .put("in", Token.Type.IN)
@@ -102,7 +101,7 @@ public class Scanner {
             switch(c) {
                 case '"':
                 case '\'': {
-                    StringBuffer b = new StringBuffer();
+                    StringBuilder b = new StringBuilder();
                     char terminator = c;
                     c = getch();
                     while (c != terminator && c != 0) {
@@ -115,6 +114,8 @@ public class Scanner {
                 case ')': return new Token(Token.Type.RPAREN, pos);
                 case '[': return new Token(Token.Type.LBRACK, pos);
                 case ']': return new Token(Token.Type.RBRACK, pos);
+                case '{': return new Token(Token.Type.LBRACE, pos);
+                case '}': return new Token(Token.Type.RBRACE, pos);
                 case '+': return new Token(Token.Type.PLUS, pos);
                 case '-': return new Token(Token.Type.MINUS, pos);
                 case '*': return new Token(Token.Type.ASTERISK, pos);
@@ -141,6 +142,7 @@ public class Scanner {
                 }
                 case '=': return new Token(Token.Type.EQ, pos);
                 case ',': return new Token(Token.Type.COMMA, pos);
+                case ':': return new Token(Token.Type.COLON, pos);
                 case '.': return new Token(Token.Type.DOT, pos);
                 case 0: return new Token(Token.Type.EOT, pos);
             }

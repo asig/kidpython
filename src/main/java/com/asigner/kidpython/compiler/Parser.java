@@ -11,11 +11,11 @@ import java.util.function.BiFunction;
 
 import static com.asigner.kidpython.compiler.Token.Type.AND;
 import static com.asigner.kidpython.compiler.Token.Type.ASTERISK;
+import static com.asigner.kidpython.compiler.Token.Type.COLON;
 import static com.asigner.kidpython.compiler.Token.Type.COMMA;
 import static com.asigner.kidpython.compiler.Token.Type.DO;
 import static com.asigner.kidpython.compiler.Token.Type.DOT;
 import static com.asigner.kidpython.compiler.Token.Type.ELSE;
-import static com.asigner.kidpython.compiler.Token.Type.ELSEIF;
 import static com.asigner.kidpython.compiler.Token.Type.END;
 import static com.asigner.kidpython.compiler.Token.Type.EOT;
 import static com.asigner.kidpython.compiler.Token.Type.EQ;
@@ -26,6 +26,7 @@ import static com.asigner.kidpython.compiler.Token.Type.GT;
 import static com.asigner.kidpython.compiler.Token.Type.IDENT;
 import static com.asigner.kidpython.compiler.Token.Type.IF;
 import static com.asigner.kidpython.compiler.Token.Type.IN;
+import static com.asigner.kidpython.compiler.Token.Type.LBRACE;
 import static com.asigner.kidpython.compiler.Token.Type.LBRACK;
 import static com.asigner.kidpython.compiler.Token.Type.LE;
 import static com.asigner.kidpython.compiler.Token.Type.LPAREN;
@@ -35,6 +36,7 @@ import static com.asigner.kidpython.compiler.Token.Type.NE;
 import static com.asigner.kidpython.compiler.Token.Type.NUM_LIT;
 import static com.asigner.kidpython.compiler.Token.Type.OR;
 import static com.asigner.kidpython.compiler.Token.Type.PLUS;
+import static com.asigner.kidpython.compiler.Token.Type.RBRACE;
 import static com.asigner.kidpython.compiler.Token.Type.RBRACK;
 import static com.asigner.kidpython.compiler.Token.Type.REPEAT;
 import static com.asigner.kidpython.compiler.Token.Type.RETURN;
@@ -151,17 +153,28 @@ public class Parser {
 
     private void ifStmt() {
         match(IF);
-        ExprNode expr = expr();
+        expr();
         match(THEN);
         stmtBlock();
-        while (lookahead.getType() == ELSEIF) {
-            match(ELSEIF);
-            expr();
-            match(THEN);
-            stmtBlock();
-        }
-        if (lookahead.getType() == ELSE) {
-            stmtBlock();
+        for (;;) {
+            if (lookahead.getType() == ELSE) {
+                // ELSE IF or just ELSE
+                match(ELSE);
+                if (lookahead.getType() == IF) {
+                    // ELSE IF: stay in loop
+                    match(IF);
+                    expr();
+                    match(THEN);
+                    stmtBlock();
+                } else {
+                    // terminating ELSE. break out of loop afterwards
+                    stmtBlock();
+                    break;
+                }
+            } else {
+                // Neither ELSE IF nor ELSE: break out of loop
+                break;
+            }
         }
         match(END);
     }
@@ -253,7 +266,7 @@ public class Parser {
         match(FUNC);
         match(IDENT);
         match(LPAREN);
-        optIdentList();;
+        optIdentList();
         match(RPAREN);
         funcBody();
     }
@@ -321,6 +334,17 @@ public class Parser {
                 }
                 match(RBRACK);
                 break;
+            case LBRACE:
+                match(LBRACE);
+                if (lookahead.getType() != RBRACE) {
+                    mapEntry();
+                    while (lookahead.getType() == COMMA) {
+                        match(COMMA);
+                        mapEntry();
+                    }
+                }
+                match(RBRACK);
+                break;
             case IDENT:
                 match(IDENT);
                 while (SELECTOR_OR_CALL_START_SET.contains(lookahead.getType())) {
@@ -361,6 +385,12 @@ public class Parser {
                 match(IDENT);
             }
         }
+    }
+
+    private void mapEntry() {
+        expr();
+        match(COLON);
+        expr();
     }
 
     private ExprNode rightMergeNodes(List<ExprNode> nodes, BiFunction<ExprNode, ExprNode, ExprNode> merger) {
