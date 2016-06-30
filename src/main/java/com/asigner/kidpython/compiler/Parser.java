@@ -1,9 +1,13 @@
 package com.asigner.kidpython.compiler;
 
+import com.asigner.kidpython.compiler.ast.BoolNode;
 import com.asigner.kidpython.compiler.ast.ExprNode;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import java.util.List;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 import static com.asigner.kidpython.compiler.Token.Type.AND;
 import static com.asigner.kidpython.compiler.Token.Type.ASTERISK;
@@ -255,23 +259,26 @@ public class Parser {
     }
 
     private ExprNode expr() {
-        ExprNode left = andExpr();
+        List<ExprNode> nodes = Lists.newArrayList();
+        nodes.add(andExpr());
         while(lookahead.getType() == AND) {
-
             match(AND);
-            ExprNode right = andExpr();
+            nodes.add(andExpr());
         }
+        return rightMergeNodes(nodes, (l, r) -> new BoolNode(l.getPos(), BoolNode.Op.AND, l, r));
     }
 
-    private void andExpr() {
-        orExpr();
+    private ExprNode andExpr() {
+        List<ExprNode> nodes = Lists.newArrayList();
+        nodes.add(orExpr());
         while(lookahead.getType() == OR) {
             match(OR);
-            orExpr();
+            nodes.add(orExpr());
         }
+        return rightMergeNodes(nodes, (l, r) -> new BoolNode(l.getPos(), BoolNode.Op.OR, l, r));
     }
 
-    private void orExpr() {
+    private ExprNode orExpr() {
         arithExpr();
         if(RELOPS.contains(lookahead.getType())) {
             match(lookahead.getType());
@@ -279,7 +286,7 @@ public class Parser {
         }
     }
 
-    private void arithExpr() {
+    private ExprNode arithExpr() {
         factor();
         while (lookahead.getType() == ASTERISK || lookahead.getType() == SLASH) {
             match(lookahead.getType());
@@ -287,7 +294,7 @@ public class Parser {
         }
     }
 
-    private void factor() {
+    private ExprNode factor() {
         term();
         while (lookahead.getType() == PLUS || lookahead.getType() == MINUS) {
             match(lookahead.getType());
@@ -295,7 +302,7 @@ public class Parser {
         }
     }
 
-    private void term() {
+    private ExprNode term() {
         switch (lookahead.getType()) {
             case NUM_LIT:
                 match(NUM_LIT);
@@ -355,4 +362,16 @@ public class Parser {
             }
         }
     }
+
+    private ExprNode rightMergeNodes(List<ExprNode> nodes, BiFunction<ExprNode, ExprNode, ExprNode> merger) {
+        while (nodes.size() > 1) {
+            ExprNode left = nodes.get(nodes.size() - 2);
+            ExprNode right = nodes.get(nodes.size() - 1);
+            ExprNode newNode = merger.apply(left, right);;
+            nodes.set(nodes.size() - 2, newNode);
+            nodes.remove(nodes.size() - 1);
+        }
+        return nodes.get(0);
+    }
+
 }

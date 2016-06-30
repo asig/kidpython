@@ -48,6 +48,40 @@ public class Value {
                 (funcVal != null ? 1 : 0) == 1);
     }
 
+    public boolean asBool() {
+        switch (type) {
+            case BOOLEAN: return boolVal;
+            case NUMBER: return numVal.compareTo(BigDecimal.ZERO) != 0;
+            case FUNCTION: return true;
+            case STRING: return !strVal.isEmpty();
+        }
+        throw new IllegalStateException("Can't happen");
+    }
+
+    public String asString() {
+        switch (type) {
+            case BOOLEAN: return boolVal.toString();
+            case NUMBER: return numVal.toString();
+            case FUNCTION: return "func";
+            case STRING: return strVal;
+        }
+        throw new IllegalStateException("Can't happen");
+    }
+
+    public BigDecimal asNumber() {
+        switch (type) {
+            case BOOLEAN: return boolVal ? BigDecimal.ONE : BigDecimal.ZERO;
+            case NUMBER: return numVal;
+            case FUNCTION: return new BigDecimal(funcVal.hashCode());
+            case STRING: try {
+                return new BigDecimal(strVal);
+            } catch (NumberFormatException e) {
+                return BigDecimal.ZERO;
+            }
+        }
+        throw new IllegalStateException("Can't happen");
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -68,4 +102,5 @@ public class Value {
         }
         return builder.toString();
     }
+
 }

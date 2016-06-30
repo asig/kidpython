@@ -5,7 +5,7 @@ import com.asigner.kidpython.compiler.runtime.Value;
 
 public class BoolNode extends ExprNode {
 
-    enum Op {
+    public enum Op {
         AND, OR
     }
 
@@ -22,18 +22,25 @@ public class BoolNode extends ExprNode {
 
     @Override
     public Value eval() {
+        boolean val;
         switch(op) {
             case AND:
                 // "IF !A THEN FALSE ELSE B"
-                Value val = left.eval();
-                
-                break;
+                val = left.eval().asBool();
+                if (!val) {
+                    return Value.of(false);
+                } else {
+                    return Value.of(right.eval().asBool());
+                }
             case OR:
                 // "IF A THEN TRUE ELSE B"
-                break;
+                val = left.eval().asBool();
+                if (val) {
+                    return Value.of(true);
+                } else {
+                    return Value.of(right.eval().asBool());
+                }
         }
-
-        //
-        return null;
+        throw new IllegalStateException("Can't happen");
     }
 }
