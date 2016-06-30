@@ -1,6 +1,7 @@
 package com.asigner.kidpython.controls;
 
 import com.asigner.kidpython.Settings;
+import com.asigner.kidpython.controls.editor.CodeEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;

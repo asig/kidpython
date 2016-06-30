@@ -1,7 +1,9 @@
 package com.asigner.kidpython.compiler;
 
+import com.asigner.kidpython.compiler.ast.ArithOpNode;
 import com.asigner.kidpython.compiler.ast.BoolNode;
 import com.asigner.kidpython.compiler.ast.ExprNode;
+import com.asigner.kidpython.compiler.ast.RelOpNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -48,6 +50,8 @@ import static com.asigner.kidpython.compiler.Token.Type.THEN;
 import static com.asigner.kidpython.compiler.Token.Type.TO;
 import static com.asigner.kidpython.compiler.Token.Type.UNTIL;
 import static com.asigner.kidpython.compiler.Token.Type.WHILE;
+import static com.asigner.kidpython.compiler.ast.ArithOpNode.Op.DIV;
+import static com.asigner.kidpython.compiler.ast.ArithOpNode.Op.MUL;
 
 public class Parser {
 
@@ -272,39 +276,53 @@ public class Parser {
     }
 
     private ExprNode expr() {
-        List<ExprNode> nodes = Lists.newArrayList();
-        nodes.add(andExpr());
+        ExprNode node = andExpr();
         while(lookahead.getType() == AND) {
             match(AND);
-            nodes.add(andExpr());
+            ExprNode node2 = andExpr();
+            node = new BoolNode(node.getPos(), BoolNode.Op.AND, node, node2);
         }
-        return rightMergeNodes(nodes, (l, r) -> new BoolNode(l.getPos(), BoolNode.Op.AND, l, r));
+        return node;
     }
 
     private ExprNode andExpr() {
-        List<ExprNode> nodes = Lists.newArrayList();
-        nodes.add(orExpr());
+        ExprNode node = orExpr();
         while(lookahead.getType() == OR) {
             match(OR);
-            nodes.add(orExpr());
+            ExprNode node2 = orExpr();
+            node = new BoolNode(node.getPos(), BoolNode.Op.OR, node, node2);
         }
-        return rightMergeNodes(nodes, (l, r) -> new BoolNode(l.getPos(), BoolNode.Op.OR, l, r));
+        return node;
     }
 
     private ExprNode orExpr() {
-        arithExpr();
+        ExprNode node = arithExpr();
         if(RELOPS.contains(lookahead.getType())) {
+            RelOpNode.Op op = null;
+            switch (lookahead.getType()) {
+                case EQ: op = RelOpNode.Op.EQ; break;
+                case NE: op = RelOpNode.Op.NE; break;
+                case LE: op = RelOpNode.Op.LE; break;
+                case LT: op = RelOpNode.Op.LT; break;
+                case GE: op = RelOpNode.Op.GE; break;
+                case GT: op = RelOpNode.Op.GT; break;
+            }
             match(lookahead.getType());
-            arithExpr();
+            ExprNode node2 = arithExpr();
+            node = new RelOpNode(node.getPos(), op, node, node2);
         }
+        return node;
     }
 
     private ExprNode arithExpr() {
-        factor();
+        ExprNode node = factor();
         while (lookahead.getType() == ASTERISK || lookahead.getType() == SLASH) {
+            ArithOpNode.Op op = lookahead.getType() == ASTERISK ? MUL : DIV;
             match(lookahead.getType());
-            factor();
+            ExprNode node2 = factor();
+            node = new ArithOpNode(node.getPos(), op, node, node2);
         }
+        return node;
     }
 
     private ExprNode factor() {
@@ -313,6 +331,7 @@ public class Parser {
             match(lookahead.getType());
             term();
         }
+        return null;
     }
 
     private ExprNode term() {
@@ -368,6 +387,7 @@ public class Parser {
             default:
                 error(Error.unexpectedToken(lookahead, TERM_START_SET));
         }
+        return null;
     }
 
     private void funcBody() {

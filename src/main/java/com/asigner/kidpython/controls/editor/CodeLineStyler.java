@@ -1,4 +1,4 @@
-package com.asigner.kidpython.controls;
+package com.asigner.kidpython.controls.editor;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -7,16 +7,27 @@ import org.eclipse.swt.custom.LineStyleEvent;
 import org.eclipse.swt.custom.LineStyleListener;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.asigner.kidpython.controls.editor.CodeLineStyler.Token.COMMENT;
+import static com.asigner.kidpython.controls.editor.CodeLineStyler.Token.EOF;
+import static com.asigner.kidpython.controls.editor.CodeLineStyler.Token.IDENT;
+import static com.asigner.kidpython.controls.editor.CodeLineStyler.Token.KEYWORD;
+import static com.asigner.kidpython.controls.editor.CodeLineStyler.Token.NUMBER;
+import static com.asigner.kidpython.controls.editor.CodeLineStyler.Token.OTHER;
+import static com.asigner.kidpython.controls.editor.CodeLineStyler.Token.STRING;
+import static com.asigner.kidpython.controls.editor.CodeLineStyler.Token.WHITESPACE;
+
 public class CodeLineStyler implements LineStyleListener {
+
+    private Stylesheet stylesheet;
+    private CodeScanner scanner;
+    private List<Range> multiLineComments;
 
     private static class Range {
         int start;
@@ -46,37 +57,25 @@ public class CodeLineStyler implements LineStyleListener {
         }
     }
 
-    PythonScanner scanner = new PythonScanner();
-    int[] tokenColors;
-    Color[] colors;
-    List<Range> multiLineComments = new ArrayList<>();
-
-    public static final int EOF = -1;
-    public static final int EOL = 10;
-
-    public static final int WORD=		0;
-    public static final int WHITE=		1;
-    public static final int KEYWORD =			2;
-    public static final int COMMENT=		3;
-    public static final int STRING=		5;
-    public static final int OTHER=		6;
-    public static final int NUMBER=		7;
-
-    public static final int MAXIMUM_TOKEN= 8;
-
-    public CodeLineStyler() {
-        initializeColors();
-        scanner = new PythonScanner();
+    public enum Token {
+        IDENT,
+        KEYWORD,
+        COMMENT,
+        STRING,
+        NUMBER,
+        OTHER,
+        WHITESPACE,
+        EOF
     }
 
-    Color getColor(int type) {
-        if (type < 0 || type >= tokenColors.length) {
-            return null;
-        }
-        return colors[tokenColors[type]];
+
+    public CodeLineStyler(Stylesheet stylesheet) {
+        this.stylesheet = stylesheet;
+        scanner = new CodeScanner();
+        multiLineComments = new ArrayList<>();
     }
 
-    Range findMultiLineComment(int pos) {
+    private Range findMultiLineComment(int pos) {
         for (Range r : multiLineComments) {
             if (r.contains(pos)) {
                 return r;
@@ -85,28 +84,8 @@ public class CodeLineStyler implements LineStyleListener {
         return null;
     }
 
-    void initializeColors() {
-        Display display = Display.getDefault();
-        colors= new Color[] {
-                new Color(display, new RGB(0, 0, 0)),		// black
-                new Color(display, new RGB(255, 0, 0)),	// red
-                new Color(display, new RGB(0, 255, 0)),	// green
-                new Color(display, new RGB(0,   0, 255))	// blue
-        };
-        tokenColors= new int[MAXIMUM_TOKEN];
-        tokenColors[WORD]=		0;
-        tokenColors[WHITE]=		0;
-        tokenColors[KEYWORD]=		3;
-        tokenColors[COMMENT]=	1;
-        tokenColors[STRING]= 	2;
-        tokenColors[OTHER]=		0;
-        tokenColors[NUMBER]=	1;
-    }
-
-    void disposeColors() {
-        for (int i=0;i<colors.length;i++) {
-            colors[i].dispose();
-        }
+    void dispose() {
+        this.stylesheet.dispose();
     }
 
     /**
@@ -118,7 +97,7 @@ public class CodeLineStyler implements LineStyleListener {
     @Override
     public void lineGetStyle(LineStyleEvent event) {
         List<StyleRange> styles = new ArrayList<>();
-        int token;
+        Token token;
         StyleRange lastStyle;
 
         Color defaultFgColor = ((Control)event.widget).getForeground();
@@ -127,38 +106,33 @@ public class CodeLineStyler implements LineStyleListener {
         while (token != EOF) {
             if (token == OTHER) {
                 // do nothing for non-colored tokens
-            } else if (token != WHITE) {
-                Color color = getColor(token);
-                // Only create a style if the token color is different than the
-                // widget's default foreground color and the token's style is not
-                // bold.  Keywords are bolded.
-                if ((!color.equals(defaultFgColor)) || (token == KEYWORD)) {
-                    StyleRange style = new StyleRange(scanner.getStartOffset() + event.lineOffset, scanner.getLength(), color, null);
-                    if (token == KEYWORD) {
-                        style.fontStyle = SWT.BOLD;
+            } else if (token == WHITESPACE) {
+                // Whitespace take over the previous style to reduce the number of style changes
+                if (styles.size() > 0) {
+                    int start = scanner.getStartOffset() + event.lineOffset;
+                    lastStyle = styles.get(styles.size() - 1);
+                    if (lastStyle.start + lastStyle.length == start) {
+                        lastStyle.length += scanner.getLength();
                     }
+                }
+            } else {
+                Stylesheet.Style s = stylesheet.getStyle(token);
+                // Only create a style if the token color is different than the
+                // widget's default foreground color and the token's style is bold or italic
+                if (!s.getFg().equals(defaultFgColor) || s.getFontStyle() != SWT.NONE) {
+                    StyleRange style = new StyleRange(scanner.getStartOffset() + event.lineOffset, scanner.getLength(), s.getFg(), s.getBg());
+                    style.fontStyle = s.getFontStyle();
                     if (styles.isEmpty()) {
                         styles.add(style);
                     } else {
                         // Merge similar styles.  Doing so will improve performance.
-                        lastStyle = styles.get(styles.size()-1);
+                        lastStyle = styles.get(styles.size() - 1);
                         if (lastStyle.similarTo(style) && (lastStyle.start + lastStyle.length == style.start)) {
                             lastStyle.length += style.length;
                         } else {
                             styles.add(style);
                         }
                     }
-                }
-            } else if ((!styles.isEmpty()) && ((lastStyle=styles.get(styles.size()-1)).fontStyle == SWT.BOLD)) {
-                int start = scanner.getStartOffset() + event.lineOffset;
-                lastStyle = styles.get(styles.size() - 1);
-                // A font style of SWT.BOLD implies that the last style
-                // represents a java keyword.
-                if (lastStyle.start + lastStyle.length == start) {
-                    // Have the white space take on the style before it to
-                    // minimize the number of style ranges created and the
-                    // number of font style changes during rendering.
-                    lastStyle.length += scanner.getLength();
                 }
             }
             token= scanner.nextToken();
@@ -207,7 +181,7 @@ public class CodeLineStyler implements LineStyleListener {
     /**
      * A simple fuzzy scanner for Python
      */
-    public class PythonScanner {
+    private class CodeScanner {
 
         protected StringBuffer buffer = new StringBuffer();
         private int offset;
@@ -267,7 +241,7 @@ public class CodeLineStyler implements LineStyleListener {
         /**
          * Returns the next lexical token in the document.
          */
-        public int nextToken() {
+        public Token nextToken() {
             int c;
             int sep;
             startToken = pos;
@@ -278,14 +252,14 @@ public class CodeLineStyler implements LineStyleListener {
             }
             while (true) {
                 switch (c= read()) {
-                    case EOF:
+                    case -1:
                         return EOF;
                     case '/': {
                         int c2 = read();
                         if (c2 == '/') {
                             while (true) {
                                 c= read();
-                                if ((c == EOF) || (c == EOL)) {
+                                if ((c == -1) || (c == '\n')) {
                                     unread(c);
                                     return COMMENT;
                                 }
@@ -302,7 +276,7 @@ public class CodeLineStyler implements LineStyleListener {
                             c= read();
                             if (c == sep) {
                                 return STRING;
-                            } else if (c == EOF) {
+                            } else if (c == -1) {
                                 unread(c);
                                 return STRING;
                             } else if (c == '\\') {
@@ -319,7 +293,7 @@ public class CodeLineStyler implements LineStyleListener {
                                 c= read();
                             } while(Character.isWhitespace((char)c));
                             unread(c);
-                            return WHITE;
+                            return WHITESPACE;
                         }
                         if (Character.isJavaIdentifierStart((char)c)) {
                             buffer.setLength(0);
@@ -331,7 +305,7 @@ public class CodeLineStyler implements LineStyleListener {
                             if (keywords.contains(buffer.toString())) {
                                 return KEYWORD;
                             } else {
-                                return WORD;
+                                return IDENT;
                             }
                         }
                         return OTHER;
@@ -339,7 +313,7 @@ public class CodeLineStyler implements LineStyleListener {
             }
         }
 
-        private int readNumber() {
+        private Token readNumber() {
             int c = read();
             while (Character.isDigit(c)) {
                 c = read();
@@ -364,7 +338,7 @@ public class CodeLineStyler implements LineStyleListener {
             if (pos <= end) {
                 return text.charAt(pos++);
             }
-            return EOF;
+            return -1;
         }
 
         public void setRange(int offset, String text) {
@@ -375,7 +349,7 @@ public class CodeLineStyler implements LineStyleListener {
         }
 
         protected void unread(int c) {
-            if (c != EOF)
+            if (c != -1)
                 pos--;
         }
     }

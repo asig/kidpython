@@ -1,6 +1,6 @@
 // Copyright 2016 Andreas Signer. All rights reserved.
 
-package com.asigner.kidpython.controls;
+package com.asigner.kidpython.controls.editor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -8,13 +8,15 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 
 public class CodeEditor extends StyledText {
 
-    static class State {
+    public static class State {
         private int caretOfs = 0;
         private String text = "";
         private Point selection = new Point(0,0);
@@ -30,6 +32,11 @@ public class CodeEditor extends StyledText {
     public CodeEditor(Composite parent, int style) {
         super(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 
+        Stylesheet stylesheet = new Stylesheet();
+        lineStyler = new CodeLineStyler(stylesheet);
+
+        this.setBackground(stylesheet.getDefaultBackground());
+
         font = new Font(parent.getDisplay(), "Mono", 10, SWT.NONE);
         this.addDisposeListener(new DisposeListener() {
             @Override
@@ -38,7 +45,6 @@ public class CodeEditor extends StyledText {
             }
         });
 
-        lineStyler = new CodeLineStyler();
         addLineStyleListener(lineStyler);
         setFont(font);
         addModifyListener(new ModifyListener() {
