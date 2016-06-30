@@ -13,7 +13,6 @@ public class Scanner {
             .put("end", Token.Type.END)
             .put("if", Token.Type.IF)
             .put("then", Token.Type.THEN)
-            .put("elseif", Token.Type.ELSEIF)
             .put("else", Token.Type.ELSE)
             .put("step", Token.Type.STEP)
             .put("in", Token.Type.IN)

@@ -51,7 +51,7 @@ public class ScannerTest {
 
     @Test
     public void testToken() throws Exception {
-        Scanner scanner = new Scanner("func for to end if then elseif else step in do while repeat until return and or ()[]+-*/= <> < <= > >= , . 1 12. 12.34 abc a2b \"foo\" 'bar'");
+        Scanner scanner = new Scanner("func for to end if then else step in do while repeat until return and or ()[]+-*/= <> < <= > >= , . 1 12. 12.34 abc a2b \"foo\" 'bar'");
         Token t;
         t = scanner.next(); assertEquals(Token.Type.FUNC, t.getType());
         t = scanner.next(); assertEquals(Token.Type.FOR, t.getType());
@@ -59,7 +59,6 @@ public class ScannerTest {
         t = scanner.next(); assertEquals(Token.Type.END, t.getType());
         t = scanner.next(); assertEquals(Token.Type.IF, t.getType());
         t = scanner.next(); assertEquals(Token.Type.THEN, t.getType());
-        t = scanner.next(); assertEquals(Token.Type.ELSEIF, t.getType());
         t = scanner.next(); assertEquals(Token.Type.ELSE, t.getType());
         t = scanner.next(); assertEquals(Token.Type.STEP, t.getType());
         t = scanner.next(); assertEquals(Token.Type.IN, t.getType());

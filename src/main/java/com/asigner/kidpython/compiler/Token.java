@@ -7,7 +7,6 @@ public class Token {
         END,
         IF,
         THEN,
-        ELSEIF,
         ELSE,
         FOR,
         STEP,

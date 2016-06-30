@@ -148,14 +148,25 @@ public class Parser {
         expr();
         match(THEN);
         stmtBlock();
-        while (lookahead.getType() == ELSEIF) {
-            match(ELSEIF);
-            expr();
-            match(THEN);
-            stmtBlock();
-        }
-        if (lookahead.getType() == ELSE) {
-            stmtBlock();
+        for (;;) {
+            if (lookahead.getType() == ELSE) {
+                // ELSE IF or just ELSE
+                match(ELSE);
+                if (lookahead.getType() == IF) {
+                    // ELSE IF: stay in loop
+                    match(IF);
+                    expr();
+                    match(THEN);
+                    stmtBlock();
+                } else {
+                    // terminating ELSE. break out of loop afterwards
+                    stmtBlock();
+                    break;
+                }
+            } else {
+                // Neither ELSE IF nor ELSE: break out of loop
+                break;
+            }
         }
         match(END);
     }
