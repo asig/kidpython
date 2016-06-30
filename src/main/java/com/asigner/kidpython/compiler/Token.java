@@ -28,8 +28,11 @@ public class Token {
         RPAREN,
         LBRACK,
         RBRACK,
+        LBRACE,
+        RBRACE,
         COMMA,
         DOT,
+        COLON,
 
         EQ,
         NE,
