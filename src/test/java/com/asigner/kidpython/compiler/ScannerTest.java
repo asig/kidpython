@@ -11,41 +11,47 @@ public class ScannerTest {
         Scanner scanner = new Scanner("FOO\nBAR\n");
         char c;
 
-        c = scanner.getch(); assertEquals('F', c); assertEquals(1, scanner.getCol()); assertEquals(1, scanner.getLine());
-        c = scanner.getch(); assertEquals('O', c); assertEquals(2, scanner.getCol()); assertEquals(1, scanner.getLine());
-        c = scanner.getch(); assertEquals('O', c); assertEquals(3, scanner.getCol()); assertEquals(1, scanner.getLine());
-        c = scanner.getch(); assertEquals('\n', c); assertEquals(4, scanner.getCol()); assertEquals(1, scanner.getLine());
-        scanner.ungetch(); assertEquals(3, scanner.getCol()); assertEquals(1, scanner.getLine());
-        scanner.ungetch(); assertEquals(2, scanner.getCol()); assertEquals(1, scanner.getLine());
-        scanner.ungetch(); assertEquals(1, scanner.getCol()); assertEquals(1, scanner.getLine());
-        scanner.ungetch(); assertEquals(0, scanner.getCol()); assertEquals(1, scanner.getLine());
+        c = scanner.getch(); assertEquals('F', c); checkPos(scanner, 1, 1);
+        c = scanner.getch(); assertEquals('O', c); checkPos(scanner, 1, 2);
+        c = scanner.getch(); assertEquals('O', c); checkPos(scanner, 1, 3);
+        c = scanner.getch(); assertEquals('\n', c); checkPos(scanner, 1, 4);
+        scanner.ungetch(); checkPos(scanner, 1, 3);
+        scanner.ungetch(); checkPos(scanner, 1, 2);
+        scanner.ungetch(); checkPos(scanner, 1, 1);
+        scanner.ungetch(); checkPos(scanner, 1, 0);
 
-        c = scanner.getch(); assertEquals('F', c); assertEquals(1, scanner.getCol()); assertEquals(1, scanner.getLine());
-        c = scanner.getch(); assertEquals('O', c); assertEquals(2, scanner.getCol()); assertEquals(1, scanner.getLine());
-        c = scanner.getch(); assertEquals('O', c); assertEquals(3, scanner.getCol()); assertEquals(1, scanner.getLine());
-        c = scanner.getch(); assertEquals('\n', c); assertEquals(4, scanner.getCol()); assertEquals(1, scanner.getLine());
-        c = scanner.getch(); assertEquals('B', c); assertEquals(1, scanner.getCol()); assertEquals(2, scanner.getLine());
-        c = scanner.getch(); assertEquals('A', c); assertEquals(2, scanner.getCol()); assertEquals(2, scanner.getLine());
-        c = scanner.getch(); assertEquals('R', c); assertEquals(3, scanner.getCol()); assertEquals(2, scanner.getLine());
-        c = scanner.getch(); assertEquals('\n', c); assertEquals(4, scanner.getCol()); assertEquals(2, scanner.getLine());
-        c = scanner.getch(); assertEquals('\0', c); assertEquals(1, scanner.getCol()); assertEquals(3, scanner.getLine());
-        c = scanner.getch(); assertEquals('\0', c); assertEquals(2, scanner.getCol()); assertEquals(3, scanner.getLine());
-        scanner.ungetch(); assertEquals(1, scanner.getCol()); assertEquals(3, scanner.getLine());
-        scanner.ungetch(); assertEquals(4, scanner.getCol()); assertEquals(2, scanner.getLine());
-        scanner.ungetch(); assertEquals(3, scanner.getCol()); assertEquals(2, scanner.getLine());
-        scanner.ungetch(); assertEquals(2, scanner.getCol()); assertEquals(2, scanner.getLine());
-        scanner.ungetch(); assertEquals(1, scanner.getCol()); assertEquals(2, scanner.getLine());
-        scanner.ungetch(); assertEquals(4, scanner.getCol()); assertEquals(1, scanner.getLine());
-        scanner.ungetch(); assertEquals(3, scanner.getCol()); assertEquals(1, scanner.getLine());
-        scanner.ungetch(); assertEquals(2, scanner.getCol()); assertEquals(1, scanner.getLine());
-        scanner.ungetch(); assertEquals(1, scanner.getCol()); assertEquals(1, scanner.getLine());
-        scanner.ungetch(); assertEquals(0, scanner.getCol()); assertEquals(1, scanner.getLine());
-        c = scanner.getch(); assertEquals('F', c); assertEquals(1, scanner.getCol()); assertEquals(1, scanner.getLine());
+        c = scanner.getch(); assertEquals('F', c); checkPos(scanner, 1, 1);
+        c = scanner.getch(); assertEquals('O', c); checkPos(scanner, 1, 2);
+        c = scanner.getch(); assertEquals('O', c); checkPos(scanner, 1, 3);
+        c = scanner.getch(); assertEquals('\n', c); checkPos(scanner, 1, 4);
+        c = scanner.getch(); assertEquals('B', c); checkPos(scanner, 2, 1);
+        c = scanner.getch(); assertEquals('A', c); checkPos(scanner, 2, 2);
+        c = scanner.getch(); assertEquals('R', c); checkPos(scanner, 2, 3);
+        c = scanner.getch(); assertEquals('\n', c); checkPos(scanner, 2, 4);
+        c = scanner.getch(); assertEquals('\0', c); checkPos(scanner, 3, 1);
+        c = scanner.getch(); assertEquals('\0', c); checkPos(scanner, 3, 2);
+        scanner.ungetch(); checkPos(scanner, 3, 1);
+        scanner.ungetch(); checkPos(scanner, 2, 4);
+        scanner.ungetch(); checkPos(scanner, 2, 3);
+        scanner.ungetch(); checkPos(scanner, 2, 2);
+        scanner.ungetch(); checkPos(scanner, 2, 1);
+        scanner.ungetch(); checkPos(scanner, 1, 4);
+        scanner.ungetch(); checkPos(scanner, 1, 3);
+        scanner.ungetch(); checkPos(scanner, 1, 2);
+        scanner.ungetch(); checkPos(scanner, 1, 1);
+        scanner.ungetch(); checkPos(scanner, 1, 0);
+        c = scanner.getch(); assertEquals('F', c); checkPos(scanner, 1, 1);
+    }
+
+    private void checkPos(Scanner scanner, int line, int col) {
+        Position p = scanner.getPos();
+        assertEquals(line, p.getLine());
+        assertEquals(col, p.getCol());
     }
 
     @Test
     public void testToken() throws Exception {
-        Scanner scanner = new Scanner("func for to end if then elseif else step in do while repeat until return and or ()[]+-*/= <> < <= > >= , 1 12. 12.34 abc a2b \"foo\" 'bar'");
+        Scanner scanner = new Scanner("func for to end if then elseif else step in do while repeat until return and or ()[]+-*/= <> < <= > >= , . 1 12. 12.34 abc a2b \"foo\" 'bar'");
         Token t;
         t = scanner.next(); assertEquals(Token.Type.FUNC, t.getType());
         t = scanner.next(); assertEquals(Token.Type.FOR, t.getType());
@@ -79,6 +85,7 @@ public class ScannerTest {
         t = scanner.next(); assertEquals(Token.Type.GT, t.getType());
         t = scanner.next(); assertEquals(Token.Type.GE, t.getType());
         t = scanner.next(); assertEquals(Token.Type.COMMA, t.getType());
+        t = scanner.next(); assertEquals(Token.Type.DOT, t.getType());
 
         t = scanner.next(); assertEquals(Token.Type.NUM_LIT, t.getType());  assertEquals("1", t.getValue());
         t = scanner.next(); assertEquals(Token.Type.NUM_LIT, t.getType());  assertEquals("12.", t.getValue());

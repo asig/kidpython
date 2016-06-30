@@ -30,6 +30,7 @@ public class Token {
         LBRACK,
         RBRACK,
         COMMA,
+        DOT,
 
         EQ,
         NE,
@@ -47,26 +48,21 @@ public class Token {
     }
 
     private final Type type;
-    private final int line, col;
+    private final Position pos;
     private final String val;
 
-    Token(Type t, int line, int col) {
-        this(t, line, col, "");
+    Token(Type t, Position pos) {
+        this(t, pos, "");
     }
 
-    Token(Type t, int line, int col, String val) {
+    Token(Type t, Position pos, String val) {
         this.type = t;
-        this.line = line;
-        this.col = col;
+        this.pos = pos;
         this.val = val;
     }
 
-    public int getCol() {
-        return col;
-    }
-
-    public int getLine() {
-        return line;
+    public Position getPos() {
+        return pos;
     }
 
     public Type getType() {

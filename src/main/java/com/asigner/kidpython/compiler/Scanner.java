@@ -70,8 +70,7 @@ public class Scanner {
             }
         }
 
-        int col = this.getCol();
-        int line = this.getLine();
+        Position pos = getPos();
         if (Character.isLetter(c)) {
             // Ident or keyword
             StringBuffer b = new StringBuffer();
@@ -82,7 +81,7 @@ public class Scanner {
             ungetch();
             String val = b.toString();
             Token.Type t = keywords.get(val);
-            return new Token(t == null ? Token.Type.IDENT : t, line, col, val);
+            return new Token(t == null ? Token.Type.IDENT : t, pos, val);
         } else if (Character.isDigit(c)) {
             StringBuffer b = new StringBuffer();
             while(Character.isDigit(c)) {
@@ -98,7 +97,7 @@ public class Scanner {
                 }
             }
             ungetch();
-            return new Token(Token.Type.NUM_LIT, line, col, b.toString());
+            return new Token(Token.Type.NUM_LIT, getPos(), b.toString());
         } else {
             switch(c) {
                 case '"':
@@ -110,41 +109,42 @@ public class Scanner {
                         b.append(c);
                         c = getch();
                     }
-                    return new Token(Token.Type.STRING_LIT, line, col, b.toString());
+                    return new Token(Token.Type.STRING_LIT, pos, b.toString());
                 }
-                case '(': return new Token(Token.Type.LPAREN, line, col);
-                case ')': return new Token(Token.Type.RPAREN, line, col);
-                case '[': return new Token(Token.Type.LBRACK, line, col);
-                case ']': return new Token(Token.Type.RBRACK, line, col);
-                case '+': return new Token(Token.Type.PLUS, line, col);
-                case '-': return new Token(Token.Type.MINUS, line, col);
-                case '*': return new Token(Token.Type.ASTERISK, line, col);
-                case '/': return new Token(Token.Type.SLASH, line, col);
+                case '(': return new Token(Token.Type.LPAREN, pos);
+                case ')': return new Token(Token.Type.RPAREN, pos);
+                case '[': return new Token(Token.Type.LBRACK, pos);
+                case ']': return new Token(Token.Type.RBRACK, pos);
+                case '+': return new Token(Token.Type.PLUS, pos);
+                case '-': return new Token(Token.Type.MINUS, pos);
+                case '*': return new Token(Token.Type.ASTERISK, pos);
+                case '/': return new Token(Token.Type.SLASH, pos);
                 case '<': {
                     char c2 = getch();
                     if (c2 == '=') {
-                        return new Token(Token.Type.LE, line, col);
+                        return new Token(Token.Type.LE, pos);
                     } else if (c2 == '>') {
-                        return new Token(Token.Type.NE, line, col);
+                        return new Token(Token.Type.NE, pos);
                     } else {
                         ungetch();
-                        return new Token(Token.Type.LT, line, col);
+                        return new Token(Token.Type.LT, pos);
                     }
                 }
                 case '>': {
                     char c2 = getch();
                     if (c2 == '=') {
-                        return new Token(Token.Type.GE, line, col);
+                        return new Token(Token.Type.GE, pos);
                     } else {
                         ungetch();
-                        return new Token(Token.Type.GT, line, col);
+                        return new Token(Token.Type.GT, pos);
                     }
                 }
-                case '=': return new Token(Token.Type.EQ, line, col);
-                case ',': return new Token(Token.Type.COMMA, line, col);
-                case 0: return new Token(Token.Type.EOT, line, col);
+                case '=': return new Token(Token.Type.EQ, pos);
+                case ',': return new Token(Token.Type.COMMA, pos);
+                case '.': return new Token(Token.Type.DOT, pos);
+                case 0: return new Token(Token.Type.EOT, pos);
             }
-            return new Token(Token.Type.UNKNOWN, line, col, String.valueOf(c));
+            return new Token(Token.Type.UNKNOWN, pos, String.valueOf(c));
         }
     }
 
@@ -178,11 +178,7 @@ public class Scanner {
         }
     }
 
-    public int getCol() {
-        return col;
-    }
-
-    public int getLine() {
-        return line;
+    public Position getPos() {
+        return new Position(line, col);
     }
 }

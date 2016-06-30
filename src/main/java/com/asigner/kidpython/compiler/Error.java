@@ -10,8 +10,7 @@ public class Error {
         UNEXPECTED_TOKEN,
     }
 
-    private final int line;
-    private final int col;
+    private final Position pos;
     private final Code code;
     private final String message;
 
@@ -19,14 +18,12 @@ public class Error {
         return new Error(
                 Code.UNEXPECTED_TOKEN,
                 "Unexpected token " + token.getType() + ". Expected instead one of " + expected.stream().map(Enum::toString).collect(joining(",")),
-                token.getLine(),
-                token.getCol());
+                token.getPos());
     }
 
-    private Error(Code code, String message, int line, int col) {
+    private Error(Code code, String message, Position pos) {
         this.code = code;
         this.message = message;
-        this.line = line;
-        this.col = col;
+        this.pos = pos;
     }
 }
