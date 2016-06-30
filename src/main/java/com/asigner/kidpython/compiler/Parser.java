@@ -1,5 +1,6 @@
 package com.asigner.kidpython.compiler;
 
+import com.asigner.kidpython.compiler.ast.ExprNode;
 import com.google.common.collect.Sets;
 
 import java.util.Set;
@@ -73,6 +74,7 @@ public class Parser {
     private Set<Token.Type> TERM_START_SET = Sets.newHashSet(
             NUM_LIT,
             STRING_LIT,
+            FUNC,
             LBRACK,
             IDENT,
             LPAREN
@@ -145,7 +147,7 @@ public class Parser {
 
     private void ifStmt() {
         match(IF);
-        expr();
+        ExprNode expr = expr();
         match(THEN);
         stmtBlock();
         while (lookahead.getType() == ELSEIF) {
@@ -247,23 +249,17 @@ public class Parser {
         match(FUNC);
         match(IDENT);
         match(LPAREN);
-        if (lookahead.getType() != RPAREN) {
-            match(IDENT);
-            while (lookahead.getType() == COMMA) {
-                match(COMMA);
-                match(IDENT);
-            }
-        }
+        optIdentList();;
         match(RPAREN);
-        stmtBlock();
-        match(END);
+        funcBody();
     }
 
-    private void expr() {
-        andExpr();
+    private ExprNode expr() {
+        ExprNode left = andExpr();
         while(lookahead.getType() == AND) {
+
             match(AND);
-            andExpr();
+            ExprNode right = andExpr();
         }
     }
 
@@ -332,8 +328,31 @@ public class Parser {
                     selectorOrCall();
                 }
                 break;
+            case FUNC:
+                match(FUNC);
+                match(LPAREN);
+                optIdentList();
+                match(RPAREN);
+
             default:
                 error(Error.unexpectedToken(lookahead, TERM_START_SET));
+        }
+    }
+
+    private void funcBody() {
+        if (STMT_START_SET.contains(lookahead.getType())) {
+            stmtBlock();
+        }
+        match(END);
+    }
+
+    private void optIdentList() {
+        if (lookahead.getType() == IDENT) {
+            match(IDENT);
+            while (lookahead.getType() == COMMA) {
+                match(COMMA);
+                match(IDENT);
+            }
         }
     }
 }
