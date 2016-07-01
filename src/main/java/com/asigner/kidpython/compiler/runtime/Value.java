@@ -1,16 +1,24 @@
 package com.asigner.kidpython.compiler.runtime;
 
 import com.asigner.kidpython.compiler.ast.Node;
-import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.joining;
 
 public class Value {
     enum Type {
         BOOLEAN,
         STRING,
         FUNCTION,
-        NUMBER
+        NUMBER,
+        LIST,
+        MAP
     }
 
     private final Type type;
@@ -18,34 +26,67 @@ public class Value {
     private final String strVal;
     private final BigDecimal numVal;
     private final Node funcVal;
+    private final Map<Value, Value> mapVal;
+    private final List<Value> listVal;
 
-    public static Value of(Boolean val) {
-        return new Value(Type.BOOLEAN, val, null, null, null);
+    public Value(Boolean val) {
+        this.type = Type.BOOLEAN;
+        this.boolVal = val;
+        this.numVal = null;
+        this.strVal = null;
+        this.funcVal = null;
+        this.mapVal = null;
+        this.listVal = null;
     }
 
-    public static Value of(BigDecimal val) {
-        return new Value(Type.NUMBER, null, val, null, null);
+    public Value(BigDecimal val) {
+        this.type = Type.NUMBER;
+        this.boolVal = null;
+        this.numVal = val;
+        this.strVal = null;
+        this.funcVal = null;
+        this.mapVal = null;
+        this.listVal = null;
     }
 
-    public static Value of(String val) {
-        return new Value(Type.STRING, null, null, val, null);
+    public Value(String val) {
+        this.type = Type.STRING;
+        this.boolVal = null;
+        this.numVal = null;
+        this.strVal = val;
+        this.funcVal = null;
+        this.mapVal = null;
+        this.listVal = null;
     }
 
-    public static Value of(Node val) {
-        return new Value(Type.FUNCTION, null, null, null, val);
+    public Value(Node val) {
+        this.type = Type.FUNCTION;
+        this.boolVal = null;
+        this.numVal = null;
+        this.strVal = null;
+        this.funcVal = val;
+        this.mapVal = null;
+        this.listVal = null;
     }
 
-    private Value(Type t, Boolean boolVal, BigDecimal numVal, String strVal, Node funcVal) {
-        this.type = t;
-        this.boolVal = boolVal;
-        this.numVal = numVal;
-        this.strVal = strVal;
-        this.funcVal = funcVal;
-        Preconditions.checkState(
-                (boolVal != null ? 1 : 0) +
-                (numVal != null ? 1 : 0) +
-                (strVal != null ? 1 : 0) +
-                (funcVal != null ? 1 : 0) == 1);
+    public Value(Map<Value, Value> val) {
+        this.type = Type.MAP;
+        this.boolVal = null;
+        this.numVal = null;
+        this.strVal = null;
+        this.funcVal = null;
+        this.mapVal = val;
+        this.listVal = null;
+    }
+
+    public Value(List<Value> val) {
+        this.type = Type.LIST;
+        this.boolVal = null;
+        this.numVal = null;
+        this.strVal = null;
+        this.funcVal = null;
+        this.mapVal = null;
+        this.listVal = val;
     }
 
     public boolean asBool() {
@@ -54,6 +95,8 @@ public class Value {
             case NUMBER: return numVal.compareTo(BigDecimal.ZERO) != 0;
             case FUNCTION: return true;
             case STRING: return !strVal.isEmpty();
+            case LIST: return listVal.size() > 0;
+            case MAP: return mapVal.size() > 0;
         }
         throw new IllegalStateException("Can't happen");
     }
@@ -64,6 +107,9 @@ public class Value {
             case NUMBER: return numVal.toString();
             case FUNCTION: return "func";
             case STRING: return strVal;
+            case LIST: return "[" + listVal.stream().map(Value::asString).collect(joining(",")) + "]";
+            case MAP: return "{" + mapVal.entrySet().stream().map(e -> e.getKey().asString() + ":" + e.getValue().asString()).collect(joining(",")) + "}";
+
         }
         throw new IllegalStateException("Can't happen");
     }
@@ -78,8 +124,48 @@ public class Value {
             } catch (NumberFormatException e) {
                 return BigDecimal.ZERO;
             }
+            case LIST: throw new IllegalStateException("Can't convert List to Number");
+            case MAP: throw new IllegalStateException("Can't convert Map to Number");
         }
         throw new IllegalStateException("Can't happen");
+    }
+
+    public List<Value> asList() {
+        switch (type) {
+            case BOOLEAN:
+            case NUMBER:
+            case FUNCTION:
+            case STRING:
+                return Lists.newArrayList(this);
+            case LIST: return listVal;
+            case MAP: return mapVal.values().stream().collect(Collectors.toList());
+
+        }
+        throw new IllegalStateException("Can't happen");
+    }
+
+    public Map<Value, Value> asMap() {
+        Map<Value, Value> res = Maps.newHashMap();
+        switch (type) {
+            case BOOLEAN:
+            case NUMBER:
+            case FUNCTION:
+            case STRING:
+                res.put(new Value(BigDecimal.ZERO), this);
+                break;
+            case LIST:
+                int i = 0;
+                for (Value v : listVal) {
+                    res.put( new Value(new BigDecimal(i)), v);
+                }
+                break;
+            case MAP:
+                res.putAll(mapVal);
+                break;
+            default:
+                throw new IllegalStateException("Can't happen");
+        }
+        return res;
     }
 
     @Override
@@ -98,6 +184,12 @@ public class Value {
                 break;
             case NUMBER:
                 builder.append(numVal.toString());
+                break;
+            case LIST:
+                builder.append(listVal.toString());
+                break;
+            case MAP:
+                builder.append(mapVal.toString());
                 break;
         }
         return builder.toString();
