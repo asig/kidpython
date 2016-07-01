@@ -38,6 +38,32 @@ public class Stylesheet {
             .setStyle(CodeLineStyler.Token.COMMENT, new RGB(112, 109,  77), null, SWT.ITALIC)
             .setStyle(CodeLineStyler.Token.OTHER,   new RGB(252, 252, 251), null, SWT.NONE);
 
+    public static final Stylesheet RAINBOW = new Stylesheet("rainbow")
+            .setDefaultBackground(new RGB( 65, 67, 67))
+            .setStyle(CodeLineStyler.Token.IDENT,   new RGB(193, 200, 208), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.KEYWORD, new RGB(188, 141, 188), null, SWT.BOLD)
+            .setStyle(CodeLineStyler.Token.NUMBER,  new RGB(230, 134,  81), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.STRING,  new RGB(128, 176, 169), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.COMMENT, new RGB(138, 140, 138), null, SWT.ITALIC)
+            .setStyle(CodeLineStyler.Token.OTHER,   new RGB(193, 200, 208), null, SWT.NONE);
+
+    public static final Stylesheet DRACULA = new Stylesheet("dracula")
+            .setDefaultBackground(new RGB( 37, 38, 50))
+            .setStyle(CodeLineStyler.Token.IDENT,   new RGB(229, 229, 224), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.KEYWORD, new RGB(129, 215, 233), null, SWT.BOLD)
+            .setStyle(CodeLineStyler.Token.NUMBER,  new RGB(223, 231, 130), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.STRING,  new RGB(223, 231, 130), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.COMMENT, new RGB( 50,  97, 158), null, SWT.ITALIC)
+            .setStyle(CodeLineStyler.Token.OTHER,   new RGB(229, 229, 224), null, SWT.NONE);
+
+    public static final Stylesheet BLACK_AND_WHITE = new Stylesheet("black-and-white")
+            .setDefaultBackground(new RGB(255, 255, 255))
+            .setStyle(CodeLineStyler.Token.IDENT,   new RGB(0, 0, 0), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.KEYWORD, new RGB(0, 0, 0), null, SWT.BOLD)
+            .setStyle(CodeLineStyler.Token.NUMBER,  new RGB(0, 0, 0), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.STRING,  new RGB(0, 0, 0), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.COMMENT, new RGB(0, 0, 0), null, SWT.ITALIC)
+            .setStyle(CodeLineStyler.Token.OTHER,   new RGB(0, 0, 0), null, SWT.NONE);
 
     static class Style {
         private final Color fg;
