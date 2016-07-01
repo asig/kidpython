@@ -1,17 +1,19 @@
 // Copyright 2016 Andreas Signer. All rights reserved.
 
-package com.asigner.kidpython.compiler.ast;
+package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.runtime.Value;
 
-public class ArithOpNode extends BinaryNode {
+public class RelOpNode extends BinaryNode {
 
-    public enum Op { ADD, SUB, MUL, DIV }
+    public enum Op {
+        EQ, NE, LE, LT, GE, GT
+    }
 
     private final Op op;
 
-    public ArithOpNode(Position pos, Op op, ExprNode left, ExprNode right) {
+    public RelOpNode(Position pos, Op op, ExprNode left, ExprNode right) {
         super(pos, left, right);
         this.op = op;
     }

@@ -1,12 +1,18 @@
 package com.asigner.kidpython.compiler;
 
-import com.asigner.kidpython.compiler.ast.ArithOpNode;
-import com.asigner.kidpython.compiler.ast.BoolNode;
-import com.asigner.kidpython.compiler.ast.ExprNode;
-import com.asigner.kidpython.compiler.ast.RelOpNode;
+import com.asigner.kidpython.compiler.ast.expr.ArithOpNode;
+import com.asigner.kidpython.compiler.ast.expr.BoolNode;
+import com.asigner.kidpython.compiler.ast.expr.ConstNode;
+import com.asigner.kidpython.compiler.ast.expr.ExprNode;
+import com.asigner.kidpython.compiler.ast.expr.MakeListNode;
+import com.asigner.kidpython.compiler.ast.expr.MakeMapNode;
+import com.asigner.kidpython.compiler.ast.expr.RelOpNode;
+import com.asigner.kidpython.compiler.runtime.Value;
+import com.asigner.kidpython.util.Pair;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -50,8 +56,10 @@ import static com.asigner.kidpython.compiler.Token.Type.THEN;
 import static com.asigner.kidpython.compiler.Token.Type.TO;
 import static com.asigner.kidpython.compiler.Token.Type.UNTIL;
 import static com.asigner.kidpython.compiler.Token.Type.WHILE;
-import static com.asigner.kidpython.compiler.ast.ArithOpNode.Op.DIV;
-import static com.asigner.kidpython.compiler.ast.ArithOpNode.Op.MUL;
+import static com.asigner.kidpython.compiler.ast.expr.ArithOpNode.Op.ADD;
+import static com.asigner.kidpython.compiler.ast.expr.ArithOpNode.Op.DIV;
+import static com.asigner.kidpython.compiler.ast.expr.ArithOpNode.Op.MUL;
+import static com.asigner.kidpython.compiler.ast.expr.ArithOpNode.Op.SUB;
 
 public class Parser {
 
@@ -157,7 +165,7 @@ public class Parser {
 
     private void ifStmt() {
         match(IF);
-        expr();
+        ExprNode expr = expr();
         match(THEN);
         stmtBlock();
         for (;;) {
@@ -326,44 +334,54 @@ public class Parser {
     }
 
     private ExprNode factor() {
-        term();
+        ExprNode node = term();
         while (lookahead.getType() == PLUS || lookahead.getType() == MINUS) {
+            ArithOpNode.Op op = lookahead.getType() == PLUS ? ADD : SUB;
             match(lookahead.getType());
-            term();
+            ExprNode node2 = term();
+            node = new ArithOpNode(node.getPos(), op, node, node2);
         }
-        return null;
+        return node;
     }
 
     private ExprNode term() {
+        Position pos;
+        ExprNode node;
         switch (lookahead.getType()) {
             case NUM_LIT:
+                node = new ConstNode(lookahead.getPos(), new Value(new BigDecimal(lookahead.getValue())));
                 match(NUM_LIT);
-                break;
+                return node;
             case STRING_LIT:
+                node = new ConstNode(lookahead.getPos(), new Value(lookahead.getValue()));
                 match(STRING_LIT);
-                break;
+                return node;
             case LBRACK:
+                pos = lookahead.getPos();
                 match(LBRACK);
+                List<ExprNode> nodes = Lists.newLinkedList();
                 if (lookahead.getType() != RBRACK) {
-                    expr();
+                    nodes.add(expr());
                     while (lookahead.getType() == COMMA) {
                         match(COMMA);
-                        expr();
+                        nodes.add(expr());
                     }
                 }
                 match(RBRACK);
-                break;
+                return new MakeListNode(pos, nodes);
             case LBRACE:
+                pos = lookahead.getPos();
+                List<Pair<ExprNode, ExprNode>> mapNodes = Lists.newLinkedList();
                 match(LBRACE);
                 if (lookahead.getType() != RBRACE) {
-                    mapEntry();
+                    mapNodes.add(mapEntry());
                     while (lookahead.getType() == COMMA) {
                         match(COMMA);
-                        mapEntry();
+                        mapNodes.add(mapEntry());
                     }
                 }
                 match(RBRACK);
-                break;
+                return new MakeMapNode(pos, mapNodes);
             case IDENT:
                 match(IDENT);
                 while (SELECTOR_OR_CALL_START_SET.contains(lookahead.getType())) {
@@ -383,6 +401,7 @@ public class Parser {
                 match(LPAREN);
                 optIdentList();
                 match(RPAREN);
+                funcBody();
 
             default:
                 error(Error.unexpectedToken(lookahead, TERM_START_SET));
@@ -397,20 +416,26 @@ public class Parser {
         match(END);
     }
 
-    private void optIdentList() {
+    private List<String> optIdentList() {
+        List<String> idents = Lists.newArrayList();
         if (lookahead.getType() == IDENT) {
+            idents.add(lookahead.getValue());
             match(IDENT);
             while (lookahead.getType() == COMMA) {
                 match(COMMA);
+                if (lookahead.getType() == IDENT) {
+                    idents.add(lookahead.getValue());
+                }
                 match(IDENT);
             }
         }
     }
 
-    private void mapEntry() {
-        expr();
+    private Pair<ExprNode, ExprNode> mapEntry() {
+        ExprNode e1 = expr();
         match(COLON);
-        expr();
+        ExprNode e2 = expr();
+        return Pair.of(e1, e2);
     }
 
     private ExprNode rightMergeNodes(List<ExprNode> nodes, BiFunction<ExprNode, ExprNode, ExprNode> merger) {

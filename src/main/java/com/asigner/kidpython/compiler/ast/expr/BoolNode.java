@@ -1,4 +1,4 @@
-package com.asigner.kidpython.compiler.ast;
+package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.runtime.Value;

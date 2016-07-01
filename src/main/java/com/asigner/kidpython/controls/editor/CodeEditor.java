@@ -8,10 +8,8 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 
 public class CodeEditor extends StyledText {
@@ -32,7 +30,7 @@ public class CodeEditor extends StyledText {
     public CodeEditor(Composite parent, int style) {
         super(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 
-        Stylesheet stylesheet = new Stylesheet();
+        Stylesheet stylesheet = Stylesheet.MONOKAI_SUBLIME;
         lineStyler = new CodeLineStyler(stylesheet);
 
         this.setBackground(stylesheet.getDefaultBackground());
