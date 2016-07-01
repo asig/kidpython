@@ -24,17 +24,17 @@ public class BoolNode extends BinaryNode {
                 // "IF !A THEN FALSE ELSE B"
                 val = left.eval().asBool();
                 if (!val) {
-                    return Value.of(false);
+                    return new Value(false);
                 } else {
-                    return Value.of(right.eval().asBool());
+                    return new Value(right.eval().asBool());
                 }
             case OR:
                 // "IF A THEN TRUE ELSE B"
                 val = left.eval().asBool();
                 if (val) {
-                    return Value.of(true);
+                    return new Value(true);
                 } else {
-                    return Value.of(right.eval().asBool());
+                    return new Value(right.eval().asBool());
                 }
         }
         throw new IllegalStateException("Can't happen");

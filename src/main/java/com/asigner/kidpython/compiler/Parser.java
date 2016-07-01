@@ -429,6 +429,7 @@ public class Parser {
                 match(IDENT);
             }
         }
+        return idents;
     }
 
     private Pair<ExprNode, ExprNode> mapEntry() {
