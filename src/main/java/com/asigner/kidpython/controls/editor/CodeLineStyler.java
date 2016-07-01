@@ -104,9 +104,7 @@ public class CodeLineStyler implements LineStyleListener {
         scanner.setRange(event.lineOffset, event.lineText);
         token = scanner.nextToken();
         while (token != EOF) {
-            if (token == OTHER) {
-                // do nothing for non-colored tokens
-            } else if (token == WHITESPACE) {
+            if (token == WHITESPACE) {
                 // Whitespace take over the previous style to reduce the number of style changes
                 if (styles.size() > 0) {
                     int start = scanner.getStartOffset() + event.lineOffset;
@@ -252,7 +250,7 @@ public class CodeLineStyler implements LineStyleListener {
                         } else {
                             unread(c2);
                         }
-                        break;
+                        return OTHER;
                     }
                     case '\'':
                     case '"': // string
@@ -309,6 +307,7 @@ public class CodeLineStyler implements LineStyleListener {
                     c = read();
                 }
             }
+            unread(c);
             return NUMBER;
         }
 
