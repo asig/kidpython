@@ -18,4 +18,4 @@ task copyToLib(type: Copy) {
     into "$buildDir/output/lib"
     from configurations.runtime
 }
-mainClassName = "com.asigner.kidpython.KidPython"
+mainClassName = "com.asigner.kidpython.App"

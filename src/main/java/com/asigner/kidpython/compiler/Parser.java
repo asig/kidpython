@@ -1,17 +1,35 @@
 package com.asigner.kidpython.compiler;
 
+import com.asigner.kidpython.compiler.ast.AssignmentStmt;
+import com.asigner.kidpython.compiler.ast.EmptyStmt;
+import com.asigner.kidpython.compiler.ast.IfStmt;
+import com.asigner.kidpython.compiler.ast.ReturnStmt;
+import com.asigner.kidpython.compiler.ast.Stmt;
 import com.asigner.kidpython.compiler.ast.expr.ArithOpNode;
 import com.asigner.kidpython.compiler.ast.expr.BoolNode;
+import com.asigner.kidpython.compiler.ast.expr.CallNode;
 import com.asigner.kidpython.compiler.ast.expr.ConstNode;
 import com.asigner.kidpython.compiler.ast.expr.ExprNode;
+import com.asigner.kidpython.compiler.ast.expr.IndexNode;
+import com.asigner.kidpython.compiler.ast.expr.IterHasNextNode;
+import com.asigner.kidpython.compiler.ast.expr.IterNextNode;
+import com.asigner.kidpython.compiler.ast.expr.MakeFuncNode;
+import com.asigner.kidpython.compiler.ast.expr.MakeIterNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeListNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeMapNode;
+import com.asigner.kidpython.compiler.ast.expr.NotNode;
+import com.asigner.kidpython.compiler.ast.expr.PropertyNode;
 import com.asigner.kidpython.compiler.ast.expr.RelOpNode;
-import com.asigner.kidpython.compiler.runtime.Value;
+import com.asigner.kidpython.compiler.ast.expr.VarNode;
+import com.asigner.kidpython.compiler.runtime.FuncValue;
+import com.asigner.kidpython.compiler.runtime.NumberValue;
+import com.asigner.kidpython.compiler.runtime.StringValue;
 import com.asigner.kidpython.util.Pair;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import javafx.geometry.Pos;
 
+import java.awt.font.NumericShaper;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
@@ -25,7 +43,6 @@ import static com.asigner.kidpython.compiler.Token.Type.DO;
 import static com.asigner.kidpython.compiler.Token.Type.DOT;
 import static com.asigner.kidpython.compiler.Token.Type.ELSE;
 import static com.asigner.kidpython.compiler.Token.Type.END;
-import static com.asigner.kidpython.compiler.Token.Type.EOT;
 import static com.asigner.kidpython.compiler.Token.Type.EQ;
 import static com.asigner.kidpython.compiler.Token.Type.FOR;
 import static com.asigner.kidpython.compiler.Token.Type.FUNC;
@@ -100,6 +117,7 @@ public class Parser {
 
     private final Scanner scanner;
     private Token lookahead;
+    private int tmpVarCnt;
 
     public Parser(String text) {
         this.scanner = new Scanner(text);
@@ -127,60 +145,68 @@ public class Parser {
         }
     }
 
-    private void stmtBlock() {
-        stmt();
+    private Stmt stmtBlock() {
+        Stmt cur = stmt();
         while (STMT_START_SET.contains(lookahead.getType())) {
-            stmt();
+            Stmt node = stmt();
+            cur.setNext(node);
+            cur = node.last();
         }
-        match(EOT);
+        return cur;
     }
 
-    private void stmt() {
+    private Stmt stmt() {
         switch (lookahead.getType()) {
             case FUNC:
-                funcDef();
-                break;
+                return funcDef();
             case IF:
-                ifStmt();
-                break;
+                return ifStmt();
             case FOR:
-                forStmt();
-                break;
+                return forStmt();
             case WHILE:
-                whileStmt();
-                break;
+                return whileStmt();
             case REPEAT:
-                repeatStmt();
-                break;
+                return repeatStmt();
             case RETURN:
-                returnStmt();
-                break;
+                return returnStmt();
             case IDENT:
-                assignmentOrCall();
-                break;
+                return assignmentOrCall();
             default:
                 error(Error.unexpectedToken(lookahead, STMT_START_SET));
+                return new EmptyStmt(lookahead.getPos());
         }
     }
 
-    private void ifStmt() {
+    private Stmt ifStmt() {
+        StmtList stmts = new StmtList();
+
+        EmptyStmt endNode = new EmptyStmt(lookahead.getPos());
+        Position ifPos = lookahead.getPos();
         match(IF);
         ExprNode expr = expr();
         match(THEN);
-        stmtBlock();
+        Stmt body = stmtBlock();
+
+        stmts.add(new IfStmt(ifPos, expr, body));
         for (;;) {
             if (lookahead.getType() == ELSE) {
+                Position pos = lookahead.getPos();
                 // ELSE IF or just ELSE
                 match(ELSE);
                 if (lookahead.getType() == IF) {
                     // ELSE IF: stay in loop
+                    ifPos = lookahead.getPos();
                     match(IF);
-                    expr();
+                    ExprNode cond = expr();
                     match(THEN);
-                    stmtBlock();
+                    body = stmtBlock();
+                    body.setNext(endNode);
+
+                    stmts.add(new IfStmt(ifPos, cond, body));
                 } else {
                     // terminating ELSE. break out of loop afterwards
-                    stmtBlock();
+                    stmts.add(stmtBlock());
+                    stmts.getLast().setNext(endNode);
                     break;
                 }
             } else {
@@ -189,98 +215,184 @@ public class Parser {
             }
         }
         match(END);
+        return stmts.getFirst();
     }
 
-    private void forStmt() {
+    private Stmt forStmt() {
+        StmtList stmts = new StmtList();
+
+        Stmt end = new EmptyStmt(lookahead.getPos());
         match(FOR);
+        String varIdent = lookahead.getValue();
+        Position varPos = lookahead.getPos();
         match(IDENT);
+        ExprNode ctrlVar = new VarNode(varPos, varIdent);
         if (lookahead.getType() == IN) {
             match(IN);
-            expr();
+            Position rangePos = lookahead.getPos();
+            ExprNode range = expr();
+            match(DO);
+
+            // iter = range.begin()
+            ExprNode iterVar = new VarNode(rangePos, makeTempVarName());
+            stmts.add(new AssignmentStmt(rangePos, iterVar, new MakeIterNode(rangePos, range)));
+
+            // if !iter.hasnext goto end
+            ExprNode condition = new NotNode(rangePos, new IterHasNextNode(rangePos, iterVar));
+            Stmt ifNode = new IfStmt(varPos, condition, end);
+            stmts.add(ifNode);
+
+            // i = iter.next()
+            stmts.add(new AssignmentStmt(rangePos, ctrlVar, new IterNextNode(rangePos, iterVar)));
+
+            stmts.add(stmtBlock());
+            stmts.getLast().setNext(ifNode);
+
+            match(END);
         } else if (lookahead.getType() == EQ) {
+            ExprNode stepExpr = new ConstNode(lookahead.getPos(), new NumberValue(BigDecimal.ONE));
+            Position eqPos = lookahead.getPos();
             match(EQ);
-            expr();
+            ExprNode fromExpr = expr();
             match(TO);
-            expr();
+            ExprNode toExpr = expr();
             if (lookahead.getType() == STEP) {
                 match(STEP);
-                expr();
+                stepExpr = expr();
             }
 
+            // i := start
+            stmts.add(new AssignmentStmt(varPos, ctrlVar, fromExpr));
+
+            // if i == stop goto end
+            ExprNode comparison = new RelOpNode(eqPos, RelOpNode.Op.EQ, ctrlVar, toExpr);
+            Stmt ifNode = new IfStmt(varPos, comparison, end);
+            stmts.add(ifNode);
+
+            match(DO);
+
+            stmts.add(stmtBlock());
+
+            // i = i + steop
+            ExprNode addStep = new ArithOpNode(eqPos, ArithOpNode.Op.ADD, ctrlVar, stepExpr);
+            stmts.add(new AssignmentStmt(eqPos, ctrlVar, addStep));
+            // Goto comparisong
+            stmts.getLast().setNext(ifNode);
+
+            match(END);
         } else {
             sync(Sets.newHashSet(DO));
         }
-        match(DO);
-        stmtBlock();
-        match(END);
+
+        return stmts.getFirst();
     }
 
-    private void whileStmt() {
+    private Stmt whileStmt() {
+        Position pos = lookahead.getPos();
         match(WHILE);
-        expr();
+        Position condPos = lookahead.getPos();
+        ExprNode condition = expr();
         match(DO);
-        stmtBlock();
+        Stmt body = stmtBlock();
         match(END);
+
+        StmtList stmts = new StmtList();
+        Stmt ifNode = new IfStmt(pos, condition, body);
+        stmts.add(ifNode);
+        body.setNext(ifNode);
+        return stmts.getFirst();
     }
 
-    private void repeatStmt() {
+    private Stmt repeatStmt() {
         match(REPEAT);
-        stmtBlock();
+        Stmt body = stmtBlock();
         match(UNTIL);
-        expr();
+        Position condPos = lookahead.getPos();
+        ExprNode condition = expr();
+
+        StmtList stmts = new StmtList();
+        stmts.add(body);
+        Stmt ifNode = new IfStmt(condPos, new NotNode(condPos,condition), body);
+        stmts.add(ifNode);
+
+        return stmts.getFirst();
+
     }
 
-    private void returnStmt() {
+    private Stmt returnStmt() {
+        Position pos = lookahead.getPos();
         match(RETURN);
+        ExprNode expr = new ConstNode(lookahead.getPos(), new NumberValue(BigDecimal.ZERO));
         if (EXPR_START_SET.contains(lookahead.getType())) {
-            expr();
+            expr = expr();
         }
+        return new ReturnStmt(pos, expr);
     }
 
-    private void assignmentOrCall() {
+    private Stmt assignmentOrCall() {
+        Position pos = lookahead.getPos();
+        String ident = lookahead.getValue();
         match(IDENT);
+        ExprNode varExpr = new VarNode(pos, ident);
         while (SELECTOR_OR_CALL_START_SET.contains(lookahead.getType())) {
-            selectorOrCall();
+            varExpr = selectorOrCall(varExpr);
         }
+        ExprNode expr;
         if (lookahead.getType() == EQ) {
             match(EQ);
-            expr();
+            expr = expr();
+            return new AssignmentStmt(pos, varExpr, expr);
+        } else {
+            // Create fake assignment to force eval
+            return new AssignmentStmt(pos, new VarNode(pos, makeTempVarName()), varExpr);
         }
     }
 
-    private void selectorOrCall() {
+    private ExprNode selectorOrCall(ExprNode base) {
+        ExprNode curExpr = base;
+        Position pos = lookahead.getPos();
         switch (lookahead.getType()) {
             case LBRACK:
                 match(LBRACK);
-                expr();
+                ExprNode index = expr();
                 match(RBRACK);
+                curExpr = new IndexNode(pos, curExpr, index);
                 break;
             case DOT:
                 match(DOT);
+                String prop = lookahead.getValue();
                 match(IDENT);
+                curExpr = new PropertyNode(pos, curExpr, prop);
                 break;
             case LPAREN:
                 match(LPAREN);
+                List<ExprNode> params = Lists.newArrayList();
                 if (lookahead.getType() != RPAREN) {
-                    expr();
+                    params.add(expr());
                     while (lookahead.getType() == COMMA) {
                         match(COMMA);
-                        expr();
+                        params.add(expr());
                     }
                 }
                 match(RPAREN);
+                curExpr = new CallNode(pos, base, params);
             default:
                 error(Error.unexpectedToken(lookahead, SELECTOR_OR_CALL_START_SET));
         }
+        return curExpr;
     }
 
-    private void funcDef() {
+    private Stmt funcDef() {
+        Position pos = lookahead.getPos();
         match(FUNC);
+        String funcName = lookahead.getValue();
         match(IDENT);
         match(LPAREN);
-        optIdentList();
+        List<String> params = optIdentList();
         match(RPAREN);
-        funcBody();
+        Stmt body = funcBody();
+
+        return new AssignmentStmt(pos, new VarNode(pos, funcName), new MakeFuncNode(pos, body, params));
     }
 
     private ExprNode expr() {
@@ -345,15 +457,15 @@ public class Parser {
     }
 
     private ExprNode term() {
-        Position pos;
+        Position pos = lookahead.getPos();
         ExprNode node;
         switch (lookahead.getType()) {
             case NUM_LIT:
-                node = new ConstNode(lookahead.getPos(), new Value(new BigDecimal(lookahead.getValue())));
+                node = new ConstNode(lookahead.getPos(), new NumberValue((new BigDecimal(lookahead.getValue()))));
                 match(NUM_LIT);
                 return node;
             case STRING_LIT:
-                node = new ConstNode(lookahead.getPos(), new Value(lookahead.getValue()));
+                node = new ConstNode(lookahead.getPos(), new StringValue(lookahead.getValue()));
                 match(STRING_LIT);
                 return node;
             case LBRACK:
@@ -383,37 +495,43 @@ public class Parser {
                 match(RBRACK);
                 return new MakeMapNode(pos, mapNodes);
             case IDENT:
+                String varName = lookahead.getValue();
+                pos = lookahead.getPos();
                 match(IDENT);
+                node = new VarNode(pos, varName);
                 while (SELECTOR_OR_CALL_START_SET.contains(lookahead.getType())) {
-                    selectorOrCall();
+                    node = selectorOrCall(node);
                 }
-                break;
+                return node;
             case LPAREN:
                 match(LPAREN);
-                expr();
+                node = expr();
                 match(RPAREN);
                 while (SELECTOR_OR_CALL_START_SET.contains(lookahead.getType())) {
-                    selectorOrCall();
+                    node = selectorOrCall(node);
                 }
-                break;
+                return node;
             case FUNC:
+                pos = lookahead.getPos();
                 match(FUNC);
                 match(LPAREN);
-                optIdentList();
+                List<String> params = optIdentList();
                 match(RPAREN);
-                funcBody();
-
+                Stmt body = funcBody();
+                return new MakeFuncNode(pos, body, params);
             default:
                 error(Error.unexpectedToken(lookahead, TERM_START_SET));
+                return new ConstNode(pos, new NumberValue(new BigDecimal(0)));
         }
-        return null;
     }
 
-    private void funcBody() {
+    private Stmt funcBody() {
+        Stmt node = new EmptyStmt(lookahead.getPos());
         if (STMT_START_SET.contains(lookahead.getType())) {
-            stmtBlock();
+            node = stmtBlock();
         }
         match(END);
+        return node;
     }
 
     private List<String> optIdentList() {
@@ -448,6 +566,10 @@ public class Parser {
             nodes.remove(nodes.size() - 1);
         }
         return nodes.get(0);
+    }
+
+    private String makeTempVarName() {
+        return String.format("_tmp%04d", tmpVarCnt++);
     }
 
 }

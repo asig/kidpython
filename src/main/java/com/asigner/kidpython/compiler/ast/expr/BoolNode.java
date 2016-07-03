@@ -1,6 +1,7 @@
 package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
+import com.asigner.kidpython.compiler.runtime.BooleanValue;
 import com.asigner.kidpython.compiler.runtime.Value;
 
 public class BoolNode extends BinaryNode {
@@ -24,17 +25,17 @@ public class BoolNode extends BinaryNode {
                 // "IF !A THEN FALSE ELSE B"
                 val = left.eval().asBool();
                 if (!val) {
-                    return new Value(false);
+                    return new BooleanValue(false);
                 } else {
-                    return new Value(right.eval().asBool());
+                    return new BooleanValue(right.eval().asBool());
                 }
             case OR:
                 // "IF A THEN TRUE ELSE B"
                 val = left.eval().asBool();
                 if (val) {
-                    return new Value(true);
+                    return new BooleanValue(true);
                 } else {
-                    return new Value(right.eval().asBool());
+                    return new BooleanValue(right.eval().asBool());
                 }
         }
         throw new IllegalStateException("Can't happen");
