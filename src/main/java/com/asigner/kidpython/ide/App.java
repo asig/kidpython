@@ -1,7 +1,8 @@
-package com.asigner.kidpython;
+package com.asigner.kidpython.ide;
 
-import com.asigner.kidpython.controls.ConsoleCanvas;
-import com.asigner.kidpython.controls.SourceCodeComposite;
+import com.asigner.kidpython.ide.controls.SourceCodeComposite;
+import com.asigner.kidpython.ide.controls.ConsoleCanvas;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -15,12 +16,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-import java.io.IOException;
-
 public class App {
 
     protected Shell shell;
-    protected Interpreter interpreter;
 
     /**
      * Launch the application.
@@ -36,12 +34,6 @@ public class App {
     }
 
     public App() {
-        interpreter = new Interpreter();
-        try {
-            interpreter.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -94,12 +86,6 @@ public class App {
         ToolItem item1 = new ToolItem(toolBar, SWT.PUSH);
         item1.setText("new 1");
         item1.addListener(SWT.Selection, event -> {
-            try {
-                interpreter.write("ls -l /home/asigner");
-                interpreter.stop();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         });
 
         ToolItem separator = new ToolItem(toolBar, SWT.SEPARATOR);

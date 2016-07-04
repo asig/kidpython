@@ -1,4 +1,4 @@
-package com.asigner.kidpython.controls;
+package com.asigner.kidpython.ide.controls;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;

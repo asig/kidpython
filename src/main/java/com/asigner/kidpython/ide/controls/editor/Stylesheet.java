@@ -1,6 +1,6 @@
 // Copyright 2016 Andreas Signer. All rights reserved.
 
-package com.asigner.kidpython.controls.editor;
+package com.asigner.kidpython.ide.controls.editor;
 
 import com.google.common.collect.Maps;
 import org.eclipse.swt.SWT;
@@ -11,12 +11,12 @@ import org.eclipse.swt.widgets.Display;
 import java.util.HashMap;
 import java.util.Map;
 
-//import static com.asigner.kidpython.controls.editor..CodeLineStyler.TokenCOMMENT;
-//import static com.asigner.kidpython.controls.editor.CodeLineStyler.Token.IDENT;
-//import static com.asigner.kidpython.controls.editor.CodeLineStyler.Token.KEYWORD;
-//import static com.asigner.kidpython.controls.editor.CodeLineStyler.Token.NUMBER;
-//import static com.asigner.kidpython.controls.editor.CodeLineStyler.Token.OTHER;
-//import static com.asigner.kidpython.controls.editor.CodeLineStyler.Token.STRING;
+//import static com.asigner.kidpython.ide.controls.editor..CodeLineStyler.TokenCOMMENT;
+//import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.IDENT;
+//import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.KEYWORD;
+//import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.NUMBER;
+//import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.OTHER;
+//import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.STRING;
 
 public class Stylesheet {
 
