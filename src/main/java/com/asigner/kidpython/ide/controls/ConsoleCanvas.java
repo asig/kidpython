@@ -1,5 +1,6 @@
 package com.asigner.kidpython.ide.controls;
 
+import com.asigner.kidpython.ide.controls.turtle.Turtle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -8,6 +9,10 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.jfree.swt.SWTGraphics2D;
+
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 
 public class ConsoleCanvas extends Canvas {
 

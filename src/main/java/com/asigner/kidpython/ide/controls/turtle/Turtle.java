@@ -1,16 +1,10 @@
 package com.asigner.kidpython.ide.controls.turtle;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Graphics2D;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.GeneralPath;
-
-import static java.awt.Color.BLACK;
+import java.awt.*;
+import java.awt.geom.*;
+import static java.awt.Color.*;
+import static java.awt.MultipleGradientPaint.CycleMethod.*;
+import static java.awt.MultipleGradientPaint.ColorSpaceType.*;
 
 /**
  * This class has been automatically generated using
@@ -42,9 +36,11 @@ public class Turtle {
 
         //
         transformations.offer(g.getTransform());
-        g.transform(new AffineTransform(1.0666667f, 0, 0, 1.0666667f, 0, 0));
+        g.transform(new AffineTransform(1.0666667f, 0, 0, 1.0666667f, 1.6276043E-5f, 0));
 
         // _0
+        transformations.offer(g.getTransform());
+        g.transform(new AffineTransform(1, 0, 0, 1, -109.82767f, -237.02698f));
 
         // _0_0
 
@@ -90,6 +86,30 @@ public class Turtle {
 
         // _0_0_3
         shape = new GeneralPath();
+        ((GeneralPath) shape).moveTo(468.2143, 479.14792);
+        ((GeneralPath) shape).lineTo(493.57144, 432.71936);
+        ((GeneralPath) shape).lineTo(532.8572, 424.14792);
+        ((GeneralPath) shape).lineTo(559.6429, 437.3622);
+        ((GeneralPath) shape).lineTo(571.7857, 469.8622);
+        ((GeneralPath) shape).lineTo(557.5, 507.00507);
+        ((GeneralPath) shape).lineTo(505.0, 518.43365);
+        ((GeneralPath) shape).lineTo(491.42856, 515.57654);
+        ((GeneralPath) shape).closePath();
+
+        g.setPaint(new Color(0x00B200));
+        g.fill(shape);
+
+        // _0_0_4
+        shape = new GeneralPath();
+        ((GeneralPath) shape).moveTo(468.88226, 471.5328);
+        ((GeneralPath) shape).curveTo(534.3013, 335.0551, 644.72845, 527.0688, 493.37448, 514.56757);
+
+        g.setPaint(BLACK);
+        g.setStroke(new BasicStroke(20, 0, 0, 4));
+        g.draw(shape);
+
+        // _0_0_5
+        shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(424.01154, 620.77454);
         ((GeneralPath) shape).lineTo(513.41003, 620.2695);
         ((GeneralPath) shape).lineTo(510.37958, 566.2263);
@@ -99,9 +119,10 @@ public class Turtle {
         ((GeneralPath) shape).lineTo(386.6359, 555.6197);
         ((GeneralPath) shape).closePath();
 
+        g.setPaint(new Color(0xC94447));
         g.fill(shape);
 
-        // _0_0_4
+        // _0_0_6
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(304.2857, 417.36218);
         ((GeneralPath) shape).lineTo(268.92856, 354.50504);
@@ -119,7 +140,7 @@ public class Turtle {
         g.setPaint(new Color(0x00B200));
         g.fill(shape);
 
-        // _0_0_5
+        // _0_0_7
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(308.60162, 551.32654);
         ((GeneralPath) shape).lineTo(252.03308, 446.2707);
@@ -135,7 +156,7 @@ public class Turtle {
         g.setPaint(new Color(0xD4595B));
         g.fill(shape);
 
-        // _0_0_6
+        // _0_0_8
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(316.4286, 824.14795);
         ((GeneralPath) shape).lineTo(350.7143, 825.57654);
@@ -146,11 +167,8 @@ public class Turtle {
 
         g.setPaint(new Color(0x00B200));
         g.fill(shape);
-        g.setPaint(BLACK);
-        g.setStroke(new BasicStroke(1, 0, 0, 4));
-        g.draw(shape);
 
-        // _0_0_7
+        // _0_0_9
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(383.3561, 682.64856);
         ((GeneralPath) shape).lineTo(439.92465, 787.7044);
@@ -166,7 +184,7 @@ public class Turtle {
         g.setPaint(new Color(0xC94447));
         g.fill(shape);
 
-        // _0_0_8
+        // _0_0_10
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(383.60544, 682.8989);
         ((GeneralPath) shape).lineTo(443.7095, 786.4396);
@@ -180,7 +198,7 @@ public class Turtle {
         g.setPaint(new Color(0xD4595B));
         g.fill(shape);
 
-        // _0_0_9
+        // _0_0_11
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(422.37698, 617.6091);
         ((GeneralPath) shape).lineTo(383.6999, 684.5998);
@@ -194,7 +212,7 @@ public class Turtle {
         g.setStroke(new BasicStroke(20, 1, 1, 4));
         g.draw(shape);
 
-        // _0_0_10
+        // _0_0_12
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(308.5942, 553.32336);
         ((GeneralPath) shape).lineTo(306.23386, 553.62195);
@@ -202,14 +220,14 @@ public class Turtle {
         g.setStroke(new BasicStroke(1, 0, 0, 4));
         g.draw(shape);
 
-        // _0_0_11
+        // _0_0_13
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(241.5841, 450.5864);
         ((GeneralPath) shape).lineTo(240.57396, 451.59656);
 
         g.draw(shape);
 
-        // _0_0_12
+        // _0_0_14
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(223.2143, 758.43365);
         ((GeneralPath) shape).lineTo(205.35715, 799.50507);
@@ -225,7 +243,7 @@ public class Turtle {
         g.setPaint(new Color(0x00B200));
         g.fill(shape);
 
-        // _0_0_13
+        // _0_0_15
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(225.7143, 468.43362);
         ((GeneralPath) shape).lineTo(199.28572, 513.4336);
@@ -240,7 +258,7 @@ public class Turtle {
 
         g.fill(shape);
 
-        // _0_0_14
+        // _0_0_16
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(310.27448, 553.62195);
         ((GeneralPath) shape).lineTo(247.64502, 446.54578);
@@ -249,36 +267,21 @@ public class Turtle {
         g.setStroke(new BasicStroke(20, 0, 0, 4));
         g.draw(shape);
 
-        // _0_0_15
+        // _0_0_17
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(274.68558, 617.6979);
         ((GeneralPath) shape).lineTo(178.9357, 617.5202);
 
         g.draw(shape);
 
-        // _0_0_16
+        // _0_0_18
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(306.23386, 686.9621);
         ((GeneralPath) shape).lineTo(250.67546, 784.9469);
 
         g.draw(shape);
 
-        // _0_0_17
-        shape = new GeneralPath();
-        ((GeneralPath) shape).moveTo(468.2143, 479.14792);
-        ((GeneralPath) shape).lineTo(493.57144, 432.71936);
-        ((GeneralPath) shape).lineTo(532.8572, 424.14792);
-        ((GeneralPath) shape).lineTo(559.6429, 437.3622);
-        ((GeneralPath) shape).lineTo(571.7857, 469.8622);
-        ((GeneralPath) shape).lineTo(557.5, 507.00507);
-        ((GeneralPath) shape).lineTo(505.0, 518.43365);
-        ((GeneralPath) shape).lineTo(491.42856, 515.57654);
-        ((GeneralPath) shape).closePath();
-
-        g.setPaint(new Color(0x00B200));
-        g.fill(shape);
-
-        // _0_0_18
+        // _0_0_19
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(465.35715, 770.5765);
         ((GeneralPath) shape).lineTo(491.07144, 719.1479);
@@ -290,9 +293,10 @@ public class Turtle {
         ((GeneralPath) shape).lineTo(472.85718, 784.50507);
         ((GeneralPath) shape).closePath();
 
+        g.setPaint(new Color(0x00B200));
         g.fill(shape);
 
-        // _0_0_19
+        // _0_0_20
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(379.77106, 553.62195);
         ((GeneralPath) shape).lineTo(442.4005, 446.54578);
@@ -300,26 +304,18 @@ public class Turtle {
         g.setPaint(BLACK);
         g.draw(shape);
 
-        // _0_0_20
+        // _0_0_21
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(415.35995, 617.6979);
         ((GeneralPath) shape).lineTo(511.10983, 617.5202);
 
         g.draw(shape);
 
-        // _0_0_21
+        // _0_0_22
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(383.81168, 686.9621);
         ((GeneralPath) shape).lineTo(439.37006, 784.9469);
 
-        g.draw(shape);
-
-        // _0_0_22
-        shape = new GeneralPath();
-        ((GeneralPath) shape).moveTo(468.88232, 471.5328);
-        ((GeneralPath) shape).curveTo(534.30133, 335.0551, 644.7285, 527.0688, 493.37454, 514.56757);
-
-        g.setStroke(new BasicStroke(13.616275f, 0, 0, 4));
         g.draw(shape);
 
         // _0_0_23
@@ -327,7 +323,6 @@ public class Turtle {
         ((GeneralPath) shape).moveTo(304.35477, 417.22058);
         ((GeneralPath) shape).curveTo(149.84132, 191.79163, 540.4957, 189.12134, 384.0451, 416.2775);
 
-        g.setStroke(new BasicStroke(20, 0, 0, 4));
         g.draw(shape);
         transformations.offer(g.getTransform());
         g.transform(new AffineTransform(-1, 0, 0, 1, 0, 0));
@@ -337,38 +332,31 @@ public class Turtle {
         g.setStroke(new BasicStroke(20, 1, 1, 4));
         g.draw(shape);
 
-        g.setTransform(transformations.poll()); // _0_0_24
+        g.setTransform(transformations.pollLast()); // _0_0_24
 
         // _0_0_25
         shape = new GeneralPath();
-        ((GeneralPath) shape).moveTo(468.88226, 471.5328);
-        ((GeneralPath) shape).curveTo(534.3013, 335.0551, 644.72845, 527.0688, 493.37448, 514.56757);
+        ((GeneralPath) shape).moveTo(495.22333, 721.95);
+        ((GeneralPath) shape).curveTo(646.0082, 734.97815, 505.3396, 906.07983, 463.60547, 760.0574);
 
         g.setStroke(new BasicStroke(20, 0, 0, 4));
         g.draw(shape);
 
         // _0_0_26
         shape = new GeneralPath();
-        ((GeneralPath) shape).moveTo(495.22333, 721.95);
-        ((GeneralPath) shape).curveTo(646.0082, 734.97815, 505.3396, 906.07983, 463.60547, 760.0574);
-
-        g.draw(shape);
-
-        // _0_0_27
-        shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(220.35281, 471.5328);
         ((GeneralPath) shape).curveTo(154.93382, 335.0551, 44.506638, 527.0688, 195.86058, 514.56757);
 
         g.draw(shape);
 
-        // _0_0_28
+        // _0_0_27
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(194.01175, 721.95);
         ((GeneralPath) shape).curveTo(43.22691, 734.97815, 183.89548, 906.0798, 225.62962, 760.0573);
 
         g.draw(shape);
 
-        // _0_0_29
+        // _0_0_28
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(351.43976, 833.1112);
         ((GeneralPath) shape).curveTo(353.1276, 857.686, 355.88113, 864.2503, 372.0902, 884.3071);
@@ -380,19 +368,21 @@ public class Turtle {
         transformations.offer(g.getTransform());
         g.transform(new AffineTransform(1, 0, 0, 1, -0.852551f, 0));
 
-        // _0_0_30
+        // _0_0_29
 
-        // _0_0_30_0
+        // _0_0_29_0
         shape = new Ellipse2D.Double(303.0457458496094, 285.6564025878906, 34.34518814086914, 34.34518814086914);
         g.fill(shape);
 
-        // _0_0_30_1
+        // _0_0_29_1
         shape = new Ellipse2D.Double(353.5533752441406, 285.6564025878906, 34.34518814086914, 34.34518814086914);
         g.fill(shape);
 
-        g.setTransform(transformations.poll()); // _0_0_30
+        g.setTransform(transformations.pollLast()); // _0_0_29
 
-        g.setTransform(transformations.poll()); // _0
+        g.setTransform(transformations.pollLast()); // _0_0
+
+        g.setTransform(transformations.pollLast()); // _0
 
     }
 
@@ -402,7 +392,7 @@ public class Turtle {
      * @return The X of the bounding box of the original SVG image.
      */
     public static int getOrigX() {
-        return 114;
+        return 0;
     }
 
     /**
@@ -411,7 +401,7 @@ public class Turtle {
      * @return The Y of the bounding box of the original SVG image.
      */
     public static int getOrigY() {
-        return 253;
+        return 0;
     }
 
     /**
@@ -420,7 +410,7 @@ public class Turtle {
      * @return The width of the bounding box of the original SVG image.
      */
     public static int getOrigWidth() {
-        return 509;
+        return 501;
     }
 
     /**
@@ -429,7 +419,7 @@ public class Turtle {
      * @return The height of the bounding box of the original SVG image.
      */
     public static int getOrigHeight() {
-        return 703;
+        return 702;
     }
 }
 
