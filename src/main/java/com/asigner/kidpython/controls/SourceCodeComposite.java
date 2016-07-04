@@ -31,7 +31,10 @@ public class SourceCodeComposite extends Composite {
         setLayout(new GridLayout(1, false));
 
         settings = Settings.load();
-        this.addDisposeListener(disposeEvent -> settings.save());
+        this.addDisposeListener(disposeEvent -> {
+            settings.getSource(selectedSource).setCode(editor.getText());
+            settings.save();
+        });
         Thread saver = new Thread(() -> {
             for(;;) {
                 try {
@@ -80,6 +83,8 @@ public class SourceCodeComposite extends Composite {
         if (selectedSource > -1) {
             buttons[selectedSource].setSelection(false);
             editorStates[selectedSource] = editor.saveState();
+            settings.getSource(selectedSource).setCode(editor.getText());
+            settings.save();
         }
         selectedSource = idx;
         settings.setSelectedSource(selectedSource);
