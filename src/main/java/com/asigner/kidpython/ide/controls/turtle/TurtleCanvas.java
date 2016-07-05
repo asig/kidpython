@@ -2,6 +2,7 @@
 
 package com.asigner.kidpython.ide.controls.turtle;
 
+import com.asigner.kidpython.ide.util.SWTResources;
 import com.google.common.collect.Lists;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -9,6 +10,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Canvas;
@@ -53,7 +55,7 @@ public class TurtleCanvas extends Canvas {
         this.penDown = true;
         this.turtleVisible = true;
 
-        penColor = makeColor(new RGB(0,0,0));
+        penColor = SWTResources.getColor(new RGB(0,0,0));
         penWidth = 1;
 
         addPaintListener(this::draw);
@@ -96,12 +98,12 @@ public class TurtleCanvas extends Canvas {
     }
 
     public void setPen(RGB color, int width) {
-        penColor = makeColor(color);
-        penWidth = width;
+        setPen(new RGBA(color.red, color.green, color.blue, 255), width);
     }
 
-    private Color makeColor(RGB rgb) {
-        return new Color(Display.getCurrent(), rgb);
+    public void setPen(RGBA color, int width) {
+        penColor = SWTResources.getColor(color);
+        penWidth = width;
     }
 
     private void draw(PaintEvent e) {
@@ -111,7 +113,7 @@ public class TurtleCanvas extends Canvas {
         gc.fillRectangle(rect);
 
         Transform t = new Transform(gc.getDevice());
-        t.translate(rect.width/2.0f, rect.height/2.0f);
+        t.translate((rect.x + rect.width)/2.0f, (rect.y + rect.height)/2.0f);
         gc.setTransform(t);
 
         gc.setLineCap(SWT.CAP_ROUND);

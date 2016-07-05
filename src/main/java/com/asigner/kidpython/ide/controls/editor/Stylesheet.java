@@ -2,21 +2,14 @@
 
 package com.asigner.kidpython.ide.controls.editor;
 
+import com.asigner.kidpython.ide.util.SWTResources;
 import com.google.common.collect.Maps;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
-import java.util.HashMap;
 import java.util.Map;
-
-//import static com.asigner.kidpython.ide.controls.editor..CodeLineStyler.TokenCOMMENT;
-//import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.IDENT;
-//import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.KEYWORD;
-//import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.NUMBER;
-//import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.OTHER;
-//import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.STRING;
 
 public class Stylesheet {
 
@@ -89,7 +82,6 @@ public class Stylesheet {
         }
     }
 
-    private final HashMap<RGB, Color> colors = Maps.newHashMap();
     private final Map<CodeLineStyler.Token, Style> tokenStyles = Maps.newHashMap();
     private final String name;
 
@@ -108,7 +100,7 @@ public class Stylesheet {
     }
 
     public Stylesheet setDefaultBackground(RGB rgb) {
-        background = getColor(rgb);
+        background = SWTResources.getColor(rgb);
         return this;
     }
 
@@ -122,26 +114,12 @@ public class Stylesheet {
     }
 
     public Stylesheet setStyle(CodeLineStyler.Token token, RGB foreground, RGB background, int fontStyle) {
-        Style style = new Style(getColor(foreground), getColor(background), fontStyle);
+        Style style = new Style(SWTResources.getColor(foreground), SWTResources.getColor(background), fontStyle);
         tokenStyles.put(token, style);
         return this;
     }
 
     public void dispose() {
-        for (Color c: colors.values()) {
-            c.dispose();
-        }
     }
 
-    private Color getColor(RGB rgb) {
-        if (rgb == null) {
-            return null;
-        }
-        Color c = colors.get(rgb);
-        if (c == null) {
-            c = new Color(Display.getDefault(), rgb);
-            colors.put(rgb, c);
-        }
-        return c;
-    }
 }
