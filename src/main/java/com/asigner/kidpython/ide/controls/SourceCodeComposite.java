@@ -74,6 +74,10 @@ public class SourceCodeComposite extends Composite {
         selectSource(settings.getSelectedSource());
     }
 
+    public String getText() {
+        return editor.getText();
+    }
+
     private void selectSource(int idx) {
         if (selectingSource) {
             return;
