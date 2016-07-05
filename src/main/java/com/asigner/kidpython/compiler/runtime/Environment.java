@@ -1,8 +1,10 @@
 package com.asigner.kidpython.compiler.runtime;
 
+import com.asigner.kidpython.compiler.ast.Stmt;
 import com.google.common.collect.Maps;
 
 import java.util.Map;
+import java.util.Stack;
 
 public class Environment {
 
@@ -35,6 +37,9 @@ public class Environment {
     private Frame funcFrame;
     private Frame globalFrame;
 
+    private Stack<Stmt> stack = new Stack<>();
+    private Value resultValue;
+
     public Environment() {
         this.funcFrame = null;
         this.globalFrame = new Frame(null);
@@ -45,8 +50,9 @@ public class Environment {
         funcFrame = newFrame;
     }
 
-    public void leaveFunction() {
+    public void leaveFunction(Value resultValue) {
         funcFrame = funcFrame.getParent();
+        this.resultValue = resultValue;
     }
 
     public Value getVar(String name) {
