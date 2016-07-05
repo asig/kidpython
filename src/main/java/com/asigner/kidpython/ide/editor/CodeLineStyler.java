@@ -1,4 +1,4 @@
-package com.asigner.kidpython.ide.controls.editor;
+package com.asigner.kidpython.ide.editor;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.COMMENT;
-import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.EOF;
-import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.IDENT;
-import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.KEYWORD;
-import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.NUMBER;
-import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.OTHER;
-import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.STRING;
-import static com.asigner.kidpython.ide.controls.editor.CodeLineStyler.Token.WHITESPACE;
+import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.COMMENT;
+import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.EOF;
+import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.IDENT;
+import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.KEYWORD;
+import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.NUMBER;
+import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.OTHER;
+import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.STRING;
+import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.WHITESPACE;
 
 public class CodeLineStyler implements LineStyleListener {
 

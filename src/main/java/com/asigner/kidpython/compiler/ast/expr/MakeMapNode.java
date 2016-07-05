@@ -18,10 +18,20 @@ public class MakeMapNode extends ExprNode {
         this.nodes = nodes;
     }
 
+    public List<Pair<ExprNode, ExprNode>> getElements() {
+        return nodes;
+    }
+
     public Value eval() {
         return new MapValue(
                 nodes.stream()
                         .collect(toMap(p -> p.getFirst().eval(), p -> p.getSecond().eval()))
         );
+    }
+
+    @Override
+    void accept(ExprNodeVisitor visitor) {
+        visitor.visit(this);
+
     }
 }

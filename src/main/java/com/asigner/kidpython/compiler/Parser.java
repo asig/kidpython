@@ -10,7 +10,6 @@ import com.asigner.kidpython.compiler.ast.expr.BoolNode;
 import com.asigner.kidpython.compiler.ast.expr.CallNode;
 import com.asigner.kidpython.compiler.ast.expr.ConstNode;
 import com.asigner.kidpython.compiler.ast.expr.ExprNode;
-import com.asigner.kidpython.compiler.ast.expr.IndexNode;
 import com.asigner.kidpython.compiler.ast.expr.IterHasNextNode;
 import com.asigner.kidpython.compiler.ast.expr.IterNextNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeFuncNode;
@@ -18,7 +17,7 @@ import com.asigner.kidpython.compiler.ast.expr.MakeIterNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeListNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeMapNode;
 import com.asigner.kidpython.compiler.ast.expr.NotNode;
-import com.asigner.kidpython.compiler.ast.expr.PropertyNode;
+import com.asigner.kidpython.compiler.ast.expr.MapAccessNode;
 import com.asigner.kidpython.compiler.ast.expr.RelOpNode;
 import com.asigner.kidpython.compiler.ast.expr.VarNode;
 import com.asigner.kidpython.compiler.runtime.NumberValue;
@@ -165,13 +164,12 @@ public class Parser {
     }
 
     private Stmt stmtBlock() {
-        Stmt cur = stmt();
+        StmtList stmts = new StmtList();
+        stmts.add(stmt());
         while (STMT_START_SET.contains(lookahead.getType())) {
-            Stmt node = stmt();
-            cur.setNext(node);
-            cur = node.last();
+            stmts.add(stmt());
         }
-        return cur;
+        return stmts.getFirst();
     }
 
     private Stmt stmt() {
@@ -375,13 +373,14 @@ public class Parser {
                 match(LBRACK);
                 ExprNode index = expr();
                 match(RBRACK);
-                curExpr = new IndexNode(pos, curExpr, index);
+                curExpr = new MapAccessNode(pos, curExpr, index);
                 break;
             case DOT:
                 match(DOT);
+                pos = lookahead.getPos();
                 String prop = lookahead.getValue();
                 match(IDENT);
-                curExpr = new PropertyNode(pos, curExpr, prop);
+                curExpr = new MapAccessNode(pos, curExpr, new ConstNode(pos, new StringValue(prop)));
                 break;
             case LPAREN:
                 match(LPAREN);

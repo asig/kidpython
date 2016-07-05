@@ -13,4 +13,12 @@ public abstract class BinaryNode extends ExprNode {
         this.left = left;
         this.right = right;
     }
+
+    public ExprNode getLeft() {
+        return left;
+    }
+
+    public ExprNode getRight() {
+        return right;
+    }
 }

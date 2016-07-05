@@ -40,4 +40,14 @@ public class BoolNode extends BinaryNode {
         }
         throw new IllegalStateException("Can't happen");
     }
+
+    public Op getOp() {
+        return op;
+    }
+
+    @Override
+    void accept(ExprNodeVisitor visitor) {
+        visitor.visit(this);
+
+    }
 }

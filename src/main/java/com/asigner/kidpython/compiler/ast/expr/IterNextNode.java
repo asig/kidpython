@@ -17,9 +17,19 @@ public class IterNextNode extends ExprNode {
         this.expr = expr;
     }
 
+    public ExprNode getExpr() {
+        return expr;
+    }
+
     public Value eval() {
         Value v = expr.eval();
         Preconditions.checkArgument(v.getType() == Value.Type.ITERATOR);
         return v.asIterator().next();
+    }
+
+    @Override
+    void accept(ExprNodeVisitor visitor) {
+        visitor.visit(this);
+
     }
 }

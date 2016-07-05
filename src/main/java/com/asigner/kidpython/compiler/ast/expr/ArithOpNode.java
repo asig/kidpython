@@ -16,8 +16,18 @@ public class ArithOpNode extends BinaryNode {
         this.op = op;
     }
 
+    public Op getOp() {
+        return op;
+    }
+
     @Override
     public Value eval() {
         return null;
+    }
+
+    @Override
+    void accept(ExprNodeVisitor visitor) {
+        visitor.visit(this);
+
     }
 }

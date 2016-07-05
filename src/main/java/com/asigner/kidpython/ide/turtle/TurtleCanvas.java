@@ -1,6 +1,6 @@
 // Copyright 2016 Andreas Signer. All rights reserved.
 
-package com.asigner.kidpython.ide.controls.turtle;
+package com.asigner.kidpython.ide.turtle;
 
 import com.asigner.kidpython.ide.util.SWTResources;
 import com.google.common.collect.Lists;

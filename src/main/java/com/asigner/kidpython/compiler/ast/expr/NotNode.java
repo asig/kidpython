@@ -15,8 +15,18 @@ public class NotNode extends ExprNode {
         this.expr = expr;
     }
 
+    public ExprNode getExpr() {
+        return expr;
+    }
+
     @Override
     public Value eval() {
         return new BooleanValue(!expr.eval().asBool());
+    }
+
+    @Override
+    void accept(ExprNodeVisitor visitor) {
+        visitor.visit(this);
+
     }
 }

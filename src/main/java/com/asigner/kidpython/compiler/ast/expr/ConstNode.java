@@ -12,7 +12,17 @@ public class ConstNode extends ExprNode {
         this.val = val;
     }
 
+    public Value getVal() {
+        return val;
+    }
+
     public Value eval() {
         return val;
+    }
+
+    @Override
+    void accept(ExprNodeVisitor visitor) {
+        visitor.visit(this);
+
     }
 }

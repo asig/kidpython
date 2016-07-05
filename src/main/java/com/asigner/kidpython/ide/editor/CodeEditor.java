@@ -1,6 +1,6 @@
 // Copyright 2016 Andreas Signer. All rights reserved.
 
-package com.asigner.kidpython.ide.controls.editor;
+package com.asigner.kidpython.ide.editor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;

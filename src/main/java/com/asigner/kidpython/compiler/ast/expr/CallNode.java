@@ -23,4 +23,18 @@ public class CallNode extends ExprNode {
         // TODO(asigner): Implement me!
         return null;
     }
+
+    public ExprNode getExpr() {
+        return expr;
+    }
+
+    public List<ExprNode> getParams() {
+        return params;
+    }
+
+    @Override
+    void accept(ExprNodeVisitor visitor) {
+        visitor.visit(this);
+
+    }
 }

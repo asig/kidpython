@@ -11,4 +11,6 @@ public abstract class ExprNode extends Node {
     }
 
     abstract public Value eval();
+
+    abstract void accept(ExprNodeVisitor visitor);
 }

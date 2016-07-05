@@ -19,7 +19,17 @@ public class MakeIterNode extends ExprNode {
         this.node = node;
     }
 
+    public ExprNode getNode() {
+        return node;
+    }
+
     public Value eval() {
         return new IterValue(node.eval().asIterator());
+    }
+
+    @Override
+    void accept(ExprNodeVisitor visitor) {
+        visitor.visit(this);
+
     }
 }

@@ -17,8 +17,18 @@ public class VarNode extends ExprNode {
         this.var = var;
     }
 
+    public String getVar() {
+        return var;
+    }
+
     public Value eval() {
         // TODO(asigner): get value
         return new NumberValue(BigDecimal.ZERO);
+    }
+
+    @Override
+    void accept(ExprNodeVisitor visitor) {
+        visitor.visit(this);
+
     }
 }

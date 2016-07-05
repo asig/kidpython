@@ -1,10 +1,8 @@
-package com.asigner.kidpython.ide.controls.turtle;
+package com.asigner.kidpython.ide.turtle;
 
 import java.awt.*;
 import java.awt.geom.*;
 import static java.awt.Color.*;
-import static java.awt.MultipleGradientPaint.CycleMethod.*;
-import static java.awt.MultipleGradientPaint.ColorSpaceType.*;
 
 /**
  * This class has been automatically generated using

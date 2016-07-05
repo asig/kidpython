@@ -23,5 +23,11 @@ public class MakeFuncNode extends ExprNode {
     public Value eval() {
         return new FuncValue(body, params);
     }
+
+    @Override
+    void accept(ExprNodeVisitor visitor) {
+        visitor.visit(this);
+
+    }
 }
 

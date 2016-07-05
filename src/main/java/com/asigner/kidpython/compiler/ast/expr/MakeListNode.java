@@ -17,11 +17,21 @@ public class MakeListNode extends ExprNode {
         this.nodes = nodes;
     }
 
+    public List<ExprNode> getElements() {
+        return nodes;
+    }
+
     public Value eval() {
         return new ListValue(
                 nodes.stream()
                         .map(ExprNode::eval)
                         .collect(Collectors.toList())
         );
+    }
+
+    @Override
+    void accept(ExprNodeVisitor visitor) {
+        visitor.visit(this);
+
     }
 }
