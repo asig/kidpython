@@ -1,5 +1,7 @@
 package com.asigner.kidpython.ide;
 
+import com.asigner.kidpython.compiler.Error;
+import com.asigner.kidpython.compiler.Parser;
 import com.asigner.kidpython.ide.controls.ConsoleCanvas;
 import com.asigner.kidpython.ide.controls.SourceCodeComposite;
 import com.asigner.kidpython.ide.controls.turtle.TurtleCanvas;
@@ -17,11 +19,14 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
+import java.util.List;
+
 public class App {
 
     protected Shell shell;
 
-    TurtleCanvas turtleCanvas;
+    private TurtleCanvas turtleCanvas;
+    private SourceCodeComposite sourceCodeComposite;
 
     /**
      * Launch the application.
@@ -87,33 +92,28 @@ public class App {
         toolBar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
         ToolItem item1 = new ToolItem(toolBar, SWT.PUSH);
-        item1.setText("new 1");
+        item1.setText("RUN");
         item1.addListener(SWT.Selection, event -> {
-            turtleCanvas.setPen(new RGB(255,0,255), 10);
-            turtleCanvas.move(100);
-            turtleCanvas.turn(47);
+            runCode(sourceCodeComposite.getText());
         });
 
         ToolItem separator = new ToolItem(toolBar, SWT.SEPARATOR);
 
         ToolItem item3 = new ToolItem(toolBar, SWT.PUSH);
-        item3.setText("new 2");
-        toolBar.pack();
-
+        item3.setText("Turtle");
         item3.addListener(SWT.Selection, event -> {
-            shell.getDisplay().dispose();
-            System.exit(0);
+            turtleCanvas.setPen(new RGB(255,0,255), 10);
+            turtleCanvas.move(100);
+            turtleCanvas.turn(47);
         });
-
-
-
+        toolBar.pack();
 
         SashForm sashForm = new SashForm(shell, SWT.VERTICAL);
         sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
         SashForm sashForm2 = new SashForm(sashForm, SWT.HORIZONTAL);
         sashForm2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-        SourceCodeComposite sourceCodeComposite = new SourceCodeComposite(sashForm2, SWT.NONE);
+        sourceCodeComposite = new SourceCodeComposite(sashForm2, SWT.NONE);
         turtleCanvas = new TurtleCanvas(sashForm2, SWT.NONE);
 
 
@@ -133,5 +133,18 @@ public class App {
         shell.layout();
         shell.setMaximized(true);
         shell.open();
+    }
+
+    private void runCode(String code) {
+        Parser p = new Parser(code);
+        Parser.Result res = p.parse();
+        List<Error> errs = res.getErrors();
+        if (errs.size() > 0) {
+            for (Error e : errs) {
+                System.err.println(e);
+            }
+        } else {
+          // Run code!
+        }
     }
 }
