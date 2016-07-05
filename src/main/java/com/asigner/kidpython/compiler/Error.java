@@ -26,4 +26,9 @@ public class Error {
         this.message = message;
         this.pos = pos;
     }
+
+    public String toString() {
+        return String.format("Line %d, column %d: (%s) %s", pos.getLine(), pos.getCol(), code, message);
+
+    }
 }
