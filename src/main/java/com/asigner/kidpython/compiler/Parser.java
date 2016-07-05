@@ -21,15 +21,12 @@ import com.asigner.kidpython.compiler.ast.expr.NotNode;
 import com.asigner.kidpython.compiler.ast.expr.PropertyNode;
 import com.asigner.kidpython.compiler.ast.expr.RelOpNode;
 import com.asigner.kidpython.compiler.ast.expr.VarNode;
-import com.asigner.kidpython.compiler.runtime.FuncValue;
 import com.asigner.kidpython.compiler.runtime.NumberValue;
 import com.asigner.kidpython.compiler.runtime.StringValue;
 import com.asigner.kidpython.util.Pair;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import javafx.geometry.Pos;
 
-import java.awt.font.NumericShaper;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
@@ -115,20 +112,42 @@ public class Parser {
             LPAREN
     );
 
+    public static class Result {
+        private final List<Error> errors;
+        private final Stmt code;
+
+        public Result(Stmt code, List<Error> errors) {
+            this.code = code;
+            this.errors = errors;
+        }
+
+        public Stmt getCode() {
+            return code;
+        }
+
+        public List<Error> getErrors() {
+            return errors;
+        }
+    }
+
     private final Scanner scanner;
     private Token lookahead;
     private int tmpVarCnt;
+    private List<Error> errors;
 
     public Parser(String text) {
         this.scanner = new Scanner(text);
+        this.errors = Lists.newArrayList();
     }
 
-    public void parse() {
-        stmtBlock();
+    public Result parse() {
+        lookahead = scanner.next();
+        Stmt code = stmtBlock();
+        return new Result(code, errors);
     }
 
     private void error(Error error) {
-
+        this.errors.add(error);
     }
 
     private void match(Token.Type type) {
@@ -376,6 +395,7 @@ public class Parser {
                 }
                 match(RPAREN);
                 curExpr = new CallNode(pos, base, params);
+                break;
             default:
                 error(Error.unexpectedToken(lookahead, SELECTOR_OR_CALL_START_SET));
         }
