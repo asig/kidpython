@@ -26,11 +26,7 @@ public class StmtDumper implements StmtVisitor {
         seen.add(stmt);
 
         System.err.println(String.format("%08x: %-10s true=%08x false=%08x",  System.identityHashCode(this), "IF", System.identityHashCode(stmt.getTrueBranch()), System.identityHashCode(stmt.getNext())));
-        Stmt s = stmt.getTrueBranch();
-        while (s != null) {
-            s.accept(this);
-            s = s.getNext();
-        }
+        dump(stmt.getTrueBranch());
     }
 
     @Override
@@ -55,5 +51,12 @@ public class StmtDumper implements StmtVisitor {
         seen.add(stmt);
 
         System.err.println(String.format("%08x: %-10s %s = %s",  System.identityHashCode(this), "ASSIGN", stmt.getVar(), stmt.getExpr()));
+    }
+
+    public void dump(Stmt stmt) {
+        do {
+            stmt.accept(this);
+            stmt = stmt.getNext();
+        } while (stmt != null && !seen.contains(stmt));
     }
 }

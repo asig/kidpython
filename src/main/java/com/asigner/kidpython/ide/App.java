@@ -148,9 +148,7 @@ public class App {
         } else {
             Stmt s = res.getCode();
             StmtDumper dumper = new StmtDumper();
-            while(s!=null) {
-                s.accept(dumper);
-            }
+            dumper.dump(s);
         }
     }
 }
