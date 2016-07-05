@@ -1,13 +1,13 @@
 package com.asigner.kidpython.ide;
 
-import com.asigner.kidpython.ide.controls.SourceCodeComposite;
 import com.asigner.kidpython.ide.controls.ConsoleCanvas;
-
+import com.asigner.kidpython.ide.controls.SourceCodeComposite;
 import com.asigner.kidpython.ide.controls.turtle.TurtleCanvas;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
@@ -20,6 +20,8 @@ import org.eclipse.swt.widgets.ToolItem;
 public class App {
 
     protected Shell shell;
+
+    TurtleCanvas turtleCanvas;
 
     /**
      * Launch the application.
@@ -87,6 +89,9 @@ public class App {
         ToolItem item1 = new ToolItem(toolBar, SWT.PUSH);
         item1.setText("new 1");
         item1.addListener(SWT.Selection, event -> {
+            turtleCanvas.setPen(new RGB(255,0,255), 10);
+            turtleCanvas.move(100);
+            turtleCanvas.turn(47);
         });
 
         ToolItem separator = new ToolItem(toolBar, SWT.SEPARATOR);
@@ -109,7 +114,7 @@ public class App {
         SashForm sashForm2 = new SashForm(sashForm, SWT.HORIZONTAL);
         sashForm2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         SourceCodeComposite sourceCodeComposite = new SourceCodeComposite(sashForm2, SWT.NONE);
-        TurtleCanvas turtleCanvas = new TurtleCanvas(sashForm2, SWT.NONE);
+        turtleCanvas = new TurtleCanvas(sashForm2, SWT.NONE);
 
 
         ScrolledComposite scrolledComposite = new ScrolledComposite(sashForm, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
