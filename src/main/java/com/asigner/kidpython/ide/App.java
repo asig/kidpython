@@ -3,6 +3,7 @@ package com.asigner.kidpython.ide;
 import com.asigner.kidpython.ide.controls.SourceCodeComposite;
 import com.asigner.kidpython.ide.controls.ConsoleCanvas;
 
+import com.asigner.kidpython.ide.controls.turtle.TurtleCanvas;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -100,10 +101,16 @@ public class App {
         });
 
 
+
+
         SashForm sashForm = new SashForm(shell, SWT.VERTICAL);
         sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
-        SourceCodeComposite sourceCodeComposite = new SourceCodeComposite(sashForm, SWT.NONE);
+        SashForm sashForm2 = new SashForm(sashForm, SWT.HORIZONTAL);
+        sashForm2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+        SourceCodeComposite sourceCodeComposite = new SourceCodeComposite(sashForm2, SWT.NONE);
+        TurtleCanvas turtleCanvas = new TurtleCanvas(sashForm2, SWT.NONE);
+
 
         ScrolledComposite scrolledComposite = new ScrolledComposite(sashForm, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         scrolledComposite.setExpandHorizontal(true);
