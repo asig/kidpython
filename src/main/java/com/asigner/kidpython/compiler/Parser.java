@@ -39,6 +39,7 @@ import static com.asigner.kidpython.compiler.Token.Type.DO;
 import static com.asigner.kidpython.compiler.Token.Type.DOT;
 import static com.asigner.kidpython.compiler.Token.Type.ELSE;
 import static com.asigner.kidpython.compiler.Token.Type.END;
+import static com.asigner.kidpython.compiler.Token.Type.EOT;
 import static com.asigner.kidpython.compiler.Token.Type.EQ;
 import static com.asigner.kidpython.compiler.Token.Type.FOR;
 import static com.asigner.kidpython.compiler.Token.Type.FUNC;
@@ -142,6 +143,7 @@ public class Parser {
     public Result parse() {
         lookahead = scanner.next();
         Stmt code = stmtBlock();
+        match(EOT);
         return new Result(code, errors);
     }
 
@@ -511,7 +513,7 @@ public class Parser {
                         mapNodes.add(mapEntry());
                     }
                 }
-                match(RBRACK);
+                match(RBRACE);
                 return new MakeMapNode(pos, mapNodes);
             case IDENT:
                 String varName = lookahead.getValue();
