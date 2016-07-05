@@ -18,9 +18,22 @@ public class AssignmentStmt extends Stmt {
     }
 
     @Override
-    Stmt execute() {
+    public Stmt execute() {
         Value val = expr.eval();
         // TODO(asigner); Assign value to ident
         return getNext();
+    }
+
+    @Override
+    public void accept(StmtVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    public ExprNode getExpr() {
+        return expr;
+    }
+
+    public ExprNode getVar() {
+        return varExpr;
     }
 }

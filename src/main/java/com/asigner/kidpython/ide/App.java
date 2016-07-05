@@ -2,6 +2,8 @@ package com.asigner.kidpython.ide;
 
 import com.asigner.kidpython.compiler.Error;
 import com.asigner.kidpython.compiler.Parser;
+import com.asigner.kidpython.compiler.ast.Stmt;
+import com.asigner.kidpython.compiler.ast.StmtDumper;
 import com.asigner.kidpython.ide.controls.ConsoleCanvas;
 import com.asigner.kidpython.ide.controls.SourceCodeComposite;
 import com.asigner.kidpython.ide.controls.turtle.TurtleCanvas;
@@ -144,7 +146,11 @@ public class App {
                 System.err.println(e);
             }
         } else {
-          // Run code!
+            Stmt s = res.getCode();
+            StmtDumper dumper = new StmtDumper();
+            while(s!=null) {
+                s.accept(dumper);
+            }
         }
     }
 }

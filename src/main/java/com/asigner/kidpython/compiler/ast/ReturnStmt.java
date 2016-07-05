@@ -8,16 +8,24 @@ import com.asigner.kidpython.compiler.ast.expr.ExprNode;
 public class ReturnStmt extends Stmt {
 
     private ExprNode expr;
-    private Stmt trueBranch;
 
     public ReturnStmt(Position pos, ExprNode expr) {
         super(pos);
         this.expr = expr;
     }
 
+    public ExprNode getExpr() {
+        return expr;
+    }
+
     @Override
-    Stmt execute() {
+    public Stmt execute() {
         expr.eval();
         return null;
+    }
+
+    @Override
+    public void accept(StmtVisitor visitor) {
+        visitor.visit(this);
     }
 }

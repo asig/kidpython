@@ -17,11 +17,21 @@ public class IfStmt extends Stmt {
     }
 
     @Override
-    Stmt execute() {
+    public Stmt execute() {
         if (cond.eval().asBool()) {
             return trueBranch;
         } else {
             return next;
         }
     }
+
+    public Stmt getTrueBranch() {
+        return trueBranch;
+    }
+
+    @Override
+    public void accept(StmtVisitor visitor) {
+        visitor.visit(this);
+    }
+
 }

@@ -10,7 +10,6 @@ import com.asigner.kidpython.compiler.runtime.Value;
 public class CallStmt extends Stmt {
 
     private ExprNode expr;
-    private Stmt trueBranch;
 
     public CallStmt(Position pos, ExprNode expr) {
         super(pos);
@@ -18,11 +17,20 @@ public class CallStmt extends Stmt {
     }
 
     @Override
-    Stmt execute() {
+    public Stmt execute() {
         Value val = expr.eval();
         if (val.getType() != Value.Type.FUNCTION) {
             // Emit error: Can't call non-function
         }
         return ((FuncValue)val).getValue();
+    }
+
+    public ExprNode getExpr() {
+        return expr;
+    }
+
+    @Override
+    public void accept(StmtVisitor visitor) {
+        visitor.visit(this);
     }
 }

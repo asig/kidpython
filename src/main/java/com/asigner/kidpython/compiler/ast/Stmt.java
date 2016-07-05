@@ -26,5 +26,7 @@ public abstract class Stmt extends Node {
         return cur;
     }
 
-    abstract Stmt execute();
+    public abstract Stmt execute();
+
+    public abstract void accept(StmtVisitor visitor);
 }

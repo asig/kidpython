@@ -11,9 +11,15 @@ public class EmptyStmt extends Stmt {
     }
 
     @Override
-    Stmt execute() {
+    public Stmt execute() {
         return getNext();
     }
+
+    @Override
+    public void accept(StmtVisitor visitor) {
+        visitor.visit(this);
+    }
+
 }
 
 
