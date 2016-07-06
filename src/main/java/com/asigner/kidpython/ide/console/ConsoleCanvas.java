@@ -3,7 +3,10 @@ package com.asigner.kidpython.ide.console;
 import com.google.common.collect.Lists;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontMetrics;
@@ -16,7 +19,7 @@ import org.eclipse.swt.widgets.Display;
 
 import java.util.List;
 
-public class ConsoleCanvas extends Canvas {
+public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener {
 
     private static class Attr {
         int fg, bg;
@@ -70,7 +73,8 @@ public class ConsoleCanvas extends Canvas {
     public ConsoleCanvas(Composite parent, int style) {
         super(parent, style);
 
-        addPaintListener(this::paint);
+        addPaintListener(this);
+        addKeyListener(this);
 
         for (int i = 0; i < LINES; i++) {
             lines[i] = "";
@@ -177,7 +181,21 @@ public class ConsoleCanvas extends Canvas {
         }
     }
 
-    private void paint(PaintEvent e) {
+    @Override
+    public void keyPressed(KeyEvent keyEvent) {
+        addNoRepaint(keyEvent.character);
+        System.err.println(String.format("%d",(int)keyEvent.character));
+        int x = cursorX * fontMetrics.getAverageCharWidth();
+        int y = cursorY * fontMetrics.getHeight();
+        getDisplay().syncExec(() -> redraw());
+    }
+
+    @Override
+    public void keyReleased(KeyEvent keyEvent) {
+    }
+
+    @Override
+    public void paintControl(PaintEvent e) {
 //        System.out.println(String.format("PaintEvent: x=%d, y=%d, w=%d, h=%d", e.x, e.y, e.width, e.height));
 
         GC gc = e.gc;
