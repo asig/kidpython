@@ -14,7 +14,6 @@ public class ConsoleComposite extends ScrolledComposite {
     public ConsoleComposite(Composite parent, int style) {
         super(parent, style);
 
-
         setExpandHorizontal(true);
         setExpandVertical(true);
 

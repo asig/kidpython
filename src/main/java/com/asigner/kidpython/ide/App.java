@@ -97,7 +97,7 @@ public class App {
             runCode(sourceCodeComposite.getText());
         });
         addToolbarItem(toolBar, "PRINT", event -> {
-            consoleComposite.add("Hello, World! " + l + "\n");
+            consoleComposite.add("Hello\u001B[1mHello\u001B[0m, \u001B[1m\u001B[3m\u001b[41m\u001b[33mWorld!\u001b[0m " + l + "\n");
             l = l+1;
         });
         ToolItem separator = new ToolItem(toolBar, SWT.SEPARATOR);
