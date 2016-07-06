@@ -2,6 +2,7 @@ package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.ast.Node;
+import com.asigner.kidpython.compiler.runtime.Environment;
 import com.asigner.kidpython.compiler.runtime.Value;
 
 public abstract class ExprNode extends Node {
@@ -10,7 +11,7 @@ public abstract class ExprNode extends Node {
         super(pos);
     }
 
-    abstract public Value eval();
+    abstract public Value eval(Environment env);
 
     abstract void accept(ExprNodeVisitor visitor);
 }

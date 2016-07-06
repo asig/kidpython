@@ -4,6 +4,7 @@ package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.ast.Stmt;
+import com.asigner.kidpython.compiler.runtime.Environment;
 import com.asigner.kidpython.compiler.runtime.FuncValue;
 import com.asigner.kidpython.compiler.runtime.Value;
 
@@ -20,7 +21,7 @@ public class MakeFuncNode extends ExprNode {
         this.params = params;
     }
 
-    public Value eval() {
+    public Value eval(Environment env) {
         return new FuncValue(body, params);
     }
 

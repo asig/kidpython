@@ -3,6 +3,7 @@
 package com.asigner.kidpython.compiler.ast;
 
 import com.asigner.kidpython.compiler.Position;
+import com.asigner.kidpython.compiler.runtime.Environment;
 
 public class EmptyStmt extends Stmt {
 
@@ -11,7 +12,7 @@ public class EmptyStmt extends Stmt {
     }
 
     @Override
-    public Stmt execute() {
+    public Stmt execute(Environment env) {
         return getNext();
     }
 

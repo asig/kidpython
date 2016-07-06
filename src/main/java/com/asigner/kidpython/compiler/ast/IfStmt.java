@@ -4,6 +4,7 @@ package com.asigner.kidpython.compiler.ast;
 
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.ast.expr.ExprNode;
+import com.asigner.kidpython.compiler.runtime.Environment;
 
 public class IfStmt extends Stmt {
 
@@ -17,8 +18,8 @@ public class IfStmt extends Stmt {
     }
 
     @Override
-    public Stmt execute() {
-        if (cond.eval().asBool()) {
+    public Stmt execute(Environment env) {
+        if (cond.eval(env).asBool()) {
             return trueBranch;
         } else {
             return next;

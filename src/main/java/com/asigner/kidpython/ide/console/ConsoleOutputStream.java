@@ -15,6 +15,6 @@ public class ConsoleOutputStream extends OutputStream {
 
     @Override
     public void write(int b) throws IOException {
-        console.add((char)b);
+        console.write((char)b);
     }
 }

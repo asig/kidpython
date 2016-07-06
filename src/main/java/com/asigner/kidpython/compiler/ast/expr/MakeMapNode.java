@@ -1,6 +1,7 @@
 package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
+import com.asigner.kidpython.compiler.runtime.Environment;
 import com.asigner.kidpython.compiler.runtime.MapValue;
 import com.asigner.kidpython.compiler.runtime.Value;
 import com.asigner.kidpython.util.Pair;
@@ -22,10 +23,10 @@ public class MakeMapNode extends ExprNode {
         return nodes;
     }
 
-    public Value eval() {
+    public Value eval(Environment env) {
         return new MapValue(
                 nodes.stream()
-                        .collect(toMap(p -> p.getFirst().eval(), p -> p.getSecond().eval()))
+                        .collect(toMap(p -> p.getFirst().eval(env), p -> p.getSecond().eval(env)))
         );
     }
 

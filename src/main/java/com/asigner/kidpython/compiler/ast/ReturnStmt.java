@@ -4,6 +4,7 @@ package com.asigner.kidpython.compiler.ast;
 
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.ast.expr.ExprNode;
+import com.asigner.kidpython.compiler.runtime.Environment;
 
 public class ReturnStmt extends Stmt {
 
@@ -19,8 +20,8 @@ public class ReturnStmt extends Stmt {
     }
 
     @Override
-    public Stmt execute() {
-        expr.eval();
+    public Stmt execute(Environment env) {
+        expr.eval(env);
         return null;
     }
 

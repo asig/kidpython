@@ -3,6 +3,7 @@
 package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
+import com.asigner.kidpython.compiler.runtime.Environment;
 import com.asigner.kidpython.compiler.runtime.NumberValue;
 import com.asigner.kidpython.compiler.runtime.Value;
 
@@ -21,9 +22,8 @@ public class VarNode extends ExprNode {
         return var;
     }
 
-    public Value eval() {
-        // TODO(asigner): get value
-        return new NumberValue(BigDecimal.ZERO);
+    public Value eval(Environment env) {
+        return env.getVar(var);
     }
 
     @Override

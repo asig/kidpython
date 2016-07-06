@@ -1,6 +1,7 @@
 package com.asigner.kidpython.compiler.ast;
 
 import com.asigner.kidpython.compiler.Position;
+import com.asigner.kidpython.compiler.runtime.Environment;
 
 public abstract class Stmt extends Node {
 
@@ -26,7 +27,7 @@ public abstract class Stmt extends Node {
         return cur;
     }
 
-    public abstract Stmt execute();
+    public abstract Stmt execute(Environment env);
 
     public abstract void accept(StmtVisitor visitor);
 }

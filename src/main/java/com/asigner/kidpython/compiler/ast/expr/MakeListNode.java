@@ -1,7 +1,7 @@
 package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
-import com.asigner.kidpython.compiler.ast.expr.ExprNode;
+import com.asigner.kidpython.compiler.runtime.Environment;
 import com.asigner.kidpython.compiler.runtime.ListValue;
 import com.asigner.kidpython.compiler.runtime.Value;
 
@@ -21,10 +21,10 @@ public class MakeListNode extends ExprNode {
         return nodes;
     }
 
-    public Value eval() {
+    public Value eval(Environment env) {
         return new ListValue(
                 nodes.stream()
-                        .map(ExprNode::eval)
+                        .map(exprNode -> exprNode.eval(env))
                         .collect(Collectors.toList())
         );
     }

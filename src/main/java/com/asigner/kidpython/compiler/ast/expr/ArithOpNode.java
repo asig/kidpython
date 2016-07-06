@@ -3,6 +3,7 @@
 package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
+import com.asigner.kidpython.compiler.runtime.Environment;
 import com.asigner.kidpython.compiler.runtime.Value;
 
 public class ArithOpNode extends BinaryNode {
@@ -21,7 +22,7 @@ public class ArithOpNode extends BinaryNode {
     }
 
     @Override
-    public Value eval() {
+    public Value eval(Environment environment) {
         return null;
     }
 

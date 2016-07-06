@@ -3,6 +3,10 @@ package com.asigner.kidpython.compiler.runtime;
 import com.asigner.kidpython.compiler.ast.Stmt;
 import com.google.common.collect.Maps;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -36,13 +40,38 @@ public class Environment {
 
     private Frame funcFrame;
     private Frame globalFrame;
+    private Stmt code;
+    private Stmt pc;
 
     private Stack<Stmt> stack = new Stack<>();
     private Value resultValue;
 
-    public Environment() {
+    private final PrintStream stdout;
+    private final InputStream stdin;
+
+    public Environment(OutputStream stdout, InputStream stdin) {
+        this.stdout = new PrintStream(stdout);
+        this.stdin = stdin;
+        reset();
+    }
+
+    public void reset() {
         this.funcFrame = null;
         this.globalFrame = new Frame(null);
+        this.pc = null;
+
+        globalFrame.setVar("print", new NativeFuncValue(this::print));
+    }
+
+    void setCode(Stmt code) {
+        this.code = code;
+        this.pc = pc;
+    }
+
+    void run() {
+        while (pc != null) {
+            pc = pc.execute(this);
+        }
     }
 
     public void enterFunction() {
@@ -77,4 +106,10 @@ public class Environment {
         targetFrame.setVar(name, value);
     }
 
+    private Value print(List<Value> values) {
+        for (Value v : values) {
+            stdout.print(v.asString());
+        }
+        return null;
+    }
 }

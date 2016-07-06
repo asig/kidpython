@@ -4,11 +4,9 @@ package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.runtime.BooleanValue;
-import com.asigner.kidpython.compiler.runtime.IterValue;
+import com.asigner.kidpython.compiler.runtime.Environment;
 import com.asigner.kidpython.compiler.runtime.Value;
 import com.google.common.base.Preconditions;
-
-import java.math.BigDecimal;
 
 public class IterHasNextNode extends ExprNode {
 
@@ -23,8 +21,8 @@ public class IterHasNextNode extends ExprNode {
         return expr;
     }
 
-    public Value eval() {
-        Value v = expr.eval();
+    public Value eval(Environment env) {
+        Value v = expr.eval(env);
         Preconditions.checkArgument(v.getType() == Value.Type.ITERATOR);
         return new BooleanValue(v.asIterator().hasNext());
     }

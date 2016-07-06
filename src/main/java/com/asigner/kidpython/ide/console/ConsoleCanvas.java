@@ -70,6 +70,8 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
     private boolean cursorOn;
     private Thread cursorBlinker;
 
+    private Runnable textModifiedListener = () -> {};
+
     public ConsoleCanvas(Composite parent, int style) {
         super(parent, style);
 
@@ -132,6 +134,10 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
         cursorBlinker.start();
     }
 
+    public void setTextModifiedListener(Runnable textModifiedListener) {
+        this.textModifiedListener = textModifiedListener;
+    }
+
     private void flipCursor() {
         cursorOn = !cursorOn;
         if(!isDisposed()) {
@@ -149,7 +155,21 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
         this.showCursor = showCursor;
     }
 
-    void addNoRepaint(char c) {
+    public void write(String s) {
+        for (char c : s.toCharArray()) {
+            writeNoRepaint(c);
+        }
+        Display.getCurrent().asyncExec(this::redraw);
+        textModifiedListener.run();
+    }
+
+    public void write(char c) {
+        writeNoRepaint(c);
+        textModifiedListener.run();
+    }
+
+
+    void writeNoRepaint(char c) {
         if (inEscapeSequence) {
             escapeBuffer += c;
             if (c == 'm') {
@@ -183,11 +203,30 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
 
     @Override
     public void keyPressed(KeyEvent keyEvent) {
-        addNoRepaint(keyEvent.character);
-        System.err.println(String.format("%d",(int)keyEvent.character));
-        int x = cursorX * fontMetrics.getAverageCharWidth();
-        int y = cursorY * fontMetrics.getHeight();
-        getDisplay().syncExec(() -> redraw());
+        char c = keyEvent.character;
+        if (c == '\0') {
+            return;
+        }
+        if (c == '\r') {
+            c = '\n';
+        }
+        if (c != '\n' && Character.isISOControl(c)) {
+            return;
+        }
+        writeNoRepaint(c);
+        textModifiedListener.run();
+
+        // redraw the whole line
+        int h = fontMetrics.getHeight();
+        int y = cursorY * h;
+        if (c == '\n') {
+            // ... and the previous one
+            y -= h;
+            h *= 2;
+        }
+        int finalY = y;
+        int finalH = h;
+        getDisplay().syncExec(() -> redraw(0, finalY, Integer.MAX_VALUE, finalH, false));
     }
 
     @Override

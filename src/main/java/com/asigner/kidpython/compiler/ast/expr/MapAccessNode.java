@@ -3,6 +3,7 @@
 package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
+import com.asigner.kidpython.compiler.runtime.Environment;
 import com.asigner.kidpython.compiler.runtime.Value;
 
 public class MapAccessNode extends ExprNode {
@@ -25,7 +26,7 @@ public class MapAccessNode extends ExprNode {
     }
 
     @Override
-    public Value eval() {
+    public Value eval(Environment env) {
         // TODO(asigner): Implement me!
         return null;
     }

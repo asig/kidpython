@@ -4,6 +4,7 @@ package com.asigner.kidpython.compiler.ast;
 
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.ast.expr.ExprNode;
+import com.asigner.kidpython.compiler.runtime.Environment;
 import com.asigner.kidpython.compiler.runtime.FuncValue;
 import com.asigner.kidpython.compiler.runtime.Value;
 
@@ -17,8 +18,8 @@ public class CallStmt extends Stmt {
     }
 
     @Override
-    public Stmt execute() {
-        Value val = expr.eval();
+    public Stmt execute(Environment env) {
+        Value val = expr.eval(env);
         if (val.getType() != Value.Type.FUNCTION) {
             // Emit error: Can't call non-function
         }
