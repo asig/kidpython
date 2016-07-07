@@ -24,12 +24,14 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
 
     private static class Attr {
         int fg, bg;
+        boolean inverse;
         boolean bold, italic, underlined;
 
         static Attr decode(int val) {
             Attr a = new Attr();
             a.fg = (val >> 16) & 0xff;
             a.bg = (val >> 8) & 0xff;
+            a.inverse = (val & 0x8) > 0;
             a.bold = (val & 0x4) > 0;
             a.italic = (val & 0x2) > 0;
             a.underlined = (val & 0x1) > 0;
@@ -37,7 +39,7 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
         }
 
         int encode() {
-            return (fg & 0xff) << 16 | (bg & 0xff) << 8 | (bold ? 0x4 : 0) | (italic ? 0x2 : 0) | (underlined ? 0x1 : 0);
+            return (fg & 0xff) << 16 | (bg & 0xff) << 8 | (inverse ? 0x8 : 0) | (bold ? 0x4 : 0) | (italic ? 0x2 : 0) | (underlined ? 0x1 : 0);
         }
     }
 
@@ -295,8 +297,9 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
     }
 
     private void setAttr(GC gc, Attr attr) {
-        gc.setForeground(colors[attr.fg]);
-        gc.setBackground(colors[attr.bg]);
+
+        gc.setForeground(colors[attr.inverse ? attr.bg : attr.fg]);
+        gc.setBackground(colors[attr.inverse ? attr.fg : attr.bg]);
 
         if (attr.bold && attr.italic) {
             gc.setFont(fontBoldItalic);
