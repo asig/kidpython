@@ -4,12 +4,9 @@ package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.runtime.Environment;
-import com.asigner.kidpython.compiler.runtime.NumberValue;
 import com.asigner.kidpython.compiler.runtime.Value;
 
-import java.math.BigDecimal;
-
-public class VarNode extends ExprNode {
+public class VarNode extends ExprNode implements Assignable {
 
     private final String var;
 
@@ -27,8 +24,12 @@ public class VarNode extends ExprNode {
     }
 
     @Override
+    public void assign(Environment env, Value val) {
+        env.setVar(var, val);
+    }
+
+    @Override
     void accept(ExprNodeVisitor visitor) {
         visitor.visit(this);
-
     }
 }

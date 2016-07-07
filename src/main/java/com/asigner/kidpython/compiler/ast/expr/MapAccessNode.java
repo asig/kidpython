@@ -4,9 +4,10 @@ package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.runtime.Environment;
+import com.asigner.kidpython.compiler.runtime.ExecutionException;
 import com.asigner.kidpython.compiler.runtime.Value;
 
-public class MapAccessNode extends ExprNode {
+public class MapAccessNode extends ExprNode implements Assignable {
 
     private final ExprNode mapExpr;
     private final ExprNode keyExpr;
@@ -29,6 +30,15 @@ public class MapAccessNode extends ExprNode {
     public Value eval(Environment env) {
         // TODO(asigner): Implement me!
         return null;
+    }
+
+    @Override
+    public void assign(Environment env, Value val) {
+        Value raw = mapExpr.eval(env);
+        if (raw.getType() != Value.Type.MAP) {
+            throw new ExecutionException("Base variable is not a map");
+        }
+        raw.asMap().put(keyExpr.eval(env), val);
     }
 
     @Override

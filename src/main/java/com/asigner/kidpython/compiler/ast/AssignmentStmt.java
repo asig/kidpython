@@ -3,8 +3,10 @@
 package com.asigner.kidpython.compiler.ast;
 
 import com.asigner.kidpython.compiler.Position;
+import com.asigner.kidpython.compiler.ast.expr.Assignable;
 import com.asigner.kidpython.compiler.ast.expr.ExprNode;
 import com.asigner.kidpython.compiler.runtime.Environment;
+import com.asigner.kidpython.compiler.runtime.ExecutionException;
 import com.asigner.kidpython.compiler.runtime.Value;
 
 public class AssignmentStmt extends Stmt {
@@ -15,13 +17,16 @@ public class AssignmentStmt extends Stmt {
     public AssignmentStmt(Position pos, ExprNode varExpr, ExprNode expr) {
         super(pos);
         this.expr = expr;
+        if (!(varExpr instanceof Assignable)) {
+            throw new ExecutionException("Can't assign to this expression");
+        }
         this.varExpr = varExpr;
     }
 
     @Override
     public Stmt execute(Environment env) {
         Value val = expr.eval(env);
-        // TODO(asigner); Assign value to ident
+        ((Assignable)varExpr).assign(env, val);
         return getNext();
     }
 
