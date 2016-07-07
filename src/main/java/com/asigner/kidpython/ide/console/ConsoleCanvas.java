@@ -169,7 +169,7 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
         textModifiedListener.run();
     }
 
-    void writeNoRepaint(char c) {
+    private void writeNoRepaint(char c) {
         if (inEscapeSequence) {
             escapeBuffer += c;
             if (c == 'm') {
