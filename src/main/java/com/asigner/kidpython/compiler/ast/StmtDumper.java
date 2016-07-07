@@ -59,6 +59,14 @@ public class StmtDumper implements StmtVisitor {
         printStream.println(String.format("%08x: %-10s %s = %s",  System.identityHashCode(stmt), "ASSIGN", dumpExpr(stmt.getVar()), dumpExpr(stmt.getExpr())));
     }
 
+    @Override
+    public void visit(EvalStmt stmt) {
+        if (seen.contains(stmt)) return;
+        seen.add(stmt);
+
+        printStream.println(String.format("%08x: %-10s %s",  System.identityHashCode(stmt), "EVAL", dumpExpr(stmt.getExpr())));
+    }
+
     public void dump(Stmt stmt) {
         do {
             stmt.accept(this);

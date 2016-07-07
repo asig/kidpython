@@ -6,4 +6,5 @@ public interface StmtVisitor {
     void visit(EmptyStmt stmt);
     void visit(CallStmt stmt);
     void visit(AssignmentStmt stmt);
+    void visit(EvalStmt stmt);
 }

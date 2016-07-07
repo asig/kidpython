@@ -2,6 +2,7 @@ package com.asigner.kidpython.compiler;
 
 import com.asigner.kidpython.compiler.ast.AssignmentStmt;
 import com.asigner.kidpython.compiler.ast.EmptyStmt;
+import com.asigner.kidpython.compiler.ast.EvalStmt;
 import com.asigner.kidpython.compiler.ast.IfStmt;
 import com.asigner.kidpython.compiler.ast.ReturnStmt;
 import com.asigner.kidpython.compiler.ast.Stmt;
@@ -16,8 +17,8 @@ import com.asigner.kidpython.compiler.ast.expr.MakeFuncNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeIterNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeListNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeMapNode;
-import com.asigner.kidpython.compiler.ast.expr.NotNode;
 import com.asigner.kidpython.compiler.ast.expr.MapAccessNode;
+import com.asigner.kidpython.compiler.ast.expr.NotNode;
 import com.asigner.kidpython.compiler.ast.expr.RelOpNode;
 import com.asigner.kidpython.compiler.ast.expr.VarNode;
 import com.asigner.kidpython.compiler.runtime.NumberValue;
@@ -362,8 +363,7 @@ public class Parser {
             expr = expr();
             return new AssignmentStmt(pos, varExpr, expr);
         } else {
-            // Create fake assignment to force eval
-            return new AssignmentStmt(pos, new VarNode(pos, makeTempVarName()), varExpr);
+            return new EvalStmt(pos, varExpr);
         }
     }
 
