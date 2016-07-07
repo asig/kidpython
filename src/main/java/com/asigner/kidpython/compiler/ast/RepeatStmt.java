@@ -4,23 +4,29 @@ package com.asigner.kidpython.compiler.ast;
 
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.ast.expr.ExprNode;
-import com.asigner.kidpython.compiler.runtime.Environment;
 
-public class ReturnStmt extends Stmt {
+public class RepeatStmt extends Stmt {
 
-    private ExprNode expr;
+    private ExprNode cond;
+    private Stmt body;
 
-    public ReturnStmt(Position pos, ExprNode expr) {
+    public RepeatStmt(Position pos, ExprNode cond, Stmt body) {
         super(pos);
-        this.expr = expr;
+        this.cond = cond;
+        this.body = body;
     }
 
-    public ExprNode getExpr() {
-        return expr;
+    public ExprNode getCond() {
+        return cond;
+    }
+
+    public Stmt getBody() {
+        return body;
     }
 
     @Override
     public void accept(NodeVisitor visitor) {
         visitor.visit(this);
     }
+
 }

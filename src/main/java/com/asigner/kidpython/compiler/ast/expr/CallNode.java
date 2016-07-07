@@ -4,9 +4,13 @@ package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.runtime.Environment;
+import com.asigner.kidpython.compiler.runtime.ExecutionException;
+import com.asigner.kidpython.compiler.runtime.FuncValue;
 import com.asigner.kidpython.compiler.runtime.Value;
 
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 public class CallNode extends ExprNode {
 
@@ -21,7 +25,11 @@ public class CallNode extends ExprNode {
 
     @Override
     public Value eval(Environment env) {
-        // TODO(asigner): Implement me!
+        Value v = expr.eval(env);
+        if (v.getType() != Value.Type.FUNCTION) {
+            throw new ExecutionException("Can't call non-function object");
+        }
+
         return null;
     }
 

@@ -4,23 +4,23 @@ package com.asigner.kidpython.compiler.ast;
 
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.ast.expr.ExprNode;
-import com.asigner.kidpython.compiler.runtime.Environment;
 
-public class ReturnStmt extends Stmt {
+public class ForEachStmt extends Stmt {
 
-    private ExprNode expr;
+    private ExprNode ctrlVar;
+    private ExprNode range;
+    private Stmt body;
 
-    public ReturnStmt(Position pos, ExprNode expr) {
+    public ForEachStmt(Position pos, ExprNode ctrlVar, ExprNode range, Stmt body) {
         super(pos);
-        this.expr = expr;
-    }
-
-    public ExprNode getExpr() {
-        return expr;
+        this.ctrlVar = ctrlVar;
+        this.range = range;
+        this.body = body;
     }
 
     @Override
     public void accept(NodeVisitor visitor) {
         visitor.visit(this);
     }
+
 }

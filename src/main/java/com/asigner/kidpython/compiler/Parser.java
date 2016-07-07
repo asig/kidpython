@@ -3,22 +3,22 @@ package com.asigner.kidpython.compiler;
 import com.asigner.kidpython.compiler.ast.AssignmentStmt;
 import com.asigner.kidpython.compiler.ast.EmptyStmt;
 import com.asigner.kidpython.compiler.ast.EvalStmt;
+import com.asigner.kidpython.compiler.ast.ForEachStmt;
+import com.asigner.kidpython.compiler.ast.ForStmt;
 import com.asigner.kidpython.compiler.ast.IfStmt;
+import com.asigner.kidpython.compiler.ast.RepeatStmt;
 import com.asigner.kidpython.compiler.ast.ReturnStmt;
 import com.asigner.kidpython.compiler.ast.Stmt;
+import com.asigner.kidpython.compiler.ast.WhileStmt;
 import com.asigner.kidpython.compiler.ast.expr.ArithOpNode;
 import com.asigner.kidpython.compiler.ast.expr.BoolNode;
 import com.asigner.kidpython.compiler.ast.expr.CallNode;
 import com.asigner.kidpython.compiler.ast.expr.ConstNode;
 import com.asigner.kidpython.compiler.ast.expr.ExprNode;
-import com.asigner.kidpython.compiler.ast.expr.IterHasNextNode;
-import com.asigner.kidpython.compiler.ast.expr.IterNextNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeFuncNode;
-import com.asigner.kidpython.compiler.ast.expr.MakeIterNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeListNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeMapNode;
 import com.asigner.kidpython.compiler.ast.expr.MapAccessNode;
-import com.asigner.kidpython.compiler.ast.expr.NotNode;
 import com.asigner.kidpython.compiler.ast.expr.RelOpNode;
 import com.asigner.kidpython.compiler.ast.expr.VarNode;
 import com.asigner.kidpython.compiler.runtime.NumberValue;
@@ -184,16 +184,14 @@ public class Parser {
     }
 
     private Stmt ifStmt() {
-        StmtList stmts = new StmtList();
-
-        EmptyStmt endNode = new EmptyStmt(lookahead.getPos());
         Position ifPos = lookahead.getPos();
         match(IF);
         ExprNode expr = expr();
         match(THEN);
         Stmt body = stmtBlock();
 
-        stmts.add(new IfStmt(ifPos, expr, body));
+        IfStmt ifStmt = new IfStmt(ifPos, expr, body);
+        IfStmt curIf = ifStmt;
         for (;;) {
             if (lookahead.getType() == ELSE) {
                 Position pos = lookahead.getPos();
@@ -206,13 +204,13 @@ public class Parser {
                     ExprNode cond = expr();
                     match(THEN);
                     body = stmtBlock();
-                    body.setNext(endNode);
 
-                    stmts.add(new IfStmt(ifPos, cond, body));
+                    IfStmt innerIf = new IfStmt(ifPos, cond, body);
+                    curIf.setFalseBranch(innerIf);
+                    curIf = innerIf;
                 } else {
                     // terminating ELSE. break out of loop afterwards
-                    stmts.add(stmtBlock());
-                    stmts.getLast().setNext(endNode);
+                    curIf.setFalseBranch(stmtBlock());
                     break;
                 }
             } else {
@@ -221,13 +219,11 @@ public class Parser {
             }
         }
         match(END);
-        return stmts.getFirst();
+        return ifStmt;
     }
 
     private Stmt forStmt() {
-        StmtList stmts = new StmtList();
-
-        Stmt end = new EmptyStmt(lookahead.getPos());
+        Position pos = lookahead.getPos();
         match(FOR);
         String varIdent = lookahead.getValue();
         Position varPos = lookahead.getPos();
@@ -239,22 +235,27 @@ public class Parser {
             ExprNode range = expr();
             match(DO);
 
-            // iter = range.begin()
-            ExprNode iterVar = new VarNode(rangePos, makeTempVarName());
-            stmts.add(new AssignmentStmt(rangePos, iterVar, new MakeIterNode(rangePos, range)));
+//            // iter = range.begin()
+//            ExprNode iterVar = new VarNode(rangePos, makeTempVarName());
+//            stmts.add(new AssignmentStmt(rangePos, iterVar, new MakeIterNode(rangePos, range)));
+//
+//            // if !iter.hasnext goto end
+//            ExprNode condition = new NotNode(rangePos, new IterHasNextNode(rangePos, iterVar));
+//            Stmt ifNode = new IfStmt(varPos, condition, end);
+//            stmts.add(ifNode);
+//
+//            // i = iter.next()
+//            stmts.add(new AssignmentStmt(rangePos, ctrlVar, new IterNextNode(rangePos, iterVar)));
+//
+            Stmt body = stmtBlock();
 
-            // if !iter.hasnext goto end
-            ExprNode condition = new NotNode(rangePos, new IterHasNextNode(rangePos, iterVar));
-            Stmt ifNode = new IfStmt(varPos, condition, end);
-            stmts.add(ifNode);
-
-            // i = iter.next()
-            stmts.add(new AssignmentStmt(rangePos, ctrlVar, new IterNextNode(rangePos, iterVar)));
-
-            stmts.add(stmtBlock());
-            stmts.getLast().setNext(ifNode);
+//            stmts.add(stmtBlock());
+//            stmts.getLast().setNext(ifNode);
 
             match(END);
+
+            return new ForEachStmt(pos, ctrlVar, range, body);
+
         } else if (lookahead.getType() == EQ) {
             ExprNode stepExpr = new ConstNode(lookahead.getPos(), new NumberValue(BigDecimal.ONE));
             Position eqPos = lookahead.getPos();
@@ -267,30 +268,32 @@ public class Parser {
                 stepExpr = expr();
             }
 
-            // i := start
-            stmts.add(new AssignmentStmt(varPos, ctrlVar, fromExpr));
-
-            // if i == stop goto end
-            ExprNode comparison = new RelOpNode(eqPos, RelOpNode.Op.EQ, ctrlVar, toExpr);
-            Stmt ifNode = new IfStmt(varPos, comparison, end);
-            stmts.add(ifNode);
+//            // i := start
+//            stmts.add(new AssignmentStmt(varPos, ctrlVar, fromExpr));
+//
+//            // if i == stop goto end
+//            ExprNode comparison = new RelOpNode(eqPos, RelOpNode.Op.EQ, ctrlVar, toExpr);
+//            Stmt ifNode = new IfStmt(varPos, comparison, end);
+//            stmts.add(ifNode);
 
             match(DO);
 
-            stmts.add(stmtBlock());
+            Stmt body = stmtBlock();
 
-            // i = i + steop
-            ExprNode addStep = new ArithOpNode(eqPos, ArithOpNode.Op.ADD, ctrlVar, stepExpr);
-            stmts.add(new AssignmentStmt(eqPos, ctrlVar, addStep));
-            // Goto comparisong
-            stmts.getLast().setNext(ifNode);
+//            // i = i + steop
+//            ExprNode addStep = new ArithOpNode(eqPos, ArithOpNode.Op.ADD, ctrlVar, stepExpr);
+//            stmts.add(new AssignmentStmt(eqPos, ctrlVar, addStep));
+//            // Goto comparisong
+//            stmts.getLast().setNext(ifNode);
 
             match(END);
+
+            return new ForStmt(pos, ctrlVar, fromExpr, toExpr, stepExpr, body);
+
         } else {
             sync(Sets.newHashSet(DO));
+            return new EmptyStmt(pos);
         }
-
-        return stmts.getFirst();
     }
 
     private Stmt whileStmt() {
@@ -302,27 +305,17 @@ public class Parser {
         Stmt body = stmtBlock();
         match(END);
 
-        StmtList stmts = new StmtList();
-        Stmt ifNode = new IfStmt(pos, condition, body);
-        stmts.add(ifNode);
-        body.setNext(ifNode);
-        return stmts.getFirst();
+        return new WhileStmt(pos, condition, body);
     }
 
     private Stmt repeatStmt() {
+        Position pos = lookahead.getPos();
         match(REPEAT);
         Stmt body = stmtBlock();
         match(UNTIL);
-        Position condPos = lookahead.getPos();
         ExprNode condition = expr();
 
-        StmtList stmts = new StmtList();
-        stmts.add(body);
-        Stmt ifNode = new IfStmt(condPos, new NotNode(condPos,condition), body);
-        stmts.add(ifNode);
-
-        return stmts.getFirst();
-
+        return new RepeatStmt(pos, condition, body);
     }
 
     private Stmt returnStmt() {

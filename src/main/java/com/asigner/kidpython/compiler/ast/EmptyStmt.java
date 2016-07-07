@@ -12,12 +12,7 @@ public class EmptyStmt extends Stmt {
     }
 
     @Override
-    public Stmt execute(Environment env) {
-        return getNext();
-    }
-
-    @Override
-    public void accept(StmtVisitor visitor) {
+    public void accept(NodeVisitor visitor) {
         visitor.visit(this);
     }
 

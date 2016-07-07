@@ -40,11 +40,10 @@ public class Environment {
 
     private Frame funcFrame;
     private Frame globalFrame;
-    private Stmt code;
-    private Stmt pc;
+    private Instruction[] program;
+    private int pc;
 
-    private Stack<Stmt> stack = new Stack<>();
-    private Value resultValue;
+    private Stack<Value> stack = new Stack<>();
 
     private final PrintStream stdout;
     private final InputStream stdin;
@@ -55,34 +54,27 @@ public class Environment {
         reset();
     }
 
+    public void setProgram(List<Instruction> instrs) {
+        this.program = instrs.toArray(new Instruction[instrs.size()]);
+        this.pc = 0;
+    }
+
     public void reset() {
         this.funcFrame = null;
         this.globalFrame = new Frame(null);
-        this.pc = null;
+        this.program = null;
+        this.pc = 0;
 
         globalFrame.setVar("print", new NativeFuncValue(this::print));
     }
 
-    public void setCode(Stmt code) {
-        this.code = code;
-        this.pc = code;
-    }
-
     public void run() {
-        while (pc != null) {
-            pc = pc.execute(this);
+        for(;;) {
+            Instruction i = program[pc++];
+            // Handle instr
         }
     }
 
-    public void enterFunction() {
-        Frame newFrame = new Frame(funcFrame);
-        funcFrame = newFrame;
-    }
-
-    public void leaveFunction(Value resultValue) {
-        funcFrame = funcFrame.getParent();
-        this.resultValue = resultValue;
-    }
 
     public Value getVar(String name) {
         Value v;

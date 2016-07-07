@@ -24,14 +24,7 @@ public class AssignmentStmt extends Stmt {
     }
 
     @Override
-    public Stmt execute(Environment env) {
-        Value val = expr.eval(env);
-        ((Assignable)varExpr).assign(env, val);
-        return getNext();
-    }
-
-    @Override
-    public void accept(StmtVisitor visitor) {
+    public void accept(NodeVisitor visitor) {
         visitor.visit(this);
     }
 

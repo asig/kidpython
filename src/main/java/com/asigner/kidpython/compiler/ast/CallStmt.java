@@ -17,21 +17,12 @@ public class CallStmt extends Stmt {
         this.expr = expr;
     }
 
-    @Override
-    public Stmt execute(Environment env) {
-        Value val = expr.eval(env);
-        if (val.getType() != Value.Type.FUNCTION) {
-            // Emit error: Can't call non-function
-        }
-        return ((FuncValue)val).getValue();
-    }
-
     public ExprNode getExpr() {
         return expr;
     }
 
     @Override
-    public void accept(StmtVisitor visitor) {
+    public void accept(NodeVisitor visitor) {
         visitor.visit(this);
     }
 }

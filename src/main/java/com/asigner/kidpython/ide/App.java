@@ -1,9 +1,11 @@
 package com.asigner.kidpython.ide;
 
+import com.asigner.kidpython.compiler.CodeGenerator;
 import com.asigner.kidpython.compiler.Error;
 import com.asigner.kidpython.compiler.Parser;
 import com.asigner.kidpython.compiler.ast.Stmt;
 import com.asigner.kidpython.compiler.runtime.Environment;
+import com.asigner.kidpython.compiler.runtime.Instruction;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
 import com.asigner.kidpython.ide.console.ConsoleInputStream;
 import com.asigner.kidpython.ide.console.ConsoleOutputStream;
@@ -26,6 +28,7 @@ import org.eclipse.swt.widgets.ToolItem;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.List;
 
 public class App {
 
@@ -149,14 +152,17 @@ public class App {
     }
     private void runCode(String source) {
         Parser p = new Parser(source);
-        Stmt code = p.parse();
-        if (code == null) {
+        Stmt stmt = p.parse();
+        if (stmt == null) {
             for (Error e : p.getErrors()) {
                 consoleOut.println(e);
             }
-        } else {
-            environment.setCode(code);
-            environment.run();
+            return;
         }
+
+        CodeGenerator codeGen = new CodeGenerator(stmt);
+        List<Instruction> program = codeGen.generate();
+        environment.setProgram(program);
+        environment.run();
     }
 }
