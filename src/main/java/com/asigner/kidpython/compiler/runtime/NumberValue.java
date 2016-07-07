@@ -2,12 +2,9 @@
 
 package com.asigner.kidpython.compiler.runtime;
 
-import com.google.common.collect.Lists;
-
 import java.math.BigDecimal;
-import java.util.Iterator;
 
-public class NumberValue  extends Value {
+public class NumberValue extends Value {
     private final BigDecimal numVal;
 
     public NumberValue(BigDecimal val) {

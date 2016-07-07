@@ -8,8 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.stream.Collectors.joining;
-
 public abstract class Value {
     public enum Type {
         BOOLEAN,
@@ -19,6 +17,7 @@ public abstract class Value {
         LIST,
         MAP,
         ITERATOR,
+        UNDEFINED,
     }
 
     private final Type type;
