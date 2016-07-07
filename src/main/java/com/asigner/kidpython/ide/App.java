@@ -8,6 +8,7 @@ import com.asigner.kidpython.ide.console.ConsoleComposite;
 import com.asigner.kidpython.ide.console.ConsoleInputStream;
 import com.asigner.kidpython.ide.console.ConsoleOutputStream;
 import com.asigner.kidpython.ide.turtle.TurtleCanvas;
+import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Image;
@@ -104,7 +105,7 @@ public class App {
             runCode(sourceCodeComposite.getText());
         });
         addToolbarItem(toolBar, "PRINT", event -> {
-            consoleComposite.write("Hello\u001B[1mHello\u001B[0m, \u001B[1m\u001B[3m\u001b[41m\u001b[33mWorld!\u001b[0m " + l + "\n");
+            consoleComposite.write("Hello " + AnsiEscapeCodes.IMAGE_NEGATIVE + "Hello" + AnsiEscapeCodes.IMAGE_POSITIVE + "\u001B[0m, \u001B[1m\u001B[3m\u001b[41m\u001b[33mWorld!\u001b[0m " + l + "\n");
             l = l+1;
         });
         ToolItem separator = new ToolItem(toolBar, SWT.SEPARATOR);
