@@ -26,6 +26,7 @@ public class CodeEditor extends StyledText {
 
     private final CodeLineStyler lineStyler;
     private Font font;
+    private int lastLineCount = 0; // Used to trigger redraws for line numbering
 
     public CodeEditor(Composite parent, int style) {
         super(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
@@ -48,9 +49,11 @@ public class CodeEditor extends StyledText {
         addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent modifyEvent) {
-                if (lineStyler.parseMultiLineComments(getText())) {
+                int lineCount = getLineCount();
+                if (lastLineCount != lineCount || lineStyler.parseMultiLineComments(getText())) {
                     redraw();
                 }
+                lastLineCount = lineCount;
             }
         });
 
@@ -68,6 +71,7 @@ public class CodeEditor extends StyledText {
             return;
         }
         setText(s.text);
+        lineStyler.parseMultiLineComments(s.text);
         setSelection(s.selection);
         setCaretOffset(s.caretOfs);
     }

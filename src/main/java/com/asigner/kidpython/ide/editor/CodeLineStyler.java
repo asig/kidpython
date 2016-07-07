@@ -3,11 +3,17 @@ package com.asigner.kidpython.ide.editor;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.Bullet;
 import org.eclipse.swt.custom.LineStyleEvent;
 import org.eclipse.swt.custom.LineStyleListener;
+import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GlyphMetrics;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +34,7 @@ public class CodeLineStyler implements LineStyleListener {
     private Stylesheet stylesheet;
     private CodeScanner scanner;
     private List<Range> multiLineComments;
+    private Font lineNumberFont;
 
     private static class Range {
         int start;
@@ -73,6 +80,7 @@ public class CodeLineStyler implements LineStyleListener {
         this.stylesheet = stylesheet;
         scanner = new CodeScanner();
         multiLineComments = new ArrayList<>();
+        lineNumberFont = new Font(Display.getDefault(), "Mono", 8, SWT.NONE);
     }
 
     private Range findMultiLineComment(int pos) {
@@ -136,6 +144,30 @@ public class CodeLineStyler implements LineStyleListener {
             token= scanner.nextToken();
         }
         event.styles = styles.toArray(new StyleRange[styles.size()]);
+
+        addLineBullets(event);
+    }
+
+    private void addLineBullets(LineStyleEvent e) {
+        // Using ST.BULLET_NUMBER sometimes results in weird alignment.
+        //event.bulletIndex = styledText.getLineAtOffset(event.lineOffset);
+        // See http://stackoverflow.com/questions/11057442/java-swt-show-line-numbers-for-styledtext
+
+        StyledText styledText = (StyledText)e.getSource();
+
+        int bulletLength = Math.max(3, Integer.toString(styledText.getLineCount()).length());
+
+        StyleRange styleRange = new StyleRange();
+        styleRange.foreground = stylesheet.getStyle(OTHER).getFg();
+        styleRange.font = lineNumberFont;
+        // Width of number character is half the height in monospaced font, add 1 character width for right padding.
+        styleRange.metrics = new GlyphMetrics(0, 0, (bulletLength + 1) * styledText.getLineHeight() / 2);
+
+        Bullet bullet = new Bullet(ST.BULLET_TEXT, styleRange);
+        int bulletLine = styledText.getLineAtOffset(e.lineOffset) + 1;
+        bullet.text = String.format("%" + bulletLength + "s", bulletLine);
+
+        e.bullet = bullet;
     }
 
     public boolean parseMultiLineComments(String text) {
