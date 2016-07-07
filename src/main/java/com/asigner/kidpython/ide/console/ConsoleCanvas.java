@@ -165,9 +165,9 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
 
     public void write(char c) {
         writeNoRepaint(c);
+        Display.getCurrent().asyncExec(this::redraw);
         textModifiedListener.run();
     }
-
 
     void writeNoRepaint(char c) {
         if (inEscapeSequence) {
