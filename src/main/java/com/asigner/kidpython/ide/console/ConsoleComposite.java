@@ -2,13 +2,11 @@
 
 package com.asigner.kidpython.ide.console;
 
+import com.asigner.kidpython.util.ByteBuffer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 
 public class ConsoleComposite extends ScrolledComposite {
     private final ConsoleCanvas consoleCanvas;
@@ -37,5 +35,9 @@ public class ConsoleComposite extends ScrolledComposite {
 
     public void write(char c) {
         consoleCanvas.write(c);
+    }
+
+    ByteBuffer getInputBuffer() {
+        return consoleCanvas.getInputBuffer();
     }
 }

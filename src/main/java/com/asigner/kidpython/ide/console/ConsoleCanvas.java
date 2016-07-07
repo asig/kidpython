@@ -1,5 +1,6 @@
 package com.asigner.kidpython.ide.console;
 
+import com.asigner.kidpython.util.ByteBuffer;
 import com.google.common.collect.Lists;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.swt.SWT;
@@ -69,6 +70,8 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
     private int cursorX, cursorY;
     private boolean cursorOn;
     private Thread cursorBlinker;
+
+    private ByteBuffer inputBuffer = new ByteBuffer(128 * 1024);
 
     private Runnable textModifiedListener = () -> {};
 
@@ -201,9 +204,19 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
         }
     }
 
+    ByteBuffer getInputBuffer() {
+        return inputBuffer;
+    }
+
     @Override
     public void keyPressed(KeyEvent keyEvent) {
         char c = keyEvent.character;
+        try {
+            inputBuffer.write((byte)c);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         if (c == '\0') {
             return;
         }

@@ -113,24 +113,6 @@ public class Parser {
             LPAREN
     );
 
-    public static class Result {
-        private final List<Error> errors;
-        private final Stmt code;
-
-        public Result(Stmt code, List<Error> errors) {
-            this.code = code;
-            this.errors = errors;
-        }
-
-        public Stmt getCode() {
-            return code;
-        }
-
-        public List<Error> getErrors() {
-            return errors;
-        }
-    }
-
     private final Scanner scanner;
     private Token lookahead;
     private int tmpVarCnt;
@@ -141,11 +123,15 @@ public class Parser {
         this.errors = Lists.newArrayList();
     }
 
-    public Result parse() {
+    public Stmt parse() {
         lookahead = scanner.next();
         Stmt code = stmtBlock();
         match(EOT);
-        return new Result(code, errors);
+        return errors.size() > 0 ? null : code;
+    }
+
+    public List<Error> getErrors() {
+        return errors;
     }
 
     private void error(Error error) {

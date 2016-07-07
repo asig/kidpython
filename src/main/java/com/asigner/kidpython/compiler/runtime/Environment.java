@@ -63,12 +63,12 @@ public class Environment {
         globalFrame.setVar("print", new NativeFuncValue(this::print));
     }
 
-    void setCode(Stmt code) {
+    public void setCode(Stmt code) {
         this.code = code;
-        this.pc = pc;
+        this.pc = code;
     }
 
-    void run() {
+    public void run() {
         while (pc != null) {
             pc = pc.execute(this);
         }

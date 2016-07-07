@@ -3,8 +3,9 @@ package com.asigner.kidpython.ide;
 import com.asigner.kidpython.compiler.Error;
 import com.asigner.kidpython.compiler.Parser;
 import com.asigner.kidpython.compiler.ast.Stmt;
-import com.asigner.kidpython.compiler.ast.StmtDumper;
+import com.asigner.kidpython.compiler.runtime.Environment;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
+import com.asigner.kidpython.ide.console.ConsoleInputStream;
 import com.asigner.kidpython.ide.console.ConsoleOutputStream;
 import com.asigner.kidpython.ide.turtle.TurtleCanvas;
 import org.eclipse.swt.SWT;
@@ -21,8 +22,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-import java.io.PrintStream;
-import java.util.List;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 
 public class App {
 
@@ -31,6 +33,11 @@ public class App {
     private TurtleCanvas turtleCanvas;
     private SourceCodeComposite sourceCodeComposite;
     private ConsoleComposite consoleComposite;
+
+    private InputStream consoleInputStream;
+    private OutputStream consoleOutputStream;
+    private PrintWriter consoleOut;
+    private Environment environment;
 
     /**
      * Launch the application.
@@ -117,8 +124,6 @@ public class App {
         sourceCodeComposite = new SourceCodeComposite(sashForm2, SWT.NONE);
         turtleCanvas = new TurtleCanvas(sashForm2, SWT.NONE);
 
-
-
         consoleComposite = new ConsoleComposite(sashForm, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 
         sashForm.setWeights(new int[] {1, 1});
@@ -128,6 +133,11 @@ public class App {
         shell.layout();
         shell.setMaximized(true);
         shell.open();
+
+        consoleInputStream = new ConsoleInputStream(consoleComposite);
+        consoleOutputStream = new ConsoleOutputStream(consoleComposite);
+        consoleOut = new PrintWriter(consoleOutputStream, true);
+        environment = new Environment(consoleOutputStream, consoleInputStream);
     }
 
     private void addToolbarItem(ToolBar toolbar, String text, Listener handler) {
@@ -136,18 +146,16 @@ public class App {
         item.addListener(SWT.Selection, handler);
 
     }
-    private void runCode(String code) {
-        Parser p = new Parser(code);
-        Parser.Result res = p.parse();
-        List<Error> errs = res.getErrors();
-        if (errs.size() > 0) {
-            for (Error e : errs) {
-                System.err.println(e);
+    private void runCode(String source) {
+        Parser p = new Parser(source);
+        Stmt code = p.parse();
+        if (code == null) {
+            for (Error e : p.getErrors()) {
+                consoleOut.println(e);
             }
         } else {
-            Stmt s = res.getCode();
-            StmtDumper dumper = new StmtDumper(new PrintStream(new ConsoleOutputStream(consoleComposite), true));
-            dumper.dump(s);
+            environment.setCode(code);
+            environment.run();
         }
     }
 }
