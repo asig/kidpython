@@ -20,6 +20,28 @@ import org.eclipse.swt.widgets.Display;
 
 import java.util.List;
 
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.BG_BLACK;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.BG_BLUE;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.BG_CYAN;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.BG_GREEN;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.BG_MAGENTA;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.BG_RED;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.BG_WHITE;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.BG_YELLOW;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.BOLD;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.FG_BLACK;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.FG_BLUE;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.FG_CYAN;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.FG_GREEN;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.FG_MAGENTA;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.FG_RED;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.FG_WHITE;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.FG_YELLOW;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.IMAGE_NEGATIVE;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.IMAGE_POSITIVE;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.ITALIC;
+import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.RESET;
+
 public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener {
 
     private static class Attr {
@@ -316,46 +338,75 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
         if (escapeBuffer.charAt(1) != '[') {
             return;
         }
-        switch(escapeBuffer.charAt(escapeBuffer.length() - 1)) {
-            case 'm':
-                // SGR – Select Graphic Rendition
-                int code = Integer.parseInt(escapeBuffer.substring(2, escapeBuffer.length() - 1));
-                switch (code) {
-                    case 0:
-                        curAttr.fg = BLACK;
-                        curAttr.bg = WHITE;
-                        curAttr.bold = curAttr.italic = curAttr.underlined = false;
-                        break;
-                    case 1:
-                        curAttr.bold = true;
-                        break;
-                    case 3:
-                        curAttr.italic = true;
-                        break;
-                    case 30:
-                    case 31:
-                    case 32:
-                    case 33:
-                    case 34:
-                    case 35:
-                    case 36:
-                    case 37:
-                        curAttr.fg = code - 30;
-                        break;
-                    case 40:
-                    case 41:
-                    case 42:
-                    case 43:
-                    case 44:
-                    case 45:
-                    case 46:
-                    case 47:
-                        curAttr.bg = code - 40;
-                        break;
-                }
-                curAttrCode = curAttr.encode();
+        switch(escapeBuffer) {
+            case RESET:
+                curAttr.fg = BLACK;
+                curAttr.bg = WHITE;
+                curAttr.bold = curAttr.italic = curAttr.underlined = false;
+                curAttr.inverse = false;
+                break;
+            case BOLD:
+                curAttr.bold = true;
+                break;
+            case ITALIC:
+                curAttr.italic = true;
+                break;
+            case IMAGE_NEGATIVE:
+                curAttr.inverse = true;
+                break;
+            case IMAGE_POSITIVE:
+                curAttr.inverse = false;
+                break;
+            case FG_BLACK:
+                curAttr.fg = 0;
+                break;
+            case FG_RED:
+                curAttr.fg = 1;
+                break;
+            case FG_GREEN:
+                curAttr.fg = 2;
+                break;
+            case FG_YELLOW:
+                curAttr.fg = 3;
+                break;
+            case FG_BLUE:
+                curAttr.fg = 4;
+                break;
+            case FG_MAGENTA:
+                curAttr.fg = 5;
+                break;
+            case FG_CYAN:
+                curAttr.fg = 6;
+                break;
+            case FG_WHITE:
+                curAttr.fg = 7;
+                break;
+            case BG_BLACK:
+                curAttr.bg = 0;
+                break;
+            case BG_RED:
+                curAttr.bg = 1;
+                break;
+            case BG_GREEN:
+                curAttr.bg = 2;
+                break;
+            case BG_YELLOW:
+                curAttr.bg = 3;
+                break;
+            case BG_BLUE:
+                curAttr.bg = 4;
+                break;
+            case BG_MAGENTA:
+                curAttr.bg = 5;
+                break;
+            case BG_CYAN:
+                curAttr.bg = 6;
+                break;
+            case BG_WHITE:
+                curAttr.bg = 7;
                 break;
         }
+        curAttrCode = curAttr.encode();
     }
 
     private void drawCursor(GC gc) {
