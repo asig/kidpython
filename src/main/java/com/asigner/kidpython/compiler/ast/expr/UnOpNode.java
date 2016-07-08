@@ -1,20 +1,25 @@
-// Copyright 2016 Andreas Signer. All rights reserved.
-
 package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.ast.NodeVisitor;
-import com.asigner.kidpython.compiler.runtime.Environment;
-import com.asigner.kidpython.compiler.runtime.Value;
-import com.google.common.base.Preconditions;
 
-public class IterNextNode extends ExprNode {
+public class UnOpNode extends ExprNode {
 
+    public enum Op {
+        NEG, NOT, ITER_NEXT, ITER_HAS_NEXT
+    };
+
+    private final UnOpNode.Op op;
     private final ExprNode expr;
 
-    public IterNextNode(Position pos, ExprNode expr) {
+    public UnOpNode(Position pos, UnOpNode.Op op, ExprNode expr) {
         super(pos);
         this.expr = expr;
+        this.op = op;
+    }
+
+    public UnOpNode.Op getOp() {
+        return op;
     }
 
     public ExprNode getExpr() {

@@ -4,7 +4,7 @@ import com.asigner.kidpython.compiler.CodeGenerator;
 import com.asigner.kidpython.compiler.Error;
 import com.asigner.kidpython.compiler.Parser;
 import com.asigner.kidpython.compiler.ast.Stmt;
-import com.asigner.kidpython.compiler.runtime.Environment;
+import com.asigner.kidpython.compiler.runtime.VirtualMachine;
 import com.asigner.kidpython.compiler.runtime.Instruction;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
 import com.asigner.kidpython.ide.console.ConsoleInputStream;
@@ -41,7 +41,7 @@ public class App {
     private InputStream consoleInputStream;
     private OutputStream consoleOutputStream;
     private PrintWriter consoleOut;
-    private Environment environment;
+    private VirtualMachine virtualMachine;
 
     /**
      * Launch the application.
@@ -141,7 +141,7 @@ public class App {
         consoleInputStream = new ConsoleInputStream(consoleComposite);
         consoleOutputStream = new ConsoleOutputStream(consoleComposite);
         consoleOut = new PrintWriter(consoleOutputStream, true);
-        environment = new Environment(consoleOutputStream, consoleInputStream);
+        virtualMachine = new VirtualMachine(consoleOutputStream, consoleInputStream);
     }
 
     private void addToolbarItem(ToolBar toolbar, String text, Listener handler) {
@@ -162,7 +162,9 @@ public class App {
 
         CodeGenerator codeGen = new CodeGenerator(stmt);
         List<Instruction> program = codeGen.generate();
-        environment.setProgram(program);
-        environment.run();
+        int i = 0;
+        for (Instruction instr : program) {
+            consoleOut.println(String.format("%04d: %s", i++, instr));
+        }
     }
 }

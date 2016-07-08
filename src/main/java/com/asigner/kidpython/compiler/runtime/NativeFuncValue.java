@@ -2,7 +2,6 @@
 
 package com.asigner.kidpython.compiler.runtime;
 
-import com.asigner.kidpython.compiler.ast.Stmt;
 import com.google.common.collect.Maps;
 
 import java.math.BigDecimal;
@@ -10,7 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class NativeFuncValue  extends Value {
+public class NativeFuncValue extends Value {
 
     public interface Iface {
         Value run(List<Value> vals);

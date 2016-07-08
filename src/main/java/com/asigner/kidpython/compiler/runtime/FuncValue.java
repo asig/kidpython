@@ -2,29 +2,23 @@
 
 package com.asigner.kidpython.compiler.runtime;
 
-import com.asigner.kidpython.compiler.ast.Node;
-import com.asigner.kidpython.compiler.ast.Stmt;
-import com.google.common.collect.Maps;
-
 import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.stream.Collectors.joining;
-
 public class FuncValue extends Value {
-    private final Stmt funcVal;
+    private final int startPc;
     private final List<String> params;
 
-    public FuncValue(Stmt val, List<String> params) {
+    public FuncValue(int startPc, List<String> params) {
         super(Type.FUNCTION);
-        this.funcVal = val;
+        this.startPc = startPc;
         this.params = params;
     }
 
-    public Stmt getValue() {
-        return funcVal;
+    public int getStartPc() {
+        return startPc;
     }
 
     @Override
@@ -34,28 +28,26 @@ public class FuncValue extends Value {
 
     @Override
     public String asString() {
-        return "func@" + funcVal.hashCode();
+        return "func@" + startPc;
     }
 
     @Override
     public BigDecimal asNumber() {
-        return new BigDecimal(funcVal.hashCode());
+        throw new ExecutionException("Can't coerce function to number");
     }
 
     @Override
     public Iterator<? extends Value> asIterator() {
-        return null;
+        throw new ExecutionException("Can't coerce function to iterator");
     }
 
     public Map<Value, Value> asMap() {
-        Map<Value, Value> res = Maps.newHashMap();
-        res.put(new NumberValue(new BigDecimal(funcVal.hashCode())), this);
-        return res;
+        throw new ExecutionException("Can't coerce function to map");
     }
 
     @Override
     public String toString() {
-        return "FuncValue{" + getType().toString() + ":" + funcVal + "}";
+        return "FuncValue{" + getType().toString() + ":" + startPc + "}";
     }
 
 }

@@ -14,34 +14,47 @@ import com.asigner.kidpython.compiler.ast.RepeatStmt;
 import com.asigner.kidpython.compiler.ast.ReturnStmt;
 import com.asigner.kidpython.compiler.ast.Stmt;
 import com.asigner.kidpython.compiler.ast.WhileStmt;
-import com.asigner.kidpython.compiler.ast.expr.ArithOpNode;
-import com.asigner.kidpython.compiler.ast.expr.BoolNode;
+import com.asigner.kidpython.compiler.ast.expr.BinOpNode;
 import com.asigner.kidpython.compiler.ast.expr.CallNode;
 import com.asigner.kidpython.compiler.ast.expr.ConstNode;
-import com.asigner.kidpython.compiler.ast.expr.IterHasNextNode;
-import com.asigner.kidpython.compiler.ast.expr.IterNextNode;
+import com.asigner.kidpython.compiler.ast.expr.ExprNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeFuncNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeIterNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeListNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeMapNode;
 import com.asigner.kidpython.compiler.ast.expr.MapAccessNode;
-import com.asigner.kidpython.compiler.ast.expr.NotNode;
-import com.asigner.kidpython.compiler.ast.expr.RelOpNode;
+import com.asigner.kidpython.compiler.ast.expr.UnOpNode;
 import com.asigner.kidpython.compiler.ast.expr.VarNode;
+import com.asigner.kidpython.compiler.runtime.BooleanValue;
+import com.asigner.kidpython.compiler.runtime.FuncValue;
 import com.asigner.kidpython.compiler.runtime.Instruction;
 import com.asigner.kidpython.compiler.runtime.ReferenceValue;
+import com.asigner.kidpython.util.Pair;
 import com.google.common.collect.Lists;
 
 import java.util.List;
 
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.ADD;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.ASSIGN;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.B;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.BF;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.DIV;
 import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.EQ;
 import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.GE;
 import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.GT;
 import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.LE;
 import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.LT;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.MKLIST;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.MKMAP;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.MUL;
 import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.NE;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.NEG;
 import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.NOT;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.POP;
 import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.PUSH;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.RET;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.STOP;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.SUB;
 
 public class CodeGenerator implements NodeVisitor {
 
@@ -56,6 +69,7 @@ public class CodeGenerator implements NodeVisitor {
 
     public List<Instruction> generate() {
         generateStmtBlock(stmt);
+        emit(new Instruction(stmt, STOP));
         return instrs;
     }
 
@@ -68,22 +82,23 @@ public class CodeGenerator implements NodeVisitor {
 
     @Override
     public void visit(AssignmentStmt stmt) {
-
+        stmt.getVar().accept(this);
+        stmt.getExpr().accept(this);
+        emit(new Instruction(stmt, ASSIGN));
     }
 
     @Override
     public void visit(CallStmt stmt) {
-
     }
 
     @Override
     public void visit(EmptyStmt stmt) {
-
     }
 
     @Override
     public void visit(EvalStmt stmt) {
-
+        stmt.getExpr().accept(this);
+        emit(new Instruction(stmt, POP));
     }
 
     @Override
@@ -98,32 +113,123 @@ public class CodeGenerator implements NodeVisitor {
 
     @Override
     public void visit(IfStmt stmt) {
-
+        stmt.getCond().accept(this);
+        int branchIfFalsePc = emit(new Instruction(stmt, BF, 0)); // patch later
+        stmt.getTrueBranch().accept(this);
+        int branchPc = emit(new Instruction(stmt, B, 0)); // patch later
+        int falseStart = instrs.size();
+        stmt.getFalseBranch().accept(this);
+        int pc = instrs.size();
+        patch(branchIfFalsePc, new Instruction(stmt, BF, falseStart));
+        patch(branchPc, new Instruction(stmt, B, pc));
     }
 
     @Override
     public void visit(RepeatStmt stmt) {
-
+        int startPc = instrs.size();
+        generateStmtBlock(stmt.getBody());
+        stmt.getCond().accept(this);
+        emit(new Instruction(stmt, BF, startPc));
     }
 
     @Override
     public void visit(ReturnStmt stmt) {
-
+        stmt.getExpr().accept(this);
+        emit(new Instruction(stmt, RET));
     }
 
     @Override
     public void visit(WhileStmt stmt) {
-
+        int startPc = instrs.size();
+        stmt.getCond().accept(this);
+        int jumpPc = instrs.size();
+        emit(new Instruction(stmt, BF, 0)); // will be patched afterwards
+        generateStmtBlock(stmt.getBody());
+        emit(new Instruction(stmt, B, startPc)); // will be patched afterwards
+        patch(jumpPc, new Instruction(stmt, BF, instrs.size()));
     }
 
     @Override
-    public void visit(ArithOpNode node) {
+    public void visit(BinOpNode node) {
+        if (node.getOp() == BinOpNode.Op.AND) {
+            // IF a THEN b ELSE false
+            node.getLeft().accept(this);
+            int bf = emit(new Instruction(node, BF, 0));
+            node.getRight().accept(this);
+            int endOfTrue = emit(new Instruction(node, B, 0));
+            int falseStart = emit(new Instruction(node, PUSH, new BooleanValue(false)));
+            int end = instrs.size();
 
+            patch(bf, new Instruction(node, BF, falseStart));
+            patch(endOfTrue, new Instruction(node, B, end));
+        } else if (node.getOp() == BinOpNode.Op.OR) {
+            // IF a THEN true ELSE b
+            node.getLeft().accept(this);
+            int bf = emit(new Instruction(node, BF, 0));
+            emit(new Instruction(node, PUSH, new BooleanValue(true)));
+            int endOfTrue = emit(new Instruction(node, B, 0));
+            int falseStart = instrs.size();
+            node.getRight().accept(this);
+            int end = instrs.size();
+
+            patch(bf, new Instruction(node, BF, falseStart));
+            patch(endOfTrue, new Instruction(node, B, end));
+        } else {
+            node.getLeft().accept(this);
+            node.getRight().accept(this);
+            Instruction.OpCode opCode;
+            switch (node.getOp()) {
+                case EQ:
+                    opCode = EQ;
+                    break;
+                case NE:
+                    opCode = NE;
+                    break;
+                case LE:
+                    opCode = LE;
+                    break;
+                case LT:
+                    opCode = LT;
+                    break;
+                case GE:
+                    opCode = GE;
+                    break;
+                case GT:
+                    opCode = GT;
+                    break;
+
+                case ADD:
+                    opCode = ADD;
+                    break;
+                case SUB:
+                    opCode = SUB;
+                    break;
+                case MUL:
+                    opCode = MUL;
+                    break;
+                case DIV:
+                    opCode = DIV;
+                    break;
+
+                default:
+                    throw new IllegalStateException("Unknown BinOpNode op " + node.getOp());
+            }
+            emit(new Instruction(node, opCode));
+        }
     }
 
-    @Override
-    public void visit(BoolNode node) {
 
+    @Override
+    public void visit(UnOpNode node) {
+        node.getExpr().accept(this);
+        Instruction.OpCode opCode;
+        switch(node.getOp()) {
+            case NEG: opCode = NEG; break;
+            case NOT: opCode = NOT; break;
+
+            default: throw new IllegalStateException("Unknown UnOpNode op " + node.getOp());
+        }
+        emit(new Instruction(node, opCode));
     }
 
     @Override
@@ -133,22 +239,17 @@ public class CodeGenerator implements NodeVisitor {
 
     @Override
     public void visit(ConstNode node) {
-
-    }
-
-    @Override
-    public void visit(IterHasNextNode node) {
-
-    }
-
-    @Override
-    public void visit(IterNextNode node) {
-
+        emit(new Instruction(node, PUSH, node.getVal()));
     }
 
     @Override
     public void visit(MakeFuncNode node) {
-
+        // jump over function for now.
+        int jumpOverFunc = emit(new Instruction(node, B, 0));
+        int startPc = instrs.size();
+        node.getBody().accept(this);
+        patch(jumpOverFunc, new Instruction(node, B, instrs.size()));
+        emit(new Instruction(node, PUSH, new FuncValue(startPc, node.getParams())));
     }
 
     @Override
@@ -158,12 +259,19 @@ public class CodeGenerator implements NodeVisitor {
 
     @Override
     public void visit(MakeListNode node) {
-
+        for (ExprNode elem : node.getElements()) {
+            elem.accept(this);
+        }
+        emit(new Instruction(node, MKLIST, node.getElements().size()));
     }
 
     @Override
     public void visit(MakeMapNode node) {
-
+        for (Pair<ExprNode, ExprNode> elem : node.getElements()) {
+            elem.getFirst().accept(this);
+            elem.getSecond().accept(this);
+        }
+        emit(new Instruction(node, MKMAP, node.getElements().size()));
     }
 
     @Override
@@ -172,34 +280,16 @@ public class CodeGenerator implements NodeVisitor {
     }
 
     @Override
-    public void visit(NotNode node) {
-        node.getExpr().accept(this);
-        emit(new Instruction(node, NOT));
-    }
-
-    @Override
-    public void visit(RelOpNode node) {
-        node.getLeft().accept(this);
-        node.getRight().accept(this);
-        Instruction.OpCode opCode;
-        switch(node.getOp()) {
-            case EQ: opCode = EQ; break;
-            case NE: opCode = NE; break;
-            case LE: opCode = LE; break;
-            case LT: opCode = LT; break;
-            case GE: opCode = GE; break;
-            case GT: opCode = GT; break;
-            default: throw new IllegalStateException("Unknown RelOpNode op " + node.getOp());
-        }
-        emit(new Instruction(node, opCode));
-    }
-
-    @Override
     public void visit(VarNode node) {
         emit(new Instruction(node, PUSH, new ReferenceValue(node)));
     }
 
-    private void emit(Instruction instr) {
+    private int emit(Instruction instr) {
         instrs.add(instr);
+        return instrs.size() - 1;
+    }
+
+    private void patch(int pos, Instruction instr) {
+        instrs.set(pos, instr);
     }
 }

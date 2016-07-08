@@ -4,26 +4,35 @@ package com.asigner.kidpython.compiler.runtime;
 
 
 import com.asigner.kidpython.compiler.ast.Node;
+import com.google.common.collect.Lists;
+
+import java.util.List;
+
+import static java.util.stream.Collectors.joining;
 
 public class Instruction {
     public enum OpCode {
         PUSH,  // Push a value to the stack
-        STORE, // Store from stack to variable
+        POP,
+        ASSIGN, // Store from stack to variable
+        STOP,
 
-        MAP_ACCESS, // Access a map property
+        MAPACCESS, // Access a map property
 
-        MAKE_LIST, // Create a list of n elements
-        MAKE_MAP,
+        MKLIST, // Create a list of n elements
+        MKMAP,
+        MKITER,
 
-        BRANCH_IF_TRUE,
-        BRANCH,
+        BT,
+        BF,
+        B,
         CALL,
-        CALL_NATIVE,
-        RETURN,
+        CALLN,
+        RET,
 
-        AND,
-        OR,
         NOT,
+
+        NEG,
 
         ADD,
         SUB,
@@ -39,7 +48,7 @@ public class Instruction {
     }
 
     private final OpCode opCode;
-    private final Integer i;
+    private final Integer intVal;
     private final Value val;
     private final Node sourceNode;
 
@@ -47,18 +56,45 @@ public class Instruction {
         this(sourceNode, opCode, null, val);
     }
 
-    public Instruction(Node sourceNode, OpCode opCode, Integer i) {
-        this(sourceNode, opCode, i, null);
+    public Instruction(Node sourceNode, OpCode opCode, Integer intVal) {
+        this(sourceNode, opCode, intVal, null);
     }
 
     public Instruction(Node sourceNode, OpCode opCode) {
         this(sourceNode, opCode, null, null);
     }
 
-    private Instruction(Node sourceNode, OpCode opCode, Integer i, Value v) {
+    private Instruction(Node sourceNode, OpCode opCode, Integer intVal, Value val) {
         this.sourceNode = sourceNode;
         this.opCode = opCode;
-        this.i = null;
-        this.val = v;
+        this.intVal = intVal;
+        this.val = val;
+    }
+
+    public Integer getIntVal() {
+        return intVal;
+    }
+
+    public OpCode getOpCode() {
+        return opCode;
+    }
+
+    public Node getSourceNode() {
+        return sourceNode;
+    }
+
+    public Value getVal() {
+        return val;
+    }
+
+    public String toString() {
+        List<String> params = Lists.newArrayList();
+        if (val != null) {
+            params.add(val.toString());
+        }
+        if (intVal != null) {
+            params.add(intVal.toString());
+        }
+        return String.format("%-9s %s", opCode.toString(), params.stream().collect(joining(",")));
     }
 }

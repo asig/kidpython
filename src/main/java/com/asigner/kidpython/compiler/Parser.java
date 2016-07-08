@@ -10,8 +10,7 @@ import com.asigner.kidpython.compiler.ast.RepeatStmt;
 import com.asigner.kidpython.compiler.ast.ReturnStmt;
 import com.asigner.kidpython.compiler.ast.Stmt;
 import com.asigner.kidpython.compiler.ast.WhileStmt;
-import com.asigner.kidpython.compiler.ast.expr.ArithOpNode;
-import com.asigner.kidpython.compiler.ast.expr.BoolNode;
+import com.asigner.kidpython.compiler.ast.expr.BinOpNode;
 import com.asigner.kidpython.compiler.ast.expr.CallNode;
 import com.asigner.kidpython.compiler.ast.expr.ConstNode;
 import com.asigner.kidpython.compiler.ast.expr.ExprNode;
@@ -19,7 +18,6 @@ import com.asigner.kidpython.compiler.ast.expr.MakeFuncNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeListNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeMapNode;
 import com.asigner.kidpython.compiler.ast.expr.MapAccessNode;
-import com.asigner.kidpython.compiler.ast.expr.RelOpNode;
 import com.asigner.kidpython.compiler.ast.expr.VarNode;
 import com.asigner.kidpython.compiler.runtime.NumberValue;
 import com.asigner.kidpython.compiler.runtime.StringValue;
@@ -71,10 +69,10 @@ import static com.asigner.kidpython.compiler.Token.Type.THEN;
 import static com.asigner.kidpython.compiler.Token.Type.TO;
 import static com.asigner.kidpython.compiler.Token.Type.UNTIL;
 import static com.asigner.kidpython.compiler.Token.Type.WHILE;
-import static com.asigner.kidpython.compiler.ast.expr.ArithOpNode.Op.ADD;
-import static com.asigner.kidpython.compiler.ast.expr.ArithOpNode.Op.DIV;
-import static com.asigner.kidpython.compiler.ast.expr.ArithOpNode.Op.MUL;
-import static com.asigner.kidpython.compiler.ast.expr.ArithOpNode.Op.SUB;
+import static com.asigner.kidpython.compiler.ast.expr.BinOpNode.Op.ADD;
+import static com.asigner.kidpython.compiler.ast.expr.BinOpNode.Op.DIV;
+import static com.asigner.kidpython.compiler.ast.expr.BinOpNode.Op.MUL;
+import static com.asigner.kidpython.compiler.ast.expr.BinOpNode.Op.SUB;
 
 public class Parser {
 
@@ -400,7 +398,7 @@ public class Parser {
         while(lookahead.getType() == AND) {
             match(AND);
             ExprNode node2 = andExpr();
-            node = new BoolNode(node.getPos(), BoolNode.Op.AND, node, node2);
+            node = new BinOpNode(node.getPos(), BinOpNode.Op.AND, node, node2);
         }
         return node;
     }
@@ -410,7 +408,7 @@ public class Parser {
         while(lookahead.getType() == OR) {
             match(OR);
             ExprNode node2 = orExpr();
-            node = new BoolNode(node.getPos(), BoolNode.Op.OR, node, node2);
+            node = new BinOpNode(node.getPos(), BinOpNode.Op.OR, node, node2);
         }
         return node;
     }
@@ -418,18 +416,18 @@ public class Parser {
     private ExprNode orExpr() {
         ExprNode node = arithExpr();
         if(RELOPS.contains(lookahead.getType())) {
-            RelOpNode.Op op = null;
+            BinOpNode.Op op = null;
             switch (lookahead.getType()) {
-                case EQ: op = RelOpNode.Op.EQ; break;
-                case NE: op = RelOpNode.Op.NE; break;
-                case LE: op = RelOpNode.Op.LE; break;
-                case LT: op = RelOpNode.Op.LT; break;
-                case GE: op = RelOpNode.Op.GE; break;
-                case GT: op = RelOpNode.Op.GT; break;
+                case EQ: op = BinOpNode.Op.EQ; break;
+                case NE: op = BinOpNode.Op.NE; break;
+                case LE: op = BinOpNode.Op.LE; break;
+                case LT: op = BinOpNode.Op.LT; break;
+                case GE: op = BinOpNode.Op.GE; break;
+                case GT: op = BinOpNode.Op.GT; break;
             }
             match(lookahead.getType());
             ExprNode node2 = arithExpr();
-            node = new RelOpNode(node.getPos(), op, node, node2);
+            node = new BinOpNode(node.getPos(), op, node, node2);
         }
         return node;
     }
@@ -437,10 +435,10 @@ public class Parser {
     private ExprNode arithExpr() {
         ExprNode node = factor();
         while (lookahead.getType() == ASTERISK || lookahead.getType() == SLASH) {
-            ArithOpNode.Op op = lookahead.getType() == ASTERISK ? MUL : DIV;
+            BinOpNode.Op op = lookahead.getType() == ASTERISK ? MUL : DIV;
             match(lookahead.getType());
             ExprNode node2 = factor();
-            node = new ArithOpNode(node.getPos(), op, node, node2);
+            node = new BinOpNode(node.getPos(), op, node, node2);
         }
         return node;
     }
@@ -448,10 +446,10 @@ public class Parser {
     private ExprNode factor() {
         ExprNode node = term();
         while (lookahead.getType() == PLUS || lookahead.getType() == MINUS) {
-            ArithOpNode.Op op = lookahead.getType() == PLUS ? ADD : SUB;
+            BinOpNode.Op op = lookahead.getType() == PLUS ? ADD : SUB;
             match(lookahead.getType());
             ExprNode node2 = term();
-            node = new ArithOpNode(node.getPos(), op, node, node2);
+            node = new BinOpNode(node.getPos(), op, node, node2);
         }
         return node;
     }

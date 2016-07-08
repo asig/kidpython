@@ -5,9 +5,6 @@ package com.asigner.kidpython.compiler.ast.expr;
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.ast.NodeVisitor;
 import com.asigner.kidpython.compiler.ast.Stmt;
-import com.asigner.kidpython.compiler.runtime.Environment;
-import com.asigner.kidpython.compiler.runtime.FuncValue;
-import com.asigner.kidpython.compiler.runtime.Value;
 
 import java.util.List;
 
@@ -22,8 +19,12 @@ public class MakeFuncNode extends ExprNode {
         this.params = params;
     }
 
-    public Value eval(Environment env) {
-        return new FuncValue(body, params);
+    public Stmt getBody() {
+        return body;
+    }
+
+    public List<String> getParams() {
+        return params;
     }
 
     @Override
