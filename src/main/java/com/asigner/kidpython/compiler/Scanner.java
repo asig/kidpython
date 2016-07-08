@@ -54,7 +54,7 @@ public class Scanner {
             if (c == '/') {
                 char c2 = getch();
                 if (c2 == '/') {
-                    while (getch() != '\n');
+                    do { c2 = getch(); } while (c2 != '\n'  && c2 != 0);
                 } else if (c2 == '*') {
                     while ( !((c == '*' && c2 == '/') || (c == 0 && c2 == 0))) {
                         c = c2;
