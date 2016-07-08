@@ -15,10 +15,15 @@ public class Instruction {
         MAKE_LIST, // Create a list of n elements
         MAKE_MAP,
 
-        JUMP_IF_TRUE,
+        BRANCH_IF_TRUE,
+        BRANCH,
         CALL,
         CALL_NATIVE,
         RETURN,
+
+        AND,
+        OR,
+        NOT,
 
         ADD,
         SUB,
@@ -36,19 +41,24 @@ public class Instruction {
     private final OpCode opCode;
     private final Integer i;
     private final Value val;
-    private final Node node;
+    private final Node sourceNode;
 
-    public Instruction(Node node, OpCode opCode, Value val) {
-        this.node = node;
-        this.i = null;
-        this.opCode = opCode;
-        this.val = val;
+    public Instruction(Node sourceNode, OpCode opCode, Value val) {
+        this(sourceNode, opCode, null, val);
     }
 
-    public Instruction(Node node, OpCode opCode, Integer i) {
-        this.node = node;
-        this.i = i;
+    public Instruction(Node sourceNode, OpCode opCode, Integer i) {
+        this(sourceNode, opCode, i, null);
+    }
+
+    public Instruction(Node sourceNode, OpCode opCode) {
+        this(sourceNode, opCode, null, null);
+    }
+
+    private Instruction(Node sourceNode, OpCode opCode, Integer i, Value v) {
+        this.sourceNode = sourceNode;
         this.opCode = opCode;
-        this.val = null;
+        this.i = null;
+        this.val = v;
     }
 }

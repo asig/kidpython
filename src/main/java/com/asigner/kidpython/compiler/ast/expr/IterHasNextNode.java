@@ -3,6 +3,7 @@
 package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
+import com.asigner.kidpython.compiler.ast.NodeVisitor;
 import com.asigner.kidpython.compiler.runtime.BooleanValue;
 import com.asigner.kidpython.compiler.runtime.Environment;
 import com.asigner.kidpython.compiler.runtime.Value;
@@ -21,15 +22,8 @@ public class IterHasNextNode extends ExprNode {
         return expr;
     }
 
-    public Value eval(Environment env) {
-        Value v = expr.eval(env);
-        Preconditions.checkArgument(v.getType() == Value.Type.ITERATOR);
-        return new BooleanValue(v.asIterator().hasNext());
-    }
-
     @Override
-    void accept(ExprNodeVisitor visitor) {
+    public void accept(NodeVisitor visitor) {
         visitor.visit(this);
-
     }
 }

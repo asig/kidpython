@@ -3,9 +3,7 @@
 package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
-import com.asigner.kidpython.compiler.runtime.BooleanValue;
-import com.asigner.kidpython.compiler.runtime.Environment;
-import com.asigner.kidpython.compiler.runtime.Value;
+import com.asigner.kidpython.compiler.ast.NodeVisitor;
 
 public class NotNode extends ExprNode {
 
@@ -21,13 +19,7 @@ public class NotNode extends ExprNode {
     }
 
     @Override
-    public Value eval(Environment env) {
-        return new BooleanValue(!expr.eval(env).asBool());
-    }
-
-    @Override
-    void accept(ExprNodeVisitor visitor) {
+    public void accept(NodeVisitor visitor) {
         visitor.visit(this);
-
     }
 }

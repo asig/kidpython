@@ -17,6 +17,7 @@ public abstract class Value {
         LIST,
         MAP,
         ITERATOR,
+        REFERENCE,
         UNDEFINED,
     }
 

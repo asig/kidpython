@@ -3,8 +3,7 @@
 package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
-import com.asigner.kidpython.compiler.runtime.Environment;
-import com.asigner.kidpython.compiler.runtime.Value;
+import com.asigner.kidpython.compiler.ast.NodeVisitor;
 
 public class VarNode extends ExprNode implements Assignable {
 
@@ -19,17 +18,8 @@ public class VarNode extends ExprNode implements Assignable {
         return var;
     }
 
-    public Value eval(Environment env) {
-        return env.getVar(var);
-    }
-
     @Override
-    public void assign(Environment env, Value val) {
-        env.setVar(var, val);
-    }
-
-    @Override
-    void accept(ExprNodeVisitor visitor) {
+    public void accept(NodeVisitor visitor) {
         visitor.visit(this);
     }
 }

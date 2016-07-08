@@ -4,5 +4,5 @@ import com.asigner.kidpython.compiler.runtime.Environment;
 import com.asigner.kidpython.compiler.runtime.Value;
 
 public interface Assignable {
-    void assign(Environment env, Value val);
+
 }

@@ -2,7 +2,7 @@ package com.asigner.kidpython.compiler.ast;
 
 import com.asigner.kidpython.compiler.Position;
 
-public class Node {
+public abstract class Node {
 
     private final Position pos;
 
@@ -13,4 +13,6 @@ public class Node {
     public Position getPos() {
         return pos;
     }
+
+    abstract public void accept(NodeVisitor visitor);
 }

@@ -24,13 +24,24 @@ import com.asigner.kidpython.compiler.ast.expr.MakeFuncNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeIterNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeListNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeMapNode;
+import com.asigner.kidpython.compiler.ast.expr.MapAccessNode;
 import com.asigner.kidpython.compiler.ast.expr.NotNode;
 import com.asigner.kidpython.compiler.ast.expr.RelOpNode;
 import com.asigner.kidpython.compiler.ast.expr.VarNode;
 import com.asigner.kidpython.compiler.runtime.Instruction;
+import com.asigner.kidpython.compiler.runtime.ReferenceValue;
 import com.google.common.collect.Lists;
 
 import java.util.List;
+
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.EQ;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.GE;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.GT;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.LE;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.LT;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.NE;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.NOT;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.PUSH;
 
 public class CodeGenerator implements NodeVisitor {
 
@@ -156,17 +167,39 @@ public class CodeGenerator implements NodeVisitor {
     }
 
     @Override
-    public void visit(NotNode node) {
+    public void visit(MapAccessNode node) {
 
+    }
+
+    @Override
+    public void visit(NotNode node) {
+        node.getExpr().accept(this);
+        emit(new Instruction(node, NOT));
     }
 
     @Override
     public void visit(RelOpNode node) {
-
+        node.getLeft().accept(this);
+        node.getRight().accept(this);
+        Instruction.OpCode opCode;
+        switch(node.getOp()) {
+            case EQ: opCode = EQ; break;
+            case NE: opCode = NE; break;
+            case LE: opCode = LE; break;
+            case LT: opCode = LT; break;
+            case GE: opCode = GE; break;
+            case GT: opCode = GT; break;
+            default: throw new IllegalStateException("Unknown RelOpNode op " + node.getOp());
+        }
+        emit(new Instruction(node, opCode));
     }
 
     @Override
     public void visit(VarNode node) {
+        emit(new Instruction(node, PUSH, new ReferenceValue(node)));
+    }
 
+    private void emit(Instruction instr) {
+        instrs.add(instr);
     }
 }

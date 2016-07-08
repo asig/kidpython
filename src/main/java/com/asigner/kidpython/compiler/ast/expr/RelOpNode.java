@@ -3,8 +3,7 @@
 package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
-import com.asigner.kidpython.compiler.runtime.Environment;
-import com.asigner.kidpython.compiler.runtime.Value;
+import com.asigner.kidpython.compiler.ast.NodeVisitor;
 
 public class RelOpNode extends BinaryNode {
 
@@ -24,13 +23,7 @@ public class RelOpNode extends BinaryNode {
     }
 
     @Override
-    public Value eval(Environment env) {
-        return null;
-    }
-
-    @Override
-    void accept(ExprNodeVisitor visitor) {
+    public void accept(NodeVisitor visitor) {
         visitor.visit(this);
-
     }
 }

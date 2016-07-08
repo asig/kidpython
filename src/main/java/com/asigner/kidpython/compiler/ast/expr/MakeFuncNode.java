@@ -3,6 +3,7 @@
 package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
+import com.asigner.kidpython.compiler.ast.NodeVisitor;
 import com.asigner.kidpython.compiler.ast.Stmt;
 import com.asigner.kidpython.compiler.runtime.Environment;
 import com.asigner.kidpython.compiler.runtime.FuncValue;
@@ -26,9 +27,8 @@ public class MakeFuncNode extends ExprNode {
     }
 
     @Override
-    void accept(ExprNodeVisitor visitor) {
+    public void accept(NodeVisitor visitor) {
         visitor.visit(this);
-
     }
 }
 
