@@ -5,7 +5,7 @@ package com.asigner.kidpython.compiler.ast.expr;
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.ast.NodeVisitor;
 
-public class VarNode extends ExprNode implements Assignable {
+public class VarNode extends ExprNode {
 
     private final String var;
 

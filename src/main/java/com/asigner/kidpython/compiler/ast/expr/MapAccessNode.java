@@ -5,7 +5,7 @@ package com.asigner.kidpython.compiler.ast.expr;
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.ast.NodeVisitor;
 
-public class MapAccessNode extends ExprNode implements Assignable {
+public class MapAccessNode extends ExprNode {
 
     private final ExprNode mapExpr;
     private final ExprNode keyExpr;

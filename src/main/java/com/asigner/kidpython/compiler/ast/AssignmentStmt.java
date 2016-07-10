@@ -3,7 +3,6 @@
 package com.asigner.kidpython.compiler.ast;
 
 import com.asigner.kidpython.compiler.Position;
-import com.asigner.kidpython.compiler.ast.expr.Assignable;
 import com.asigner.kidpython.compiler.ast.expr.ExprNode;
 import com.asigner.kidpython.compiler.runtime.ExecutionException;
 
@@ -15,9 +14,9 @@ public class AssignmentStmt extends Stmt {
     public AssignmentStmt(Position pos, ExprNode varExpr, ExprNode expr) {
         super(pos);
         this.expr = expr;
-        if (!(varExpr instanceof Assignable)) {
-            throw new ExecutionException("Can't assign to this expression");
-        }
+//        if (!(varExpr instanceof Assignable)) {
+//            throw new ExecutionException("Can't assign to this expression");
+//        }
         this.varExpr = varExpr;
     }
 

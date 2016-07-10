@@ -18,10 +18,6 @@ public class ConstNode extends ExprNode {
         return val;
     }
 
-    public Value eval(VirtualMachine env) {
-        return val;
-    }
-
     @Override
     public void accept(NodeVisitor visitor) {
         visitor.visit(this);

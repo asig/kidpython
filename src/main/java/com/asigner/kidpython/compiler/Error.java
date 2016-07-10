@@ -8,6 +8,7 @@ public class Error {
 
     enum Code {
         UNEXPECTED_TOKEN,
+        RETURN_NOT_ALLOWED_OUTSIDE_FUNCTION
     }
 
     private final Position pos;
@@ -19,6 +20,13 @@ public class Error {
                 Code.UNEXPECTED_TOKEN,
                 "Unexpected token " + token.getType() + ". Expected instead one of " + expected.stream().map(Enum::toString).collect(joining(",")),
                 token.getPos());
+    }
+
+    public static Error returnNotAllowedOutsideFunction(Position pos) {
+        return new Error(
+                Code.RETURN_NOT_ALLOWED_OUTSIDE_FUNCTION,
+                "return statement not allowed outside a function",
+                pos);
     }
 
     private Error(Code code, String message, Position pos) {

@@ -21,28 +21,20 @@ public class FuncValue extends Value {
         return startPc;
     }
 
-    @Override
-    public boolean asBool() {
-        return true;
+    public List<String> getParams() {
+        return params;
     }
 
     @Override
-    public String asString() {
-        return "func@" + startPc;
-    }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-    @Override
-    public BigDecimal asNumber() {
-        throw new ExecutionException("Can't coerce function to number");
-    }
+        FuncValue funcValue = (FuncValue) o;
 
-    @Override
-    public Iterator<? extends Value> asIterator() {
-        throw new ExecutionException("Can't coerce function to iterator");
-    }
+        if (startPc != funcValue.startPc) return false;
+        return params != null ? params.equals(funcValue.params) : funcValue.params == null;
 
-    public Map<Value, Value> asMap() {
-        throw new ExecutionException("Can't coerce function to map");
     }
 
     @Override

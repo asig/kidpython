@@ -3,6 +3,7 @@
 package com.asigner.kidpython.compiler.runtime;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class NumberValue extends Value {
     private final BigDecimal numVal;
@@ -25,6 +26,14 @@ public class NumberValue extends Value {
     @Override
     public BigDecimal asNumber() {
         return numVal;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NumberValue that = (NumberValue) o;
+        return Objects.equals(numVal, that.numVal);
     }
 
     @Override

@@ -18,13 +18,5 @@ public abstract class Stmt extends Node {
         return next;
     }
 
-    public Stmt last() {
-        Stmt cur = this;
-        while (cur.getNext() != null) {
-            cur = cur.getNext();
-        }
-        return cur;
-    }
-
     public abstract void accept(NodeVisitor visitor);
 }

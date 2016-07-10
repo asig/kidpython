@@ -21,6 +21,7 @@ import com.asigner.kidpython.compiler.ast.expr.MapAccessNode;
 import com.asigner.kidpython.compiler.ast.expr.VarNode;
 import com.asigner.kidpython.compiler.runtime.NumberValue;
 import com.asigner.kidpython.compiler.runtime.StringValue;
+import com.asigner.kidpython.compiler.runtime.UndefinedValue;
 import com.asigner.kidpython.util.Pair;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -114,6 +115,7 @@ public class Parser {
     private final Scanner scanner;
     private Token lookahead;
     private int tmpVarCnt;
+    private int inFunction;
     private List<Error> errors;
 
     public Parser(String text) {
@@ -122,6 +124,7 @@ public class Parser {
     }
 
     public Stmt parse() {
+        inFunction = 0;
         lookahead = scanner.next();
         Stmt code = stmtBlock();
         match(EOT);
@@ -319,9 +322,12 @@ public class Parser {
     private Stmt returnStmt() {
         Position pos = lookahead.getPos();
         match(RETURN);
-        ExprNode expr = new ConstNode(lookahead.getPos(), new NumberValue(BigDecimal.ZERO));
+        ExprNode expr = new ConstNode(lookahead.getPos(), UndefinedValue.INSTANCE);
         if (EXPR_START_SET.contains(lookahead.getType())) {
             expr = expr();
+        }
+        if (inFunction == 0) {
+            error(Error.returnNotAllowedOutsideFunction(pos));
         }
         return new ReturnStmt(pos, expr);
     }
@@ -332,7 +338,7 @@ public class Parser {
         match(IDENT);
         ExprNode varExpr = new VarNode(pos, ident);
         while (SELECTOR_OR_CALL_START_SET.contains(lookahead.getType())) {
-            varExpr = selectorOrCall(varExpr);
+            varExpr = selectorOrCall(varExpr, false /* left-hand-side */);
         }
         ExprNode expr;
         if (lookahead.getType() == EQ) {
@@ -344,7 +350,7 @@ public class Parser {
         }
     }
 
-    private ExprNode selectorOrCall(ExprNode base) {
+    private ExprNode selectorOrCall(ExprNode base, boolean rhs) {
         ExprNode curExpr = base;
         Position pos = lookahead.getPos();
         switch (lookahead.getType()) {
@@ -381,6 +387,7 @@ public class Parser {
     }
 
     private Stmt funcDef() {
+        inFunction++;
         Position pos = lookahead.getPos();
         match(FUNC);
         String funcName = lookahead.getValue();
@@ -389,7 +396,7 @@ public class Parser {
         List<String> params = optIdentList();
         match(RPAREN);
         Stmt body = funcBody();
-
+        inFunction--;
         return new AssignmentStmt(pos, new VarNode(pos, funcName), new MakeFuncNode(pos, body, params));
     }
 
@@ -498,7 +505,7 @@ public class Parser {
                 match(IDENT);
                 node = new VarNode(pos, varName);
                 while (SELECTOR_OR_CALL_START_SET.contains(lookahead.getType())) {
-                    node = selectorOrCall(node);
+                    node = selectorOrCall(node, true /* rhs */);
                 }
                 return node;
             case LPAREN:
@@ -506,7 +513,7 @@ public class Parser {
                 node = expr();
                 match(RPAREN);
                 while (SELECTOR_OR_CALL_START_SET.contains(lookahead.getType())) {
-                    node = selectorOrCall(node);
+                    node = selectorOrCall(node, true /* rhs */);
                 }
                 return node;
             case FUNC:
@@ -515,7 +522,9 @@ public class Parser {
                 match(LPAREN);
                 List<String> params = optIdentList();
                 match(RPAREN);
+                inFunction++;
                 Stmt body = funcBody();
+                inFunction--;
                 return new MakeFuncNode(pos, body, params);
             default:
                 error(Error.unexpectedToken(lookahead, TERM_START_SET));

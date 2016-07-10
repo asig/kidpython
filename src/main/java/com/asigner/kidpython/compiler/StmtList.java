@@ -12,7 +12,9 @@ public class StmtList {
 
     public void add(Stmt node) {
         cur.setNext(node);
-        cur = node.last();
+        while (cur.getNext() != null) {
+            cur = cur.getNext();
+        }
     }
 
     public Stmt getFirst() {

@@ -20,18 +20,6 @@ public class ListValue extends Value {
         this.listVal = val;
     }
 
-    public boolean asBool() {
-            return listVal.size() > 0;
-    }
-
-    public String asString() {
-            return "[" + listVal.stream().map(Value::asString).collect(joining(",")) + "]";
-    }
-
-    public BigDecimal asNumber() {
-        return new BigDecimal(listVal.size());
-    }
-
     @Override
     public Iterator<? extends Value> asIterator() {
         return listVal.iterator();
@@ -41,17 +29,28 @@ public class ListValue extends Value {
 return listVal;
     }
 
-    public Map<Value, Value> asMap() {
-        Map<Value, Value> res = Maps.newHashMap();
-        int i = 0;
-        for (Value v : listVal) {
-            res.put( new NumberValue(new BigDecimal(i)), v);
-        }
-        return res;
-    }
-
     @Override
     public String toString() {
         return "ListValue{" + getType().toString() + ":" + listVal + "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ListValue listValue = (ListValue) o;
+
+        if (this.listVal.size() != listValue.listVal.size()) {
+            return false;
+        }
+        Iterator<Value> i1 = this.listVal.iterator();
+        Iterator<Value> i2 = listValue.listVal.iterator();
+        while (i1.hasNext()) {
+            if (!(i1.next().equals(i2.next()))) {
+                return false;
+            }
+        }
+        return true;
     }
 }

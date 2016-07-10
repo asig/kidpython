@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.asigner.kidpython.compiler.runtime.Value.Type.MAP;
@@ -21,18 +22,6 @@ public class MapValue extends Value {
         this.mapVal = val;
     }
 
-    public boolean asBool() {
-        return mapVal.size() > 0;
-    }
-
-    public String asString() {
-        return "{" + mapVal.entrySet().stream().map(e -> e.getKey().asString() + ":" + e.getValue().asString()).collect(joining(",")) + "}";
-    }
-
-    public BigDecimal asNumber() {
-        return new BigDecimal(mapVal.size());
-    }
-
     @Override
     public Iterator<? extends Value> asIterator() {
         return mapVal.values().iterator();
@@ -43,10 +32,27 @@ public class MapValue extends Value {
     }
 
     public Map<Value, Value> asMap() {
-        Map<Value, Value> res = Maps.newHashMap();
-        res.putAll(mapVal);
-        return res;
+        return mapVal;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MapValue mapValue = (MapValue) o;
+
+        if (this.mapVal.size() != mapValue.mapVal.size()) {
+            return false;
+        }
+        for (Value key : this.mapVal.keySet()) {
+            if (!Objects.equals(this.mapVal.get(key), mapValue.mapVal.get(key))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     @Override
     public String toString() {

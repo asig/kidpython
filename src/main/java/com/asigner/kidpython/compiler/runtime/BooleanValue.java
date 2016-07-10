@@ -4,6 +4,7 @@ package com.asigner.kidpython.compiler.runtime;
 
 import java.math.BigDecimal;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class BooleanValue extends Value {
     private final Boolean boolVal;
@@ -29,8 +30,11 @@ public class BooleanValue extends Value {
     }
 
     @Override
-    public Iterator<? extends Value> asIterator() {
-        return null;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BooleanValue that = (BooleanValue) o;
+        return Objects.equals(boolVal, that.boolVal);
     }
 
     @Override

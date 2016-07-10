@@ -1,13 +1,22 @@
 package com.asigner.kidpython.compiler.runtime;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Stack;
+
+import static com.asigner.kidpython.compiler.runtime.Value.Type.BOOLEAN;
+import static com.asigner.kidpython.compiler.runtime.Value.Type.MAP;
+import static com.asigner.kidpython.compiler.runtime.Value.Type.NUMBER;
+import static com.asigner.kidpython.compiler.runtime.Value.Type.REFERENCE;
+import static com.asigner.kidpython.compiler.runtime.Value.Type.STRING;
 
 public class VirtualMachine {
 
@@ -74,9 +83,9 @@ public class VirtualMachine {
 
     public void run() {
         boolean running = true;
-        while(running) {
+        while (running) {
             Instruction instr = program[pc++];
-            switch(instr.getOpCode()) {
+            switch (instr.getOpCode()) {
                 case PUSH:
                     valueStack.push(instr.getVal());
                     break;
@@ -85,15 +94,33 @@ public class VirtualMachine {
                     valueStack.pop();
                     break;
 
-                case ASSIGN:
-                    break;
+                case ASSIGN: {
+                    Value rhs = valueStack.pop();
+                    Value lhs = valueStack.pop();
+                    if (lhs.getType() != REFERENCE) {
+                        throw new ExecutionException("Can't assign to non-reference!");
+                    }
+                    if (lhs instanceof VarRefValue) {
+                        setVar(((VarRefValue) lhs).getVar(), rhs);
+                    } else if (lhs instanceof FieldRefValue) {
+                        FieldRefValue frv = (FieldRefValue) lhs;
+                        frv.getMap().asMap().put(frv.getKey(), lhs);
+                    }
+
+                }
+                break;
 
                 case STOP:
                     running = false;
                     break;
 
-                case MAPACCESS:
-
+                case MKFIELDREF:
+                    Value key = valueStack.pop();
+                    Value mapValue = valueStack.pop();
+                    if (mapValue.getType() != MAP) {
+                        throw new ExecutionException("Variable is not a map");
+                    }
+                    valueStack.push(new FieldRefValue((MapValue) mapValue, key));
                     break;
 
                 case MKLIST:
@@ -125,20 +152,40 @@ public class VirtualMachine {
                     pc = instr.getIntVal();
                     break;
 
-                case CALL:
-                    break;
+                case CALL: {
+                    int paramCount = instr.getIntVal();
+                    List<Value> params = Lists.newArrayListWithExpectedSize(paramCount);
+                    for (int i = paramCount - 1; i >= 0; i--) {
+                        params.set(i, valueStack.pop());
+                    }
+                    Value func = valueStack.pop();
+                    if (func instanceof NativeFuncValue) {
+                        Value result = ((NativeFuncValue) func).getFunc().run(params);
+                        valueStack.push(result);
+                    } else if (func instanceof FuncValue) {
+                        this.enterFunction((FuncValue) func, params);
+                    } else {
+                        throw new ExecutionException("Can't call non-function value");
+                    }
+                }
 
-                case CALLN:
-                    break;
+                break;
 
                 case RET:
+                    leaveFunction();
                     break;
 
-                case NOT:
-                    break;
+                case NOT: {
+                    Value val = load(valueStack.pop());
+                    valueStack.push(new BooleanValue(!val.asBool()));
+                }
+                break;
 
-                case NEG:
-                    break;
+                case NEG: {
+                    Value val = load(valueStack.pop());
+                    valueStack.push(new NumberValue(val.asNumber().negate()));
+                }
+                break;
 
                 case ADD: {
                     Value right = load(valueStack.pop());
@@ -168,22 +215,65 @@ public class VirtualMachine {
                 }
                 break;
 
-                case EQ:
-                    break;
-                case NE:
-                    break;
-                case LE:
-                    break;
-                case LT:
-                    break;
-                case GE:
-                    break;
-                case GT:
-                    break;
+                case EQ: {
+                    Value right = load(valueStack.pop());
+                    Value left = load(valueStack.pop());
+                    valueStack.push(new BooleanValue(left.equals(right)));
+                }
+                break;
+                case NE: {
+                    Value right = load(valueStack.pop());
+                    Value left = load(valueStack.pop());
+                    valueStack.push(new BooleanValue(!left.equals(right)));
+                }
+                break;
+                case LE: {
+                    Value right = load(valueStack.pop());
+                    Value left = load(valueStack.pop());
+                    Optional<Integer> res = compare(left, right);
+                    valueStack.push(new BooleanValue(res.isPresent() && res.get() <= 0));
+                }
+                break;
+                case LT: {
+                    Value right = load(valueStack.pop());
+                    Value left = load(valueStack.pop());
+                    Optional<Integer> res = compare(left, right);
+                    valueStack.push(new BooleanValue(res.isPresent() && res.get() < 0));
+                }
+                break;
+                case GE: {
+                    Value right = load(valueStack.pop());
+                    Value left = load(valueStack.pop());
+                    Optional<Integer> res = compare(left, right);
+                    valueStack.push(new BooleanValue(res.isPresent() && res.get() >= 0));
+                }
+                break;
+                case GT: {
+                    Value right = load(valueStack.pop());
+                    Value left = load(valueStack.pop());
+                    Optional<Integer> res = compare(left, right);
+                    valueStack.push(new BooleanValue(res.isPresent() && res.get() > 0));
+                }
+                break;
             }
         }
     }
 
+
+    private void enterFunction(FuncValue func, List<Value> paramValues) {
+        Frame frame = new Frame(funcFrame, pc + 1);
+        funcFrame = frame;
+        List<String> params = func.getParams();
+        for (int i = 0; i < params.size(); i++) {
+            frame.setVar(params.get(i), paramValues.get(i));
+        }
+        pc = func.getStartPc();
+    }
+
+    private void leaveFunction() {
+        pc = funcFrame.getReturnAddress();
+        funcFrame = funcFrame.getParent();
+    }
 
     public Value getVar(String name) {
         Value v;
@@ -198,7 +288,7 @@ public class VirtualMachine {
     }
 
     public void setVar(String name, Value value) {
-        Frame targetFrame ;
+        Frame targetFrame;
         if (globalFrame.isDefined(name)) {
             targetFrame = globalFrame;
         } else {
@@ -216,8 +306,8 @@ public class VirtualMachine {
 
     private Value load(Value value) {
         if (value.getType() == Value.Type.REFERENCE) {
-            ReferenceValue rValue = (ReferenceValue)value;
-            value = getVar(rValue.getVar().getVar());
+            VarRefValue rValue = (VarRefValue) value;
+            value = getVar(rValue.getVar());
         }
         return value;
     }
@@ -226,7 +316,7 @@ public class VirtualMachine {
         Value.Type tl = left.getType();
         Value.Type tr = right.getType();
 
-        if (tl == Value.Type.STRING && tr == Value.Type.STRING) {
+        if (tl == STRING && tr == STRING) {
             return new StringValue(left.asString() + right.asString());
         } else {
             return new NumberValue(left.asNumber().add(right.asNumber()));
@@ -241,13 +331,43 @@ public class VirtualMachine {
         Value.Type tl = left.getType();
         Value.Type tr = right.getType();
 
-        if (tl)
+        if ((tl == STRING && (tr == BOOLEAN || tr == NUMBER))
+                || (tr == STRING && (tl == BOOLEAN || tl == NUMBER))) {
+            String s;
+            int count;
+            if (tl == STRING) {
+                s = left.asString();
+                count = right.asNumber().intValue();
+            } else {
+                s = right.asString();
+                count = left.asNumber().intValue();
+            }
+            StringBuilder bldr = new StringBuilder();
+            while (count-- > 0) {
+                bldr.append(s);
+            }
+            return new StringValue(bldr.toString());
+        }
 
-        return null;
+        return new NumberValue(left.asNumber().divide(right.asNumber(), BigDecimal.ROUND_HALF_DOWN));
     }
 
     private Value divValues(Value left, Value right) {
-        return null;
+        return new NumberValue(left.asNumber().divide(right.asNumber(), BigDecimal.ROUND_HALF_DOWN));
+    }
+
+    private Optional<Integer> compare(Value v1, Value v2) {
+        if (v1.getType() == v2.getType()) {
+            switch (v1.getType()) {
+                case BOOLEAN:
+                    return Optional.of(Boolean.valueOf(v1.asBool()).compareTo(v2.asBool()));
+                case STRING:
+                    return Optional.of(v1.asString().compareTo(v2.asString()));
+                case NUMBER:
+                    return Optional.of(v1.asString().compareTo(v2.asString()));
+            }
+        }
+        return Optional.empty();
     }
 
 }

@@ -31,21 +31,28 @@ public abstract class Value {
         return type;
     }
 
-    public abstract boolean asBool();
-    public abstract String asString();
-    public abstract BigDecimal asNumber();
+    public boolean asBool() {
+        throw new ExecutionException("Can't coerce to boolean");
+    }
+
+    public String asString() {
+        throw new ExecutionException("Can't coerce to string");
+    }
+
+    public BigDecimal asNumber() {
+        throw new ExecutionException("Can't coerce to number");
+    }
 
     public Iterator<? extends Value> asIterator() {
-        return Lists.newArrayList(this).iterator();
-    };
-
-    public List<Value> asList() {
-        return Lists.newArrayList(this);
+        throw new ExecutionException("Can't coerce to iterator");
     }
 
     public Map<Value, Value> asMap() {
-        Map<Value, Value> res = Maps.newHashMap();
-        res.put(new NumberValue(BigDecimal.ZERO), this);
-        return res;
+        throw new ExecutionException("Can't coerce to map");
     }
+
+    public List<Value> asList() {
+        throw new ExecutionException("Can't coerce to list");
+    }
+
 }

@@ -17,9 +17,9 @@ public class Instruction {
         ASSIGN, // Store from stack to variable
         STOP,
 
-        MAPACCESS, // Access a map property
+        MKFIELDREF,
 
-        MKLIST, // Create a list of n elements
+        MKLIST,
         MKMAP,
         MKITER,
 
@@ -27,7 +27,6 @@ public class Instruction {
         BF,
         B,
         CALL,
-        CALLN,
         RET,
 
         NOT,

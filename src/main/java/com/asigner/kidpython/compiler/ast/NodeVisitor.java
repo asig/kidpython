@@ -13,7 +13,6 @@ import com.asigner.kidpython.compiler.ast.expr.VarNode;
 
 public interface NodeVisitor {
     void visit(AssignmentStmt stmt);
-    void visit(CallStmt stmt);
     void visit(EmptyStmt stmt);
     void visit(EvalStmt stmt);
     void visit(ForEachStmt stmt);
