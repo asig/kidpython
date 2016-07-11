@@ -61,8 +61,10 @@ public class VirtualMachine {
 
     private final PrintStream stdout;
     private final InputStream stdin;
+    private final NativeFunctions nativeFunctions;
 
-    public VirtualMachine(OutputStream stdout, InputStream stdin) {
+    public VirtualMachine(OutputStream stdout, InputStream stdin, NativeFunctions nativeFunctions) {
+        this.nativeFunctions = nativeFunctions;
         this.stdout = new PrintStream(stdout);
         this.stdin = stdin;
         reset();
@@ -79,7 +81,14 @@ public class VirtualMachine {
         this.program = null;
         this.pc = 0;
 
-        globalFrame.setVar("print", new NativeFuncValue(this::print));
+        globalFrame.setVar("print", new NativeFuncValue(nativeFunctions::print));
+
+        Map<Value, Value> turtle = Maps.newHashMap();
+        turtle.put(new StringValue("turn"), new NativeFuncValue(nativeFunctions::turtleTurn));
+        turtle.put(new StringValue("penDown"), new NativeFuncValue(nativeFunctions::turtlePenDown));
+        turtle.put(new StringValue("penUp"), new NativeFuncValue(nativeFunctions::turtlePenUp));
+        turtle.put(new StringValue("move"), new NativeFuncValue(nativeFunctions::turtleMove));
+        globalFrame.setVar("turtle", new MapValue(turtle));
     }
 
     public void run() {
@@ -96,7 +105,7 @@ public class VirtualMachine {
                     break;
 
                 case ASSIGN: {
-                    Value rhs = valueStack.pop();
+                    Value rhs = load(valueStack.pop());
                     Value lhs = valueStack.pop();
                     if (lhs.getType() != REFERENCE) {
                         throw new ExecutionException("Can't assign to non-reference!");
@@ -116,8 +125,8 @@ public class VirtualMachine {
                     break;
 
                 case MKFIELDREF:
-                    Value key = valueStack.pop();
-                    Value mapValue = valueStack.pop();
+                    Value key = load(valueStack.pop());
+                    Value mapValue = load(valueStack.pop());
                     if (mapValue.getType() != MAP) {
                         throw new ExecutionException("Variable is not a map");
                     }
@@ -134,7 +143,7 @@ public class VirtualMachine {
                     throw new UnsupportedOperationException("Not implemeted yet");
 
                 case BT: {
-                    Value v = valueStack.pop();
+                    Value v = load(valueStack.pop());
                     if (v.asBool()) {
                         pc = instr.getIntVal();
                     }
@@ -142,7 +151,7 @@ public class VirtualMachine {
                 break;
 
                 case BF: {
-                    Value v = valueStack.pop();
+                    Value v = load(valueStack.pop());
                     if (!v.asBool()) {
                         pc = instr.getIntVal();
                     }
@@ -299,18 +308,14 @@ public class VirtualMachine {
         targetFrame.setVar(name, value);
     }
 
-    private Value print(List<Value> values) {
-        for (Value v : values) {
-            stdout.print(v.asString());
-        }
-        stdout.flush();
-        return UndefinedValue.INSTANCE;
-    }
-
     private Value load(Value value) {
         if (value.getType() == Value.Type.REFERENCE) {
-            VarRefValue rValue = (VarRefValue) value;
-            value = getVar(rValue.getVar());
+            if (value instanceof VarRefValue) {
+                value = getVar(((VarRefValue) value).getVar());
+            } else if (value instanceof FieldRefValue) {
+                FieldRefValue frv = (FieldRefValue) value;
+                value = frv.getMap().asMap().get(frv.getKey());
+            }
         }
         return value;
     }
@@ -372,5 +377,6 @@ public class VirtualMachine {
         }
         return Optional.empty();
     }
+
 
 }

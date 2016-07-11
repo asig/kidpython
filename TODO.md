@@ -9,6 +9,7 @@ TODO
     [ ] Show error messages in code
     [ ] Show error messages in console
     [ ] Rename tabs    
+    [ ] Show "start executing program", "Program terminated" messages
 [ ] Turtle
     [ ] Slow mode that moves the Turtle pixel by pixel
     [ ] Support background images

@@ -4,6 +4,7 @@ import com.asigner.kidpython.compiler.CodeGenerator;
 import com.asigner.kidpython.compiler.Error;
 import com.asigner.kidpython.compiler.Parser;
 import com.asigner.kidpython.compiler.ast.Stmt;
+import com.asigner.kidpython.compiler.runtime.NativeFunctions;
 import com.asigner.kidpython.compiler.runtime.VirtualMachine;
 import com.asigner.kidpython.compiler.runtime.Instruction;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
@@ -42,6 +43,7 @@ public class App {
     private OutputStream consoleOutputStream;
     private PrintWriter consoleOut;
     private VirtualMachine virtualMachine;
+    private NativeFunctions nativeFunctions;
 
     /**
      * Launch the application.
@@ -141,7 +143,8 @@ public class App {
         consoleInputStream = new ConsoleInputStream(consoleComposite);
         consoleOutputStream = new ConsoleOutputStream(consoleComposite);
         consoleOut = new PrintWriter(consoleOutputStream, true);
-        virtualMachine = new VirtualMachine(consoleOutputStream, consoleInputStream);
+        nativeFunctions = new NativeFunctions(consoleInputStream, consoleOutputStream, turtleCanvas);
+        virtualMachine = new VirtualMachine(consoleOutputStream, consoleInputStream, nativeFunctions);
     }
 
     private void addToolbarItem(ToolBar toolbar, String text, Listener handler) {
