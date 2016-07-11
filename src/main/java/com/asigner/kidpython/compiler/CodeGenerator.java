@@ -101,22 +101,22 @@ public class CodeGenerator implements NodeVisitor {
 
     @Override
     public void visit(ForEachStmt stmt) {
-
+        throw new UnsupportedOperationException("Not implemented yet!");
     }
 
     @Override
     public void visit(ForStmt stmt) {
-
+        throw new UnsupportedOperationException("Not implemented yet!");
     }
 
     @Override
     public void visit(IfStmt stmt) {
         stmt.getCond().accept(this);
         int branchIfFalsePc = emit(new Instruction(stmt, BF, 0)); // patch later
-        stmt.getTrueBranch().accept(this);
+        generateStmtBlock(stmt.getTrueBranch());
         int branchPc = emit(new Instruction(stmt, B, 0)); // patch later
         int falseStart = instrs.size();
-        stmt.getFalseBranch().accept(this);
+        generateStmtBlock(stmt.getFalseBranch());
         int pc = instrs.size();
         patch(branchIfFalsePc, new Instruction(stmt, BF, falseStart));
         patch(branchPc, new Instruction(stmt, B, pc));
@@ -250,7 +250,7 @@ public class CodeGenerator implements NodeVisitor {
         // jump over function for now.
         int jumpOverFunc = emit(new Instruction(node, B, 0));
         int startPc = instrs.size();
-        node.getBody().accept(this);
+        generateStmtBlock(node.getBody());
         patch(jumpOverFunc, new Instruction(node, B, instrs.size()));
         emit(new Instruction(node, PUSH, new FuncValue(startPc, node.getParams())));
     }
