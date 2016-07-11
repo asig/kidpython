@@ -14,6 +14,7 @@ TODO
     [ ] implement "input"
     [ ] only show cursor when input is pending    
     [ ] implement \n special codes
+    [X] implement "len" function
 [ ] Turtle
     [ ] Slow mode that moves the Turtle pixel by pixel
     [ ] Support background images

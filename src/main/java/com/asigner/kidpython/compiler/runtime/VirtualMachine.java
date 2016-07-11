@@ -83,6 +83,8 @@ public class VirtualMachine {
 
         globalFrame.setVar("print", new NativeFuncValue(nativeFunctions::print));
 
+        globalFrame.setVar("len", new NativeFuncValue(nativeFunctions::utilsLen));
+
         Map<Value, Value> turtle = Maps.newHashMap();
         turtle.put(new StringValue("turn"), new NativeFuncValue(nativeFunctions::turtleTurn));
         turtle.put(new StringValue("penDown"), new NativeFuncValue(nativeFunctions::turtlePenDown));
@@ -124,20 +126,38 @@ public class VirtualMachine {
                     running = false;
                     break;
 
-                case MKFIELDREF:
+                case MKFIELDREF: {
                     Value key = load(valueStack.pop());
                     Value mapValue = load(valueStack.pop());
                     if (mapValue.getType() != MAP) {
                         throw new ExecutionException("Variable is not a map");
                     }
                     valueStack.push(new FieldRefValue((MapValue) mapValue, key));
-                    break;
+                }
+                break;
 
-                case MKLIST:
-                    throw new UnsupportedOperationException("Not implemeted yet");
+                case MKLIST: {
+                    int elemCount = instr.getIntVal();
+                    List<Value> elems = Lists.newArrayListWithExpectedSize(elemCount);
+                    for (int i = elemCount - 1; i >= 0; i--) {
+                        elems.add(load(valueStack.pop()));
+                    }
+                    elems = Lists.reverse(elems);
+                    valueStack.push(new ListValue(elems));
+                }
+                break;
 
-                case MKMAP:
-                    throw new UnsupportedOperationException("Not implemeted yet");
+                case MKMAP: {
+                    Map<Value, Value> map = Maps.newHashMap();
+                    int elemCount = instr.getIntVal();
+                    for (int i = elemCount - 1; i >= 0; i--) {
+                        Value val = load(valueStack.pop());
+                        Value key = load(valueStack.pop());
+                        map.put(key, val);
+                    }
+                    valueStack.push(new MapValue(map));
+                }
+                break;
 
                 case MKITER:
                     throw new UnsupportedOperationException("Not implemeted yet");
