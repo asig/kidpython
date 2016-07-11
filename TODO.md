@@ -8,20 +8,22 @@ TODO
 [ ] IDE/Code Editor
     [ ] Show error messages in code
     [ ] Show error messages in console
-    [ ] Rename tabs    
+    [ ] Rename tabs
     [ ] Show "start executing program", "Program terminated" messages
+    [ ] Single step
 [ ] Runtime
     [ ] implement "input"
-    [ ] only show cursor when input is pending    
+    [ ] only show cursor when input is pending
     [ ] implement \n special codes
     [X] implement "len" function
+    [ ] implement math functions
 [ ] Turtle
     [ ] Slow mode that moves the Turtle pixel by pixel
     [ ] Support background images
-    [ ] Zoom buttons
-    [ ] Reset buttons
-    [ ] Make canvas draggable
-    [ ] implement "clear"
+    [X] Zoom buttons
+    [X] Reset buttons
+    [X] Make canvas draggable
+    [X] implement "clear"
 [ ] Language
     [ ] Default parameters
     
