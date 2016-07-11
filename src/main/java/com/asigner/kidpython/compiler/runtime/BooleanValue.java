@@ -3,7 +3,6 @@
 package com.asigner.kidpython.compiler.runtime;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
 import java.util.Objects;
 
 public class BooleanValue extends Value {
@@ -35,6 +34,11 @@ public class BooleanValue extends Value {
         if (o == null || getClass() != o.getClass()) return false;
         BooleanValue that = (BooleanValue) o;
         return Objects.equals(boolVal, that.boolVal);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(boolVal);
     }
 
     @Override

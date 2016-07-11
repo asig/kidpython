@@ -2,9 +2,6 @@
 
 package com.asigner.kidpython.compiler.runtime;
 
-import com.google.common.collect.Maps;
-
-import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +9,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.asigner.kidpython.compiler.runtime.Value.Type.MAP;
-import static java.util.stream.Collectors.joining;
 
 public class MapValue extends Value {
     private final Map<Value, Value> mapVal;
@@ -53,6 +49,10 @@ public class MapValue extends Value {
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(mapVal);
+    }
 
     @Override
     public String toString() {

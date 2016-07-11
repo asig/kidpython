@@ -37,6 +37,11 @@ public class NumberValue extends Value {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(numVal);
+    }
+
+    @Override
     public String toString() {
         return "NumberValue{" + getType().toString() + ":" + numVal + "}";
     }

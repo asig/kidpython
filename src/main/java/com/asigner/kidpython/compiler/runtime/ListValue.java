@@ -2,15 +2,11 @@
 
 package com.asigner.kidpython.compiler.runtime;
 
-import com.google.common.collect.Maps;
-
-import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 import static com.asigner.kidpython.compiler.runtime.Value.Type.LIST;
-import static java.util.stream.Collectors.joining;
 
 public class ListValue extends Value {
     private final List<Value> listVal;
@@ -26,7 +22,7 @@ public class ListValue extends Value {
     }
 
     public List<Value> asList() {
-return listVal;
+        return listVal;
     }
 
     @Override
@@ -52,5 +48,10 @@ return listVal;
             }
         }
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(listVal);
     }
 }

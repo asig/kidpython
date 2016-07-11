@@ -1,5 +1,7 @@
 package com.asigner.kidpython.compiler.runtime;
 
+import java.util.Objects;
+
 public class VarRefValue extends Value {
     private final String var;
 
@@ -10,6 +12,19 @@ public class VarRefValue extends Value {
 
     public String getVar() {
         return var;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        VarRefValue that = (VarRefValue) o;
+        return Objects.equals(var, that.var);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(var);
     }
 
     @Override

@@ -2,12 +2,8 @@
 
 package com.asigner.kidpython.compiler.runtime;
 
-import com.google.common.collect.Maps;
-
-import java.math.BigDecimal;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 public class NativeFuncValue extends Value {
 
@@ -24,6 +20,19 @@ public class NativeFuncValue extends Value {
 
     public Iface getFunc() {
         return func;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NativeFuncValue that = (NativeFuncValue) o;
+        return Objects.equals(func, that.func);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(func);
     }
 
     @Override

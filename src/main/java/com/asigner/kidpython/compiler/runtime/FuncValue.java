@@ -2,10 +2,8 @@
 
 package com.asigner.kidpython.compiler.runtime;
 
-import java.math.BigDecimal;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 public class FuncValue extends Value {
     private final int startPc;
@@ -35,6 +33,11 @@ public class FuncValue extends Value {
         if (startPc != funcValue.startPc) return false;
         return params != null ? params.equals(funcValue.params) : funcValue.params == null;
 
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startPc, params);
     }
 
     @Override

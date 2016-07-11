@@ -5,7 +5,6 @@ package com.asigner.kidpython.compiler.runtime;
 import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -44,6 +43,11 @@ public class StringValue extends Value {
         if (o == null || getClass() != o.getClass()) return false;
         StringValue that = (StringValue) o;
         return Objects.equals(strVal, that.strVal);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(strVal);
     }
 
     @Override

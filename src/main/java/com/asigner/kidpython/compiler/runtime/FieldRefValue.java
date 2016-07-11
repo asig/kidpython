@@ -2,12 +2,7 @@
 
 package com.asigner.kidpython.compiler.runtime;
 
-import com.asigner.kidpython.compiler.ast.expr.ExprNode;
-import com.asigner.kidpython.compiler.ast.expr.VarNode;
-
-import java.math.BigDecimal;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.Objects;
 
 public class FieldRefValue extends Value {
     private final MapValue map;
@@ -25,5 +20,19 @@ public class FieldRefValue extends Value {
 
     public MapValue getMap() {
         return map;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FieldRefValue that = (FieldRefValue) o;
+        return Objects.equals(map, that.map) &&
+                Objects.equals(key, that.key);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(map, key);
     }
 }
