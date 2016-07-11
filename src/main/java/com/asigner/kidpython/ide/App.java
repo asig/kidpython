@@ -164,7 +164,11 @@ public class App {
         List<Instruction> program = codeGen.generate();
         int i = 0;
         for (Instruction instr : program) {
-            consoleOut.println(String.format("%04d: %s", i++, instr));
+            System.out.println(String.format("%04d: %s", i++, instr));
         }
+        System.out.flush();
+
+        virtualMachine.setProgram(program);
+        virtualMachine.run();
     }
 }
