@@ -126,7 +126,7 @@ public class Parser {
     public Stmt parse() {
         inFunction = 0;
         lookahead = scanner.next();
-        Stmt code = stmtBlock();
+        Stmt code = stmtBlock().getFirst();
         match(EOT);
         return errors.size() > 0 ? null : code;
     }
@@ -153,13 +153,13 @@ public class Parser {
         }
     }
 
-    private Stmt stmtBlock() {
+    private StmtList stmtBlock() {
         StmtList stmts = new StmtList();
         stmts.add(stmt());
         while (STMT_START_SET.contains(lookahead.getType())) {
             stmts.add(stmt());
         }
-        return stmts.getFirst();
+        return stmts;
     }
 
     private Stmt stmt() {
@@ -189,7 +189,7 @@ public class Parser {
         match(IF);
         ExprNode expr = expr();
         match(THEN);
-        Stmt body = stmtBlock();
+        Stmt body = stmtBlock().getFirst();
 
         IfStmt ifStmt = new IfStmt(ifPos, expr, body);
         IfStmt curIf = ifStmt;
@@ -204,14 +204,14 @@ public class Parser {
                     match(IF);
                     ExprNode cond = expr();
                     match(THEN);
-                    body = stmtBlock();
+                    body = stmtBlock().getFirst();
 
                     IfStmt innerIf = new IfStmt(ifPos, cond, body);
                     curIf.setFalseBranch(innerIf);
                     curIf = innerIf;
                 } else {
                     // terminating ELSE. break out of loop afterwards
-                    curIf.setFalseBranch(stmtBlock());
+                    curIf.setFalseBranch(stmtBlock().getFirst());
                     break;
                 }
             } else {
@@ -248,7 +248,7 @@ public class Parser {
 //            // i = iter.next()
 //            stmts.add(new AssignmentStmt(rangePos, ctrlVar, new IterNextNode(rangePos, iterVar)));
 //
-            Stmt body = stmtBlock();
+            Stmt body = stmtBlock().getFirst();
 
 //            stmts.add(stmtBlock());
 //            stmts.getLast().setNext(ifNode);
@@ -279,7 +279,7 @@ public class Parser {
 
             match(DO);
 
-            Stmt body = stmtBlock();
+            Stmt body = stmtBlock().getFirst();
 
 //            // i = i + steop
 //            ExprNode addStep = new ArithOpNode(eqPos, ArithOpNode.Op.ADD, ctrlVar, stepExpr);
@@ -303,7 +303,7 @@ public class Parser {
         Position condPos = lookahead.getPos();
         ExprNode condition = expr();
         match(DO);
-        Stmt body = stmtBlock();
+        Stmt body = stmtBlock().getFirst();
         match(END);
 
         return new WhileStmt(pos, condition, body);
@@ -312,7 +312,7 @@ public class Parser {
     private Stmt repeatStmt() {
         Position pos = lookahead.getPos();
         match(REPEAT);
-        Stmt body = stmtBlock();
+        Stmt body = stmtBlock().getFirst();
         match(UNTIL);
         ExprNode condition = expr();
 
@@ -533,12 +533,14 @@ public class Parser {
     }
 
     private Stmt funcBody() {
-        Stmt node = new EmptyStmt(lookahead.getPos());
+        Position pos = lookahead.getPos();
+        StmtList stmts = new StmtList();
         if (STMT_START_SET.contains(lookahead.getType())) {
-            node = stmtBlock();
+            stmts = stmtBlock();
         }
         match(END);
-        return node;
+        stmts.add(new ReturnStmt(pos, new ConstNode(pos, UndefinedValue.INSTANCE)));
+        return stmts.getFirst();
     }
 
     private List<String> optIdentList() {
