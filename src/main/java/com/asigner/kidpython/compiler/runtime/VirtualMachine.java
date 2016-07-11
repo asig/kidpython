@@ -27,6 +27,7 @@ public class VirtualMachine {
 
         public Frame(Frame parent, int returnAddress) {
             this.parent = parent;
+            this.returnAddress = returnAddress;
             this.vars = Maps.newHashMap();
         }
 
@@ -124,13 +125,13 @@ public class VirtualMachine {
                     break;
 
                 case MKLIST:
-                    break;
+                    throw new UnsupportedOperationException("Not implemeted yet");
 
                 case MKMAP:
-                    break;
+                    throw new UnsupportedOperationException("Not implemeted yet");
 
                 case MKITER:
-                    break;
+                    throw new UnsupportedOperationException("Not implemeted yet");
 
                 case BT: {
                     Value v = valueStack.pop();
@@ -156,9 +157,10 @@ public class VirtualMachine {
                     int paramCount = instr.getIntVal();
                     List<Value> params = Lists.newArrayListWithExpectedSize(paramCount);
                     for (int i = paramCount - 1; i >= 0; i--) {
-                        params.set(i, valueStack.pop());
+                        params.add(load(valueStack.pop()));
                     }
-                    Value func = valueStack.pop();
+                    params = Lists.reverse(params);
+                    Value func = load(valueStack.pop());
                     if (func instanceof NativeFuncValue) {
                         Value result = ((NativeFuncValue) func).getFunc().run(params);
                         valueStack.push(result);
@@ -301,7 +303,8 @@ public class VirtualMachine {
         for (Value v : values) {
             stdout.print(v.asString());
         }
-        return null;
+        stdout.flush();
+        return UndefinedValue.INSTANCE;
     }
 
     private Value load(Value value) {
@@ -349,7 +352,7 @@ public class VirtualMachine {
             return new StringValue(bldr.toString());
         }
 
-        return new NumberValue(left.asNumber().divide(right.asNumber(), BigDecimal.ROUND_HALF_DOWN));
+        return new NumberValue(left.asNumber().multiply(right.asNumber()));
     }
 
     private Value divValues(Value left, Value right) {
