@@ -26,7 +26,13 @@ public class NativeFunctions {
 
     public Value print(List<Value> values) {
         for (Value v : values) {
-            stdout.print(v.asString());
+            String s = v.asString()
+                    .replaceAll("\\\\n", "\n")
+                    .replaceAll("\\\\r", "\r")
+                    .replaceAll("\\\\b", "\b")
+                    .replaceAll("\\\\t", "\t")
+                    .replaceAll("\\\\f", "\f");
+            stdout.print(s);
         }
         stdout.flush();
         return UndefinedValue.INSTANCE;

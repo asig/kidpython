@@ -29,7 +29,7 @@ TODO
 [ ] Runtime
     [X] implement "input"
     [ ] only show cursor when input is pending
-    [ ] implement \n special codes
+    [X] implement \n special codes
     [X] implement "len" function
     [ ] implement math functions
 
