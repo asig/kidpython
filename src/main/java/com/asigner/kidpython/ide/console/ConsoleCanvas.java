@@ -87,7 +87,7 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
     private int first;
     private int len;
 
-    boolean inEscapeSequence = false;
+    private boolean inEscapeSequence = false;
     private String escapeBuffer;
 
     private Attr curAttr;
@@ -96,7 +96,6 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
     private boolean showCursor;
     private int cursorX, cursorY;
     private boolean cursorOn;
-    private Thread cursorBlinker;
 
     private ByteBuffer inputBuffer = new ByteBuffer(128 * 1024);
 
@@ -147,7 +146,7 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
         curAttr.bg = WHITE;
         curAttrCode = curAttr.encode();
 
-        cursorBlinker = new Thread() {
+        Thread cursorBlinker = new Thread() {
             @Override
             public void run() {
                 for (; ; ) {
@@ -265,9 +264,9 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
         int h = fontMetrics.getHeight();
         int y = cursorY * h;
         if (c == '\n') {
-            // ... and the previous one
-            y -= h;
-            h *= 2;
+            // potentially, we scrolled. repaint everything
+            y = 0;
+            h = getClientArea().height;
         }
         int finalY = y;
         int finalH = h;
