@@ -97,6 +97,7 @@ public class VirtualMachine {
         boolean running = true;
         while (running) {
             Instruction instr = program[pc++];
+            System.err.println(String.format("Executing: %04d %s", pc - 1, instr));
             switch (instr.getOpCode()) {
                 case PUSH:
                     valueStack.push(instr.getVal());
@@ -292,7 +293,7 @@ public class VirtualMachine {
 
 
     private void enterFunction(FuncValue func, List<Value> paramValues) {
-        Frame frame = new Frame(funcFrame, pc + 1);
+        Frame frame = new Frame(funcFrame, pc);
         funcFrame = frame;
         List<String> params = func.getParams();
         for (int i = 0; i < params.size(); i++) {
@@ -344,7 +345,7 @@ public class VirtualMachine {
         Value.Type tl = left.getType();
         Value.Type tr = right.getType();
 
-        if (tl == STRING && tr == STRING) {
+        if (tl == STRING || tr == STRING) {
             return new StringValue(left.asString() + right.asString());
         } else {
             return new NumberValue(left.asNumber().add(right.asNumber()));
@@ -352,7 +353,7 @@ public class VirtualMachine {
     }
 
     private Value subValues(Value left, Value right) {
-        return new NumberValue(left.asNumber().add(right.asNumber()));
+        return new NumberValue(left.asNumber().subtract(right.asNumber()));
     }
 
     private Value mulValues(Value left, Value right) {
