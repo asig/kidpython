@@ -42,6 +42,8 @@ import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.DIV;
 import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.EQ;
 import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.GE;
 import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.GT;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.ITER_HAS_NEXT;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.ITER_NEXT;
 import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.LE;
 import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.LT;
 import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.MKFIELDREF;
@@ -62,17 +64,23 @@ public class CodeGenerator implements NodeVisitor {
 
     private final Stmt stmt;
 
+    private int tmpVarCnt;
     private List<Instruction> instrs;
 
     public CodeGenerator(Stmt stmt) {
         this.stmt = stmt;
         this.instrs = Lists.newLinkedList();
+        this.tmpVarCnt = 0;
     }
 
     public List<Instruction> generate() {
         generateStmtBlock(stmt);
         emit(new Instruction(stmt, STOP));
         return instrs;
+    }
+
+    private String makeTempVarName() {
+        return String.format("_tmp%04d", tmpVarCnt++);
     }
 
     private void generateStmtBlock(Stmt stmt) {
@@ -101,7 +109,29 @@ public class CodeGenerator implements NodeVisitor {
 
     @Override
     public void visit(ForEachStmt stmt) {
-        throw new UnsupportedOperationException("Not implemented yet!");
+
+        // iter = range.begin();
+        VarNode iterVar = new VarNode(stmt.getPos(), makeTempVarName());
+        iterVar.accept(this);
+        stmt.getRange().accept(this);
+        emit(new Instruction(stmt, MKITER));
+        emit(new Instruction(stmt, ASSIGN));
+
+        // if !iter.hasnext goto end
+        int loopPc = emit(new Instruction(stmt, PUSH, new VarRefValue(iterVar.getVar())));
+        emit(new Instruction(stmt, ITER_HAS_NEXT));
+        int branchFalsePc = emit(new Instruction(stmt, BF, 0));
+
+        // ctrlVar = iter.next()
+        stmt.getCtrlVar().accept(this);
+        emit(new Instruction(stmt, PUSH, new VarRefValue(iterVar.getVar())));
+        emit(new Instruction(stmt, ITER_NEXT));
+        emit(new Instruction(stmt, ASSIGN));
+
+        stmt.getBody().accept(this);
+        emit(new Instruction(stmt, B, loopPc));
+
+        patch(branchFalsePc, new Instruction(stmt, BF, instrs.size()));
     }
 
     @Override
@@ -224,7 +254,8 @@ public class CodeGenerator implements NodeVisitor {
         switch(node.getOp()) {
             case NEG: opCode = NEG; break;
             case NOT: opCode = NOT; break;
-
+            case ITER_NEXT: opCode = ITER_NEXT; break;
+            case ITER_HAS_NEXT: opCode = ITER_HAS_NEXT; break;
             default: throw new IllegalStateException("Unknown UnOpNode op " + node.getOp());
         }
         emit(new Instruction(node, opCode));

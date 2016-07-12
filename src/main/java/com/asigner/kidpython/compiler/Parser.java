@@ -577,8 +577,4 @@ public class Parser {
         return nodes.get(0);
     }
 
-    private String makeTempVarName() {
-        return String.format("_tmp%04d", tmpVarCnt++);
-    }
-
 }

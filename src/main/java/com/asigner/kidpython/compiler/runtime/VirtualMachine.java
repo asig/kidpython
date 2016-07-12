@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Stack;
 
 import static com.asigner.kidpython.compiler.runtime.Value.Type.BOOLEAN;
+import static com.asigner.kidpython.compiler.runtime.Value.Type.ITERATOR;
 import static com.asigner.kidpython.compiler.runtime.Value.Type.MAP;
 import static com.asigner.kidpython.compiler.runtime.Value.Type.NUMBER;
 import static com.asigner.kidpython.compiler.runtime.Value.Type.REFERENCE;
@@ -165,8 +166,31 @@ public class VirtualMachine {
                 }
                 break;
 
-                case MKITER:
-                    throw new UnsupportedOperationException("Not implemeted yet");
+                case MKITER: {
+                    Value val = load(valueStack.pop());
+                    valueStack.push(new IterValue(val.asIterator()));
+                }
+                break;
+
+                case ITER_NEXT: {
+                    Value val = load(valueStack.pop());
+                    if (val.getType() != ITERATOR) {
+                        throw new ExecutionException("Not an iterator!");
+                    }
+                    IterValue ival = (IterValue)val;
+                    valueStack.push(ival.getIterator().next());
+                }
+                break;
+
+                case ITER_HAS_NEXT: {
+                    Value val = load(valueStack.pop());
+                    if (val.getType() != ITERATOR) {
+                        throw new ExecutionException("Not an iterator!");
+                    }
+                    IterValue ival = (IterValue)val;
+                    valueStack.push(new BooleanValue(ival.getIterator().hasNext()));
+                }
+                break;
 
                 case BT: {
                     Value v = load(valueStack.pop());

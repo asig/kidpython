@@ -18,6 +18,18 @@ public class ForEachStmt extends Stmt {
         this.body = body;
     }
 
+    public Stmt getBody() {
+        return body;
+    }
+
+    public ExprNode getCtrlVar() {
+        return ctrlVar;
+    }
+
+    public ExprNode getRange() {
+        return range;
+    }
+
     @Override
     public void accept(NodeVisitor visitor) {
         visitor.visit(this);

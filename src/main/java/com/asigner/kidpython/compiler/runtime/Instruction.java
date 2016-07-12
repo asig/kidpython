@@ -31,8 +31,10 @@ public class Instruction {
 
         NOT,
 
-        NEG,
+        ITER_NEXT,
+        ITER_HAS_NEXT,
 
+        NEG,
         ADD,
         SUB,
         MUL,
