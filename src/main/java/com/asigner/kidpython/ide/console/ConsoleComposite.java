@@ -19,8 +19,10 @@ public class ConsoleComposite extends ScrolledComposite {
 
         consoleCanvas = new ConsoleCanvas(this, SWT.NONE);
         consoleCanvas.setTextModifiedListener(() -> {
-            setMinSize(consoleCanvas.computeSize(-1, -1));
-            setOrigin(new Point(0, Integer.MAX_VALUE));
+            this.getDisplay().syncExec(() -> {
+                setMinSize(consoleCanvas.computeSize(-1, -1));
+                setOrigin(new Point(0, Integer.MAX_VALUE));
+            });
         });
         setContent(consoleCanvas);
     }

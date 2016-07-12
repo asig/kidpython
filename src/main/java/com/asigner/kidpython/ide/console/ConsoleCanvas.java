@@ -18,6 +18,9 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.BG_BLACK;
@@ -186,14 +189,18 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
         for (char c : s.toCharArray()) {
             writeNoRepaint(c);
         }
-        Display.getCurrent().asyncExec(this::redraw);
+        requestRedraw();
         textModifiedListener.run();
     }
 
     public void write(char c) {
         writeNoRepaint(c);
-        Display.getCurrent().asyncExec(this::redraw);
+        requestRedraw();
         textModifiedListener.run();
+    }
+
+    private void requestRedraw() {
+        this.getDisplay().asyncExec(this::redraw);
     }
 
     private void writeNoRepaint(char c) {
@@ -235,15 +242,16 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
     @Override
     public void keyPressed(KeyEvent keyEvent) {
         char c = keyEvent.character;
+        if (c == '\0') {
+            return;
+        }
+
         try {
             inputBuffer.write((byte)c);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        if (c == '\0') {
-            return;
-        }
         if (c == '\r') {
             c = '\n';
         }
@@ -438,5 +446,16 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
 
     @Override
     protected void checkSubclass() {
+    }
+
+    public static void main(String ... args) {
+        BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+        String res = null;
+        try {
+            res = r.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.err.println(res);
     }
 }

@@ -2,6 +2,7 @@ package com.asigner.kidpython.compiler.runtime;
 
 import com.asigner.kidpython.ide.turtle.TurtleCanvas;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -31,6 +32,26 @@ public class NativeFunctions {
         return UndefinedValue.INSTANCE;
     }
 
+    public Value input(List<Value> values) {
+        print(values);
+        try {
+            while(stdin.available() > 0) {
+                stdin.read();
+            }
+            StringBuffer res = new StringBuffer();
+            for(;;) {
+                int c = stdin.read();
+                if (c == -1 || c == '\n' | c == '\r') {
+                    break;
+                }
+                res.append((char)c);
+            }
+            return new StringValue(res.toString());
+        } catch (IOException e) {
+            throw new ExecutionException("Can't read from stdin!");
+        }
+    }
+
     // Input/Output
     // =========================
 
@@ -53,9 +74,6 @@ public class NativeFunctions {
     }
 
     // Utils
-    // =========================
-
-    // Input/Output
     // =========================
 
     // =========================

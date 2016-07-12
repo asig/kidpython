@@ -52,6 +52,7 @@ public class VirtualMachine {
         }
     }
 
+    private boolean running;
     private Frame funcFrame;
     private Frame globalFrame;
     private Instruction[] program;
@@ -76,13 +77,14 @@ public class VirtualMachine {
     }
 
     public void reset() {
+        this.running = false;
         this.funcFrame = null;
         this.globalFrame = new Frame(null, 0);
         this.program = null;
         this.pc = 0;
 
         globalFrame.setVar("print", new NativeFuncValue(nativeFunctions::print));
-
+        globalFrame.setVar("input", new NativeFuncValue(nativeFunctions::input));
         globalFrame.setVar("len", new NativeFuncValue(nativeFunctions::utilsLen));
 
         Map<Value, Value> turtle = Maps.newHashMap();
@@ -94,7 +96,10 @@ public class VirtualMachine {
     }
 
     public void run() {
-        boolean running = true;
+        if (running) {
+            return;
+        }
+        running = true;
         while (running) {
             Instruction instr = program[pc++];
             System.err.println(String.format("Executing: %04d %s", pc - 1, instr));
