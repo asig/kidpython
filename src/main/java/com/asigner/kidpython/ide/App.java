@@ -115,6 +115,7 @@ public class App {
         });
         ToolItem separator = new ToolItem(toolBar, SWT.SEPARATOR);
         addToolbarItem(toolBar, "Turtle", event -> {
+            turtleCanvas.setSlowMotion(true);
             turtleCanvas.setPen(new RGB(255,0,255), 10);
             turtleCanvas.move(100);
             turtleCanvas.turn(47);
@@ -172,6 +173,8 @@ public class App {
         System.out.flush();
 
         virtualMachine.setProgram(program);
-        virtualMachine.run();
+        Thread t = new Thread(() -> virtualMachine.run());
+        t.setName("Program Executor");
+        t.start();
     }
 }

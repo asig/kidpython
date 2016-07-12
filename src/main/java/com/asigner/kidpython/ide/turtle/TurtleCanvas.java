@@ -8,8 +8,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -26,9 +24,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.jfree.swt.SWTGraphics2D;
-import org.jfree.swt.SWTUtils;
 
 import java.awt.geom.AffineTransform;
 import java.util.List;
@@ -63,6 +59,7 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
     }
 
     private final List<Line> lines = Lists.newArrayList();
+    private boolean slowMotion;
     private double angle;
     private double posX, posY;
     private boolean penDown;
@@ -153,8 +150,13 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         }
     }
 
+    public void setSlowMotion(boolean slowMotion) {
+        this.slowMotion = slowMotion;
+    }
+
     public void reset() {
         lines.clear();
+        slowMotion = false;
         posX = posY = angle = 0;
         penDown = true;
         penColor = SWTResources.getColor(new RGB(0,0,0));
@@ -201,19 +203,47 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         if (len <= 0) {
             return;
         }
-        double newPosX = posX + Math.sin(Math.toRadians(angle)) * len;
-        double newPosY = posY - Math.cos(Math.toRadians(angle)) * len;
-        if (penDown) {
-            lines.add(new Line(
-                    new Point((int)posX, (int)posY),
-                    new Point((int)newPosX, (int)newPosY),
-                    penColor,
-                    penWidth));
+        double startLen;
+        int delay;
+        if (slowMotion) {
+            startLen = 1;
+            delay = 4;
+        } else {
+            startLen = len;
+            delay = 0;
         }
-        posX = newPosX;
-        posY = newPosY;
-        if (penDown || turtleVisible) {
-            Display.getCurrent().asyncExec(this::redraw);
+
+        if (penDown) {
+            lines.add(new Line(new Point(0,0), new Point(0,0), penColor, penWidth));
+        }
+        double origPosX = posX;
+        double origPosY = posY;
+        for (double i = startLen; i <= len; i ++) {
+            posX = origPosX;
+            posY = origPosY;
+            double newPosX = posX + Math.sin(Math.toRadians(angle)) * i;
+            double newPosY = posY - Math.cos(Math.toRadians(angle)) * i;
+            if (penDown) {
+                lines.set(lines.size()-1, new Line(
+                        new Point((int) posX, (int) posY),
+                        new Point((int) newPosX, (int) newPosY),
+                        penColor,
+                        penWidth));
+            }
+            posX = newPosX;
+            posY = newPosY;
+            if (penDown || turtleVisible) {
+                this.getDisplay().syncExec(this::redraw);
+            }
+
+            try {
+                for (int j = 0; j < delay; j++) {
+                    Thread.sleep(1);
+                    this.getDisplay().readAndDispatch();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
