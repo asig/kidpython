@@ -12,6 +12,9 @@ import org.eclipse.swt.widgets.Display;
 import java.util.Map;
 
 public class Stylesheet {
+    // TO ADD:
+    // https://studiostyl.es/schemes/borland-pascal-theme
+    // http://enrmarc.github.io/atom-theme-gallery/
 
     public static final Stylesheet BORLAND = new Stylesheet("borland")
             .setDefaultBackground(new RGB(255,255,255))

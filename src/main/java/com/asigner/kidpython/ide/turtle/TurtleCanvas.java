@@ -28,6 +28,8 @@ import org.jfree.swt.SWTGraphics2D;
 
 import java.awt.geom.AffineTransform;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveListener {
 
@@ -72,6 +74,8 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
     private boolean lmbDown = false;
     private int lastMouseX;
     private int lastMouseY;
+
+    private Lock linesLock = new ReentrantLock();
 
     private final Font elusiveFont;
 
@@ -155,7 +159,12 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
     }
 
     public void reset() {
-        lines.clear();
+        try {
+            linesLock.lock();
+            lines.clear();
+        } finally {
+            linesLock.unlock();
+        }
         slowMotion = false;
         posX = posY = angle = 0;
         penDown = true;
@@ -214,7 +223,7 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         }
 
         if (penDown) {
-            lines.add(new Line(new Point(0,0), new Point(0,0), penColor, penWidth));
+            addLine(new Point(0,0), new Point(0,0));
         }
         double origPosX = posX;
         double origPosY = posY;
@@ -224,11 +233,7 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
             double newPosX = posX + Math.sin(Math.toRadians(angle)) * i;
             double newPosY = posY - Math.cos(Math.toRadians(angle)) * i;
             if (penDown) {
-                lines.set(lines.size()-1, new Line(
-                        new Point((int) posX, (int) posY),
-                        new Point((int) newPosX, (int) newPosY),
-                        penColor,
-                        penWidth));
+                replaceLastLine(new Point((int) posX, (int) posY), new Point((int) newPosX, (int) newPosY));
             }
             posX = newPosX;
             posY = newPosY;
@@ -244,6 +249,24 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void addLine(Point from, Point to) {
+        try {
+            linesLock.lock();
+            lines.add(new Line(from, to, penColor,penWidth));
+        } finally {
+            linesLock.unlock();
+        }
+    }
+
+    private void replaceLastLine(Point from, Point to) {
+        try {
+            linesLock.lock();
+            lines.set(lines.size() - 1, new Line(from, to, penColor,penWidth));
+        } finally {
+            linesLock.unlock();
         }
     }
 
@@ -284,8 +307,13 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         gc.setTransform(t);
 
         gc.setLineCap(SWT.CAP_ROUND);
-        for (Line line : lines) {
-            drawLine(gc, line);
+        try {
+            linesLock.lock();
+            for (Line line : lines) {
+                drawLine(gc, line);
+            }
+        } finally {
+            linesLock.unlock();
         }
         drawTurtle(gc);
     }

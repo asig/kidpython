@@ -1,10 +1,13 @@
 TODO
 ====
 
+[ ] Bugs
+    [ ] Write to parameters are not done in the func frame, but in global?
+    
 [ ] Console
     [X] Support ANSI codes for coloring (ECMA-48)
     [X] Support input                                                                                                                                                xx
-    [ ] "Clear" button
+    [ ] "Clear" button  
 
 [ ] Virtual Machine
     [ ] Virtual Machine Events
@@ -19,6 +22,9 @@ TODO
     [ ] Rename tabs
     [ ] Show "start executing program", "Program terminated" messages
     [ ] Single step
+    [ ] Support pausing program
+    [ ] Export code to file
+    [ ] add "well know" style to stylesheets
 
 [ ] Runtime
     [X] implement "input"

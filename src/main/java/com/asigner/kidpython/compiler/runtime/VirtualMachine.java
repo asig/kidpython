@@ -141,6 +141,12 @@ public class VirtualMachine {
                     Value key = load(valueStack.pop());
                     Value mapRef = valueStack.pop();
                     Value mapValue = load(mapRef);
+                    if (mapValue == null && mapRef instanceof VarRefValue) {
+                        // Variable does not exist yet. Create it.
+                        VarRefValue varRef = (VarRefValue)mapRef;
+                        setVar(varRef.getVar(), new MapValue(Maps.newHashMap()));
+                        mapValue = load(mapRef);
+                    }
                     if (mapValue.getType() != MAP) {
                         throw new ExecutionException("Variable is not a map");
                     }
