@@ -361,10 +361,16 @@ public class VirtualMachine {
 
     public void setVar(String name, Value value) {
         Frame targetFrame;
-        if (globalFrame.isDefined(name)) {
-            targetFrame = globalFrame;
+        if (funcFrame != null) {
+            if (funcFrame.isDefined(name)) {
+                targetFrame = funcFrame;
+            } else if (globalFrame.isDefined(name)) {
+                targetFrame = globalFrame;
+            } else {
+                targetFrame = funcFrame;
+            }
         } else {
-            targetFrame = funcFrame != null ? funcFrame : globalFrame;
+            targetFrame = globalFrame;
         }
         targetFrame.setVar(name, value);
     }
