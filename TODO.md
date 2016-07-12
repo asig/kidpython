@@ -25,7 +25,7 @@ TODO
     [ ] Single step
     [ ] Support pausing program
     [ ] Export code to file
-    [ ] add "well know" style to stylesheets
+    [X] add "well know" style to stylesheets
 
 [ ] Runtime
     [X] implement "input"

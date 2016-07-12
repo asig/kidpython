@@ -27,6 +27,7 @@ import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.KEYWORD;
 import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.NUMBER;
 import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.OTHER;
 import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.STRING;
+import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.WELL_KNOWN;
 import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.WHITESPACE;
 
 public class CodeLineStyler implements LineStyleListener {
@@ -71,6 +72,7 @@ public class CodeLineStyler implements LineStyleListener {
         STRING,
         NUMBER,
         OTHER,
+        WELL_KNOWN,
         WHITESPACE,
         EOF
     }
@@ -239,6 +241,17 @@ public class CodeLineStyler implements LineStyleListener {
                 "or"
         );
 
+        private Set<String> wellKnown = Sets.newHashSet(
+                "print",
+                "input",
+                "len",
+                "turn",
+                "penDown",
+                "penUp",
+                "move",
+                "turtle"
+        );
+
         /**
          * Returns the ending location of the current token in the document.
          */
@@ -319,6 +332,8 @@ public class CodeLineStyler implements LineStyleListener {
                             unread(c);
                             if (keywords.contains(buffer.toString())) {
                                 return KEYWORD;
+                            } else if (wellKnown.contains(buffer.toString())) {
+                                return WELL_KNOWN;
                             } else {
                                 return IDENT;
                             }

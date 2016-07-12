@@ -16,50 +16,55 @@ public class Stylesheet {
     // https://studiostyl.es/schemes/borland-pascal-theme
     // http://enrmarc.github.io/atom-theme-gallery/
 
-    public static final Stylesheet BORLAND = new Stylesheet("borland")
+    public static final Stylesheet BORLAND = new Stylesheet("borland") // http://hilite.me/
             .setDefaultBackground(new RGB(255,255,255))
-            .setStyle(CodeLineStyler.Token.IDENT,   new RGB( 49,  49,  49), null, SWT.NONE)
-            .setStyle(CodeLineStyler.Token.KEYWORD, new RGB(  0,   0, 123), null, SWT.BOLD)
-            .setStyle(CodeLineStyler.Token.COMMENT, new RGB(  0, 131,   0), null, SWT.ITALIC)
-            .setStyle(CodeLineStyler.Token.STRING,  new RGB(  0,   0, 245), null, SWT.NONE)
-            .setStyle(CodeLineStyler.Token.NUMBER,  new RGB(  0,   0, 245), null, SWT.NONE)
-            .setStyle(CodeLineStyler.Token.OTHER,   new RGB( 49,  49,  49), null, SWT.NONE);
+            .setStyle(CodeLineStyler.Token.IDENT,      new RGB( 49,  49,  49), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.KEYWORD,    new RGB(  0,   0, 123), null, SWT.BOLD)
+            .setStyle(CodeLineStyler.Token.COMMENT,    new RGB(  0, 131,   0), null, SWT.ITALIC)
+            .setStyle(CodeLineStyler.Token.STRING,     new RGB(  0,   0, 245), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.NUMBER,     new RGB(  0,   0, 245), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.WELL_KNOWN, new RGB(255,   0,   0), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.OTHER,      new RGB( 49,  49,  49), null, SWT.NONE);
 
-    public static final Stylesheet MONOKAI_SUBLIME = new Stylesheet("monokai-sublime")
+    public static final Stylesheet MONOKAI_SUBLIME = new Stylesheet("monokai-sublime") // https://highlightjs.org/
             .setDefaultBackground(new RGB( 34, 35, 30))
-            .setStyle(CodeLineStyler.Token.IDENT,   new RGB(252, 252, 251), null, SWT.NONE)
-            .setStyle(CodeLineStyler.Token.KEYWORD, new RGB(239,  37, 110), null, SWT.BOLD)
-            .setStyle(CodeLineStyler.Token.NUMBER,  new RGB(167, 124, 245), null, SWT.NONE)
-            .setStyle(CodeLineStyler.Token.STRING,  new RGB(221, 210, 111), null, SWT.NONE)
-            .setStyle(CodeLineStyler.Token.COMMENT, new RGB(112, 109,  77), null, SWT.ITALIC)
-            .setStyle(CodeLineStyler.Token.OTHER,   new RGB(252, 252, 251), null, SWT.NONE);
+            .setStyle(CodeLineStyler.Token.IDENT,      new RGB(252, 252, 251), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.KEYWORD,    new RGB(239,  37, 110), null, SWT.BOLD)
+            .setStyle(CodeLineStyler.Token.NUMBER,     new RGB(167, 124, 245), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.STRING,     new RGB(221, 210, 111), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.COMMENT,    new RGB(112, 109,  77), null, SWT.ITALIC)
+            .setStyle(CodeLineStyler.Token.WELL_KNOWN, new RGB(166, 226,  42), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.OTHER,      new RGB(252, 252, 251), null, SWT.NONE);
 
-    public static final Stylesheet RAINBOW = new Stylesheet("rainbow")
+    public static final Stylesheet RAINBOW = new Stylesheet("rainbow") // https://highlightjs.org/
             .setDefaultBackground(new RGB( 65, 67, 67))
-            .setStyle(CodeLineStyler.Token.IDENT,   new RGB(193, 200, 208), null, SWT.NONE)
-            .setStyle(CodeLineStyler.Token.KEYWORD, new RGB(188, 141, 188), null, SWT.BOLD)
-            .setStyle(CodeLineStyler.Token.NUMBER,  new RGB(230, 134,  81), null, SWT.NONE)
-            .setStyle(CodeLineStyler.Token.STRING,  new RGB(128, 176, 169), null, SWT.NONE)
-            .setStyle(CodeLineStyler.Token.COMMENT, new RGB(138, 140, 138), null, SWT.ITALIC)
-            .setStyle(CodeLineStyler.Token.OTHER,   new RGB(193, 200, 208), null, SWT.NONE);
+            .setStyle(CodeLineStyler.Token.IDENT,      new RGB(193, 200, 208), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.KEYWORD,    new RGB(188, 141, 188), null, SWT.BOLD)
+            .setStyle(CodeLineStyler.Token.NUMBER,     new RGB(230, 134,  81), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.STRING,     new RGB(128, 176, 169), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.COMMENT,    new RGB(138, 140, 138), null, SWT.ITALIC)
+            .setStyle(CodeLineStyler.Token.WELL_KNOWN, new RGB(181, 189, 104), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.OTHER,      new RGB(193, 200, 208), null, SWT.NONE);
 
-    public static final Stylesheet DRACULA = new Stylesheet("dracula")
+    public static final Stylesheet DRACULA = new Stylesheet("dracula") // https://highlightjs.org/
             .setDefaultBackground(new RGB( 37, 38, 50))
-            .setStyle(CodeLineStyler.Token.IDENT,   new RGB(229, 229, 224), null, SWT.NONE)
-            .setStyle(CodeLineStyler.Token.KEYWORD, new RGB(129, 215, 233), null, SWT.BOLD)
-            .setStyle(CodeLineStyler.Token.NUMBER,  new RGB(223, 231, 130), null, SWT.NONE)
-            .setStyle(CodeLineStyler.Token.STRING,  new RGB(223, 231, 130), null, SWT.NONE)
-            .setStyle(CodeLineStyler.Token.COMMENT, new RGB( 50,  97, 158), null, SWT.ITALIC)
-            .setStyle(CodeLineStyler.Token.OTHER,   new RGB(229, 229, 224), null, SWT.NONE);
+            .setStyle(CodeLineStyler.Token.IDENT,      new RGB(229, 229, 224), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.KEYWORD,    new RGB(129, 215, 233), null, SWT.BOLD)
+            .setStyle(CodeLineStyler.Token.NUMBER,     new RGB(223, 231, 130), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.STRING,     new RGB(223, 231, 130), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.COMMENT,    new RGB( 50,  97, 158), null, SWT.ITALIC)
+            .setStyle(CodeLineStyler.Token.WELL_KNOWN, new RGB(255, 121, 198), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.OTHER,      new RGB(229, 229, 224), null, SWT.NONE);
 
     public static final Stylesheet BLACK_AND_WHITE = new Stylesheet("black-and-white")
             .setDefaultBackground(new RGB(255, 255, 255))
-            .setStyle(CodeLineStyler.Token.IDENT,   new RGB(0, 0, 0), null, SWT.NONE)
-            .setStyle(CodeLineStyler.Token.KEYWORD, new RGB(0, 0, 0), null, SWT.BOLD)
-            .setStyle(CodeLineStyler.Token.NUMBER,  new RGB(0, 0, 0), null, SWT.NONE)
-            .setStyle(CodeLineStyler.Token.STRING,  new RGB(0, 0, 0), null, SWT.NONE)
-            .setStyle(CodeLineStyler.Token.COMMENT, new RGB(0, 0, 0), null, SWT.ITALIC)
-            .setStyle(CodeLineStyler.Token.OTHER,   new RGB(0, 0, 0), null, SWT.NONE);
+            .setStyle(CodeLineStyler.Token.IDENT,      new RGB(0, 0, 0), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.KEYWORD,    new RGB(0, 0, 0), null, SWT.BOLD)
+            .setStyle(CodeLineStyler.Token.NUMBER,     new RGB(0, 0, 0), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.STRING,     new RGB(0, 0, 0), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.COMMENT,    new RGB(0, 0, 0), null, SWT.ITALIC)
+            .setStyle(CodeLineStyler.Token.WELL_KNOWN, new RGB(0, 0, 0), null, SWT.NONE)
+            .setStyle(CodeLineStyler.Token.OTHER,      new RGB(0, 0, 0), null, SWT.NONE);
 
     static class Style {
         private final Color fg;
