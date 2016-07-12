@@ -96,6 +96,10 @@ public class VirtualMachine {
         globalFrame.setVar("turtle", new MapValue(turtle));
     }
 
+    public void stop() {
+        running = false;
+    }
+
     public void run() {
         if (running) {
             return;
@@ -135,7 +139,8 @@ public class VirtualMachine {
 
                 case MKFIELDREF: {
                     Value key = load(valueStack.pop());
-                    Value mapValue = load(valueStack.pop());
+                    Value mapRef = valueStack.pop();
+                    Value mapValue = load(mapRef);
                     if (mapValue.getType() != MAP) {
                         throw new ExecutionException("Variable is not a map");
                     }

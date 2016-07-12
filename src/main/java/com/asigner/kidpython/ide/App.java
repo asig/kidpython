@@ -173,7 +173,13 @@ public class App {
         System.out.flush();
 
         virtualMachine.setProgram(program);
-        Thread t = new Thread(() -> virtualMachine.run());
+        Thread t = new Thread(() -> {
+            try {
+                virtualMachine.run();
+            } catch (Exception e) {
+                virtualMachine.stop();
+            }
+        });
         t.setName("Program Executor");
         t.start();
     }
