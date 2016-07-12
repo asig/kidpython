@@ -177,7 +177,6 @@ public class CodeLineStyler implements LineStyleListener {
         text = text + "  "; // Sentinel
         char chars[] = text.toCharArray();
         boolean inComment = false;
-        char sep = 0;
         int begin = 0;
         int i;
         for (i = 0; i < chars.length - 2; i++) {

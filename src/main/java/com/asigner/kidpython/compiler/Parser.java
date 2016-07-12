@@ -339,7 +339,7 @@ public class Parser {
         match(IDENT);
         ExprNode varExpr = new VarNode(pos, ident);
         while (SELECTOR_OR_CALL_START_SET.contains(lookahead.getType())) {
-            varExpr = selectorOrCall(varExpr, false /* left-hand-side */);
+            varExpr = selectorOrCall(varExpr);
         }
         ExprNode expr;
         if (lookahead.getType() == EQ) {
@@ -351,7 +351,7 @@ public class Parser {
         }
     }
 
-    private ExprNode selectorOrCall(ExprNode base, boolean rhs) {
+    private ExprNode selectorOrCall(ExprNode base) {
         ExprNode curExpr = base;
         Position pos = lookahead.getPos();
         switch (lookahead.getType()) {
@@ -536,7 +536,7 @@ public class Parser {
         match(IDENT);
         ExprNode node = new VarNode(pos, varName);
         while (SELECTOR_OR_CALL_START_SET.contains(lookahead.getType())) {
-            node = selectorOrCall(node, true /* rhs */);
+            node = selectorOrCall(node);
         }
         return node;
     }
@@ -553,7 +553,7 @@ public class Parser {
         ExprNode node = expr();
         match(RPAREN);
         while (SELECTOR_OR_CALL_START_SET.contains(lookahead.getType())) {
-            node = selectorOrCall(node, true /* rhs */);
+            node = selectorOrCall(node);
         }
         return node;
     }
