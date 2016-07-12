@@ -74,6 +74,7 @@ public class CodeEditor extends StyledText {
         lineStyler.parseMultiLineComments(s.text);
         setSelection(s.selection);
         setCaretOffset(s.caretOfs);
+        redraw();
     }
 
     @Override
