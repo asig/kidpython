@@ -18,6 +18,7 @@ import com.asigner.kidpython.compiler.ast.expr.MakeFuncNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeListNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeMapNode;
 import com.asigner.kidpython.compiler.ast.expr.MapAccessNode;
+import com.asigner.kidpython.compiler.ast.expr.UnOpNode;
 import com.asigner.kidpython.compiler.ast.expr.VarNode;
 import com.asigner.kidpython.compiler.runtime.NumberValue;
 import com.asigner.kidpython.compiler.runtime.StringValue;
@@ -465,16 +466,28 @@ public class Parser {
         Position pos = lookahead.getPos();
         ExprNode node;
         switch (lookahead.getType()) {
+            case MINUS:
+                match(MINUS);
+                switch(lookahead.getType()) {
+                    case NUM_LIT:
+                        node = numLitNode();
+                        return new UnOpNode(pos, UnOpNode.Op.NEG, node);
+                    case IDENT:
+                        node = varNode();
+                        return new UnOpNode(pos, UnOpNode.Op.NEG, node);
+                    case LPAREN:
+                        node = subExprNode();
+                        return new UnOpNode(pos, UnOpNode.Op.NEG, node);
+                }
+                error(Error.unexpectedToken(lookahead, Sets.newHashSet(NUM_LIT, IDENT, LPAREN)));
+                return new ConstNode(pos, UndefinedValue.INSTANCE);
             case NUM_LIT:
-                node = new ConstNode(lookahead.getPos(), new NumberValue((new BigDecimal(lookahead.getValue()))));
-                match(NUM_LIT);
-                return node;
+                return numLitNode();
             case STRING_LIT:
-                node = new ConstNode(lookahead.getPos(), new StringValue(lookahead.getValue()));
+                node = new ConstNode(pos, new StringValue(lookahead.getValue()));
                 match(STRING_LIT);
                 return node;
             case LBRACK:
-                pos = lookahead.getPos();
                 match(LBRACK);
                 List<ExprNode> nodes = Lists.newLinkedList();
                 if (lookahead.getType() != RBRACK) {
@@ -487,7 +500,6 @@ public class Parser {
                 match(RBRACK);
                 return new MakeListNode(pos, nodes);
             case LBRACE:
-                pos = lookahead.getPos();
                 List<Pair<ExprNode, ExprNode>> mapNodes = Lists.newLinkedList();
                 match(LBRACE);
                 if (lookahead.getType() != RBRACE) {
@@ -500,24 +512,10 @@ public class Parser {
                 match(RBRACE);
                 return new MakeMapNode(pos, mapNodes);
             case IDENT:
-                String varName = lookahead.getValue();
-                pos = lookahead.getPos();
-                match(IDENT);
-                node = new VarNode(pos, varName);
-                while (SELECTOR_OR_CALL_START_SET.contains(lookahead.getType())) {
-                    node = selectorOrCall(node, true /* rhs */);
-                }
-                return node;
+                return varNode();
             case LPAREN:
-                match(LPAREN);
-                node = expr();
-                match(RPAREN);
-                while (SELECTOR_OR_CALL_START_SET.contains(lookahead.getType())) {
-                    node = selectorOrCall(node, true /* rhs */);
-                }
-                return node;
+                return subExprNode();
             case FUNC:
-                pos = lookahead.getPos();
                 match(FUNC);
                 match(LPAREN);
                 List<String> params = optIdentList();
@@ -530,6 +528,34 @@ public class Parser {
                 error(Error.unexpectedToken(lookahead, TERM_START_SET));
                 return new ConstNode(pos, new NumberValue(new BigDecimal(0)));
         }
+    }
+
+    private ExprNode varNode() {
+        Position pos = lookahead.getPos();
+        String varName = lookahead.getValue();
+        match(IDENT);
+        ExprNode node = new VarNode(pos, varName);
+        while (SELECTOR_OR_CALL_START_SET.contains(lookahead.getType())) {
+            node = selectorOrCall(node, true /* rhs */);
+        }
+        return node;
+    }
+
+    private ExprNode numLitNode() {
+        Position pos = lookahead.getPos();
+        ExprNode node = new ConstNode(pos, new NumberValue((new BigDecimal(lookahead.getValue()))));
+        match(NUM_LIT);
+        return node;
+    }
+
+    private ExprNode subExprNode() {
+        match(LPAREN);
+        ExprNode node = expr();
+        match(RPAREN);
+        while (SELECTOR_OR_CALL_START_SET.contains(lookahead.getType())) {
+            node = selectorOrCall(node, true /* rhs */);
+        }
+        return node;
     }
 
     private Stmt funcBody() {
