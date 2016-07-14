@@ -3,6 +3,7 @@ package com.asigner.kidpython.ide.util;
 import com.google.common.collect.Maps;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.widgets.Display;
@@ -18,6 +19,16 @@ public class SWTResources {
 
     private static Font elusiveFont;
     private static final Map<RGBA, Color> colors = Maps.newHashMap();
+    private static final Map<String, Image> images = Maps.newHashMap();
+
+    public static Image getImage(String path) {
+        Image img = images.get(path);
+        if (img == null) {
+            img = new Image(Display.getDefault(), SWTResources.class.getResourceAsStream(path));
+            images.put(path, img);
+        }
+        return img;
+    }
 
     public static Color getColor(RGB rgb) {
         if (rgb == null) {

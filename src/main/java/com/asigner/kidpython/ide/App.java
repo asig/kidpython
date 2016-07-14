@@ -4,18 +4,17 @@ import com.asigner.kidpython.compiler.CodeGenerator;
 import com.asigner.kidpython.compiler.Error;
 import com.asigner.kidpython.compiler.Parser;
 import com.asigner.kidpython.compiler.ast.Stmt;
+import com.asigner.kidpython.compiler.runtime.Instruction;
 import com.asigner.kidpython.compiler.runtime.NativeFunctions;
 import com.asigner.kidpython.compiler.runtime.VirtualMachine;
-import com.asigner.kidpython.compiler.runtime.Instruction;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
 import com.asigner.kidpython.ide.console.ConsoleInputStream;
 import com.asigner.kidpython.ide.console.ConsoleOutputStream;
 import com.asigner.kidpython.ide.turtle.TurtleCanvas;
-import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
+import com.asigner.kidpython.ide.util.SWTResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
@@ -44,6 +43,13 @@ public class App {
     private PrintWriter consoleOut;
     private VirtualMachine virtualMachine;
     private NativeFunctions nativeFunctions;
+
+    // VirtualMachine toolbar
+    ToolItem vmStart;
+    ToolItem vmResume;
+    ToolItem vmStop;
+    ToolItem vmStepInto;
+    ToolItem vmStepOver;
 
     /**
      * Launch the application.
@@ -98,42 +104,37 @@ public class App {
         exitItem.setText("&Exit");
         shell.setMenuBar(menuBar);
 
-        exitItem.addListener(SWT.Selection, event-> {
+        exitItem.addListener(SWT.Selection, event -> {
             shell.getDisplay().dispose();
             System.exit(0);
         });
 
-        ToolBar toolBar = new ToolBar(shell, SWT.BORDER);
-        toolBar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-        addToolbarItem(toolBar, "RUN", event -> {
-            runCode(sourceCodeComposite.getText());
-        });
-        addToolbarItem(toolBar, "PRINT", event -> {
-            consoleComposite.write("Hello " + AnsiEscapeCodes.IMAGE_NEGATIVE + "Hello" + AnsiEscapeCodes.IMAGE_POSITIVE + "\u001B[0m, \u001B[1m\u001B[3m\u001b[41m\u001b[33mWorld!\u001b[0m " + l + "\n");
-            l = l+1;
-        });
-        ToolItem separator = new ToolItem(toolBar, SWT.SEPARATOR);
-        addToolbarItem(toolBar, "Turtle", event -> {
-            turtleCanvas.setSlowMotion(true);
-            turtleCanvas.setPen(new RGB(255,0,255), 10);
-            turtleCanvas.move(100);
-            turtleCanvas.turn(47);
-        });
-
-        toolBar.pack();
+        createVmToolbar();
+//        addToolbarItem(toolBar, "PRINT", event -> {
+//            consoleComposite.write("Hello " + AnsiEscapeCodes.IMAGE_NEGATIVE + "Hello" + AnsiEscapeCodes.IMAGE_POSITIVE + "\u001B[0m, \u001B[1m\u001B[3m\u001b[41m\u001b[33mWorld!\u001b[0m " + l + "\n");
+//            l = l+1;
+//        });
+//        ToolItem separator = new ToolItem(toolBar, SWT.SEPARATOR);
+//        addToolbarItem(toolBar, "Turtle", event -> {
+//            turtleCanvas.setSlowMotion(true);
+//            turtleCanvas.setPen(new RGB(255,0,255), 10);
+//            turtleCanvas.move(100);
+//            turtleCanvas.turn(47);
+//        });
 
         SashForm sashForm = new SashForm(shell, SWT.VERTICAL);
         sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
+        // Upper part of toplevel sash
         SashForm sashForm2 = new SashForm(sashForm, SWT.HORIZONTAL);
         sashForm2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         sourceCodeComposite = new SourceCodeComposite(sashForm2, SWT.NONE);
         turtleCanvas = new TurtleCanvas(sashForm2, SWT.NONE);
 
+        // Lower part of toplevel sash
         consoleComposite = new ConsoleComposite(sashForm, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 
-        sashForm.setWeights(new int[] {1, 1});
+        sashForm.setWeights(new int[]{3, 1});
 
         shell.setText("Simple menu");
         shell.setSize(578, 390);
@@ -146,14 +147,74 @@ public class App {
         consoleOut = new PrintWriter(consoleOutputStream, true);
         nativeFunctions = new NativeFunctions(consoleInputStream, consoleOutputStream, turtleCanvas);
         virtualMachine = new VirtualMachine(consoleOutputStream, consoleInputStream, nativeFunctions);
+
+        virtualMachine.addListener(new VirtualMachine.EventListener() {
+            @Override
+            public void vmStarted() {
+                shell.getDisplay().syncExec(() -> {
+                    vmStart.setEnabled(false);
+                    vmStop.setEnabled(true);
+                });
+            }
+
+            @Override
+            public void vmStopped() {
+                shell.getDisplay().syncExec(() -> {
+                    vmStart.setEnabled(true);
+                    vmStop.setEnabled(false);
+                });
+            }
+
+            @Override
+            public void newStatementReached(Stmt stmt) {
+
+            }
+
+            @Override
+            public void programSet() {
+                shell.getDisplay().syncExec(() -> {
+                    vmStart.setEnabled(true);
+                    vmStop.setEnabled(false);
+                });
+            }
+
+            @Override
+            public void reset() {
+                shell.getDisplay().syncExec(() -> {
+                    vmStart.setEnabled(false);
+                    vmStop.setEnabled(false);
+                });
+            }
+        });
     }
 
-    private void addToolbarItem(ToolBar toolbar, String text, Listener handler) {
+    private void createVmToolbar() {
+        ToolBar vmToolbar = new ToolBar(shell, SWT.BORDER);
+        vmToolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+        vmStart = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/nav_go@2x.png"), event -> {
+            runCode(sourceCodeComposite.getText());
+        });
+        vmStop = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stop@2x.png"), event -> {
+            stopVm();
+        });
+        vmStepOver = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepover_co@2x.png"), event -> {
+            stepInto();
+        });
+        vmStepInto = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepinto_co@2x.png"), event -> {
+            stepOver();
+        });
+        vmStop.setEnabled(false);
+        vmToolbar.pack();
+    }
+
+    private ToolItem addToolbarItem(ToolBar toolbar, Image image, Listener handler) {
         ToolItem item = new ToolItem(toolbar, SWT.PUSH);
-        item.setText(text);
+        item.setImage(image);
         item.addListener(SWT.Selection, handler);
-
+        return item;
     }
+
     private void runCode(String source) {
         Parser p = new Parser(source);
         Stmt stmt = p.parse();
@@ -182,5 +243,17 @@ public class App {
         });
         t.setName("Program Executor");
         t.start();
+    }
+
+    private void stopVm() {
+        virtualMachine.stop();
+    }
+
+    private void stepInto() {
+        // Implement me
+    }
+
+    private void stepOver() {
+        // Implement me
     }
 }

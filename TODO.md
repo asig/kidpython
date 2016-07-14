@@ -26,6 +26,7 @@ TODO
     [ ] Support pausing program
     [ ] Export code to file
     [X] add "well know" style to stylesheets
+    [ ] smaller size of console when starting
 
 [ ] Runtime
     [X] implement "input"

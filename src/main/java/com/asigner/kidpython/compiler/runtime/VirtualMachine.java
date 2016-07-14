@@ -1,5 +1,6 @@
 package com.asigner.kidpython.compiler.runtime;
 
+import com.asigner.kidpython.compiler.ast.Stmt;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -20,6 +21,14 @@ import static com.asigner.kidpython.compiler.runtime.Value.Type.REFERENCE;
 import static com.asigner.kidpython.compiler.runtime.Value.Type.STRING;
 
 public class VirtualMachine {
+
+    public interface EventListener {
+        void vmStarted();
+        void vmStopped();
+        void newStatementReached(Stmt stmt);
+        void programSet();
+        void reset();
+    }
 
     private static class Frame {
         private final Frame parent;
@@ -54,12 +63,15 @@ public class VirtualMachine {
     }
 
     private boolean running;
+    private boolean paused;
     private Frame funcFrame;
     private Frame globalFrame;
     private Instruction[] program;
     private int pc;
 
     private Stack<Value> valueStack = new Stack<>();
+
+    private List<EventListener> listeners = Lists.newArrayList();
 
     private final PrintStream stdout;
     private final InputStream stdin;
@@ -72,13 +84,23 @@ public class VirtualMachine {
         reset();
     }
 
+    public void addListener(EventListener listener) {
+        this.listeners.add(listener);
+    }
+
+    public void removeListener(EventListener listener) {
+        this.listeners.remove(listener);
+    }
+
     public void setProgram(List<Instruction> instrs) {
+        reset();
         this.program = instrs.toArray(new Instruction[instrs.size()]);
-        this.pc = 0;
+        listeners.stream().forEach(EventListener::programSet);
     }
 
     public void reset() {
         this.running = false;
+        this.paused = false;
         this.funcFrame = null;
         this.globalFrame = new Frame(null, 0);
         this.program = null;
@@ -94,17 +116,26 @@ public class VirtualMachine {
         turtle.put(new StringValue("penUp"), new NativeFuncValue(nativeFunctions::turtlePenUp));
         turtle.put(new StringValue("move"), new NativeFuncValue(nativeFunctions::turtleMove));
         globalFrame.setVar("turtle", new MapValue(turtle));
+
+        listeners.stream().forEach(EventListener::reset);
     }
 
     public void stop() {
         running = false;
+        paused = false;
+        listeners.stream().forEach(EventListener::vmStopped);
     }
 
-    public void run() {
+    public void pause() {
+
+    }
+
+    public void start() {
         if (running) {
             return;
         }
         running = true;
+        listeners.stream().forEach(EventListener::vmStarted);
         while (running) {
             Instruction instr = program[pc++];
             System.err.println(String.format("Executing: %04d %s", pc - 1, instr));
@@ -127,14 +158,14 @@ public class VirtualMachine {
                         setVar(((VarRefValue) lhs).getVar(), rhs);
                     } else if (lhs instanceof FieldRefValue) {
                         FieldRefValue frv = (FieldRefValue) lhs;
-                        frv.getMap().asMap().put(frv.getKey(), lhs);
+                        frv.getMap().asMap().put(frv.getKey(), rhs);
                     }
 
                 }
                 break;
 
                 case STOP:
-                    running = false;
+                    stop();
                     break;
 
                 case MKFIELDREF: {
