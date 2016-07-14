@@ -46,6 +46,7 @@ public class App {
 
     // VirtualMachine toolbar
     ToolItem vmStart;
+    ToolItem vmPause;
     ToolItem vmResume;
     ToolItem vmStop;
     ToolItem vmStepInto;
@@ -150,19 +151,8 @@ public class App {
 
         virtualMachine.addListener(new VirtualMachine.EventListener() {
             @Override
-            public void vmStarted() {
-                shell.getDisplay().syncExec(() -> {
-                    vmStart.setEnabled(false);
-                    vmStop.setEnabled(true);
-                });
-            }
-
-            @Override
-            public void vmStopped() {
-                shell.getDisplay().syncExec(() -> {
-                    vmStart.setEnabled(true);
-                    vmStop.setEnabled(false);
-                });
+            public void vmStateChanged() {
+                updateVmButtons();
             }
 
             @Override
@@ -172,28 +162,58 @@ public class App {
 
             @Override
             public void programSet() {
-                shell.getDisplay().syncExec(() -> {
-                    vmStart.setEnabled(true);
-                    vmStop.setEnabled(false);
-                });
             }
 
             @Override
             public void reset() {
-                shell.getDisplay().syncExec(() -> {
-                    vmStart.setEnabled(false);
-                    vmStop.setEnabled(false);
-                });
             }
         });
     }
 
+    private void updateVmButtons() {
+        shell.getDisplay().syncExec(() -> {
+            VirtualMachine.State state = virtualMachine.getState();
+            switch (state) {
+                case RUNNING:
+                    vmStart.setEnabled(false);
+                    vmPause.setEnabled(true);
+                    vmResume.setEnabled(false);
+                    vmStop.setEnabled(true);
+                    vmStepInto.setEnabled(false);
+                    vmStepOver.setEnabled(false);
+                    break;
+                case STOPPED:
+                    vmStart.setEnabled(true);
+                    vmPause.setEnabled(false);
+                    vmResume.setEnabled(false);
+                    vmStop.setEnabled(false);
+                    vmStepInto.setEnabled(false);
+                    vmStepOver.setEnabled(false);
+                    break;
+                case PAUSED:
+                    vmStart.setEnabled(false);
+                    vmPause.setEnabled(false);
+                    vmResume.setEnabled(true);
+                    vmStop.setEnabled(true);
+                    vmStepInto.setEnabled(true);
+                    vmStepOver.setEnabled(true);
+                    break;
+            }
+        });
+
+    }
     private void createVmToolbar() {
         ToolBar vmToolbar = new ToolBar(shell, SWT.BORDER);
         vmToolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
         vmStart = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/nav_go@2x.png"), event -> {
             runCode(sourceCodeComposite.getText());
+        });
+        vmPause = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/suspend_co@2x.png"), event -> {
+            virtualMachine.pause();
+        });
+        vmResume = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/resume_co@2x.png"), event -> {
+            virtualMachine.pause();
         });
         vmStop = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stop@2x.png"), event -> {
             stopVm();
@@ -204,6 +224,8 @@ public class App {
         vmStepInto = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepinto_co@2x.png"), event -> {
             stepOver();
         });
+
+        vmStart.setEnabled(true);
         vmStop.setEnabled(false);
         vmToolbar.pack();
     }
@@ -234,15 +256,7 @@ public class App {
         System.out.flush();
 
         virtualMachine.setProgram(program);
-        Thread t = new Thread(() -> {
-            try {
-                virtualMachine.run();
-            } catch (Exception e) {
-                virtualMachine.stop();
-            }
-        });
-        t.setName("Program Executor");
-        t.start();
+        virtualMachine.start();
     }
 
     private void stopVm() {

@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Stack;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.asigner.kidpython.compiler.runtime.Value.Type.BOOLEAN;
 import static com.asigner.kidpython.compiler.runtime.Value.Type.ITERATOR;
@@ -19,15 +22,23 @@ import static com.asigner.kidpython.compiler.runtime.Value.Type.MAP;
 import static com.asigner.kidpython.compiler.runtime.Value.Type.NUMBER;
 import static com.asigner.kidpython.compiler.runtime.Value.Type.REFERENCE;
 import static com.asigner.kidpython.compiler.runtime.Value.Type.STRING;
+import static com.asigner.kidpython.compiler.runtime.VirtualMachine.State.PAUSED;
+import static com.asigner.kidpython.compiler.runtime.VirtualMachine.State.RUNNING;
+import static com.asigner.kidpython.compiler.runtime.VirtualMachine.State.STOPPED;
 
 public class VirtualMachine {
 
     public interface EventListener {
-        void vmStarted();
-        void vmStopped();
+        void vmStateChanged();
         void newStatementReached(Stmt stmt);
         void programSet();
         void reset();
+    }
+
+    public enum State {
+        STOPPED,
+        PAUSED,
+        RUNNING
     }
 
     private static class Frame {
@@ -62,12 +73,15 @@ public class VirtualMachine {
         }
     }
 
-    private boolean running;
-    private boolean paused;
+    private State state;
     private Frame funcFrame;
     private Frame globalFrame;
     private Instruction[] program;
     private int pc;
+
+    private Lock stateLock = new ReentrantLock();
+    private Condition stateChanged = stateLock.newCondition();
+
 
     private Stack<Value> valueStack = new Stack<>();
 
@@ -77,66 +91,37 @@ public class VirtualMachine {
     private final InputStream stdin;
     private final NativeFunctions nativeFunctions;
 
-    public VirtualMachine(OutputStream stdout, InputStream stdin, NativeFunctions nativeFunctions) {
-        this.nativeFunctions = nativeFunctions;
-        this.stdout = new PrintStream(stdout);
-        this.stdin = stdin;
-        reset();
-    }
+    class ExecutorThread extends Thread {
 
-    public void addListener(EventListener listener) {
-        this.listeners.add(listener);
-    }
-
-    public void removeListener(EventListener listener) {
-        this.listeners.remove(listener);
-    }
-
-    public void setProgram(List<Instruction> instrs) {
-        reset();
-        this.program = instrs.toArray(new Instruction[instrs.size()]);
-        listeners.stream().forEach(EventListener::programSet);
-    }
-
-    public void reset() {
-        this.running = false;
-        this.paused = false;
-        this.funcFrame = null;
-        this.globalFrame = new Frame(null, 0);
-        this.program = null;
-        this.pc = 0;
-
-        globalFrame.setVar("print", new NativeFuncValue(nativeFunctions::print));
-        globalFrame.setVar("input", new NativeFuncValue(nativeFunctions::input));
-        globalFrame.setVar("len", new NativeFuncValue(nativeFunctions::utilsLen));
-
-        Map<Value, Value> turtle = Maps.newHashMap();
-        turtle.put(new StringValue("turn"), new NativeFuncValue(nativeFunctions::turtleTurn));
-        turtle.put(new StringValue("penDown"), new NativeFuncValue(nativeFunctions::turtlePenDown));
-        turtle.put(new StringValue("penUp"), new NativeFuncValue(nativeFunctions::turtlePenUp));
-        turtle.put(new StringValue("move"), new NativeFuncValue(nativeFunctions::turtleMove));
-        globalFrame.setVar("turtle", new MapValue(turtle));
-
-        listeners.stream().forEach(EventListener::reset);
-    }
-
-    public void stop() {
-        running = false;
-        paused = false;
-        listeners.stream().forEach(EventListener::vmStopped);
-    }
-
-    public void pause() {
-
-    }
-
-    public void start() {
-        if (running) {
-            return;
+        public ExecutorThread() {
+            setDaemon(true);
+            setName("VM Executor");
         }
-        running = true;
-        listeners.stream().forEach(EventListener::vmStarted);
-        while (running) {
+
+        @Override
+        public void run() {
+            for (; ; ) {
+                try {
+                    stateLock.lock();
+                    stateChanged.await();
+                } catch (InterruptedException ignored) {
+                } finally {
+                    stateLock.unlock();
+                }
+                try {
+                    while (state == RUNNING) {
+                        executeInstruction();
+                    }
+                } catch (Exception e) {
+                    stdout.println("Oooops, something went wrong...");
+                    e.printStackTrace(stdout);
+                    stdout.println("Stopping execution");
+                    VirtualMachine.this.stop();
+                }
+            }
+        }
+
+        private void executeInstruction() {
             Instruction instr = program[pc++];
             System.err.println(String.format("Executing: %04d %s", pc - 1, instr));
             switch (instr.getOpCode()) {
@@ -174,7 +159,7 @@ public class VirtualMachine {
                     Value mapValue = load(mapRef);
                     if (mapValue == null && mapRef instanceof VarRefValue) {
                         // Variable does not exist yet. Create it.
-                        VarRefValue varRef = (VarRefValue)mapRef;
+                        VarRefValue varRef = (VarRefValue) mapRef;
                         setVar(varRef.getVar(), new MapValue(Maps.newHashMap()));
                         mapValue = load(mapRef);
                     }
@@ -219,7 +204,7 @@ public class VirtualMachine {
                     if (val.getType() != ITERATOR) {
                         throw new ExecutionException("Not an iterator!");
                     }
-                    IterValue ival = (IterValue)val;
+                    IterValue ival = (IterValue) val;
                     valueStack.push(ival.getIterator().next());
                 }
                 break;
@@ -229,7 +214,7 @@ public class VirtualMachine {
                     if (val.getType() != ITERATOR) {
                         throw new ExecutionException("Not an iterator!");
                     }
-                    IterValue ival = (IterValue)val;
+                    IterValue ival = (IterValue) val;
                     valueStack.push(new BooleanValue(ival.getIterator().hasNext()));
                 }
                 break;
@@ -266,7 +251,7 @@ public class VirtualMachine {
                         Value result = ((NativeFuncValue) func).getFunc().run(params);
                         valueStack.push(result);
                     } else if (func instanceof FuncValue) {
-                        this.enterFunction((FuncValue) func, params);
+                        enterFunction((FuncValue) func, params);
                     } else {
                         throw new ExecutionException("Can't call non-function value");
                     }
@@ -362,6 +347,83 @@ public class VirtualMachine {
         }
     }
 
+    public VirtualMachine(OutputStream stdout, InputStream stdin, NativeFunctions nativeFunctions) {
+        this.nativeFunctions = nativeFunctions;
+        this.stdout = new PrintStream(stdout);
+        this.stdin = stdin;
+        reset();
+        Thread executor = new ExecutorThread();
+        executor.start();
+    }
+
+    public void addListener(EventListener listener) {
+        this.listeners.add(listener);
+    }
+
+    public void removeListener(EventListener listener) {
+        this.listeners.remove(listener);
+    }
+
+    public void setProgram(List<Instruction> instrs) {
+        reset();
+        this.program = instrs.toArray(new Instruction[instrs.size()]);
+        listeners.stream().forEach(EventListener::programSet);
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    private void setState(State newState) {
+        try {
+            stateLock.lock();
+            if (newState != state) {
+                state = newState;
+                stateChanged.signalAll();
+                listeners.stream().forEach(EventListener::vmStateChanged);
+            }
+        } finally {
+            stateLock.unlock();
+        }
+    }
+
+    public void reset() {
+        setState(STOPPED);
+        this.funcFrame = null;
+        this.globalFrame = new Frame(null, 0);
+        this.program = null;
+        this.pc = 0;
+
+        globalFrame.setVar("print", new NativeFuncValue(nativeFunctions::print));
+        globalFrame.setVar("input", new NativeFuncValue(nativeFunctions::input));
+        globalFrame.setVar("len", new NativeFuncValue(nativeFunctions::utilsLen));
+
+        Map<Value, Value> turtle = Maps.newHashMap();
+        turtle.put(new StringValue("turn"), new NativeFuncValue(nativeFunctions::turtleTurn));
+        turtle.put(new StringValue("penDown"), new NativeFuncValue(nativeFunctions::turtlePenDown));
+        turtle.put(new StringValue("penUp"), new NativeFuncValue(nativeFunctions::turtlePenUp));
+        turtle.put(new StringValue("move"), new NativeFuncValue(nativeFunctions::turtleMove));
+        globalFrame.setVar("turtle", new MapValue(turtle));
+
+        listeners.stream().forEach(EventListener::reset);
+    }
+
+    public void stop() {
+        setState(STOPPED);
+    }
+
+    public void pause() {
+        if (state == RUNNING) {
+            setState(PAUSED);
+        }
+    }
+
+    public void start() {
+        if (state != STOPPED) {
+            return;
+        }
+        setState(RUNNING);
+    }
 
     private void enterFunction(FuncValue func, List<Value> paramValues) {
         Frame frame = new Frame(funcFrame, pc);
