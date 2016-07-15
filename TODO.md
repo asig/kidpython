@@ -7,7 +7,7 @@ TODO
 [ ] Console
     [X] Support ANSI codes for coloring (ECMA-48)
     [X] Support input                                                                                                                                                xx
-    [ ] "Clear" button
+    [X] "Clear" button
     [X] Show cursor only if it has the focus
 
 [ ] Virtual Machine

@@ -8,6 +8,8 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontMetrics;
@@ -17,6 +19,8 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -118,12 +122,13 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
 
         first = 0;
         len = 1;
-        lines[0] = "";
         cursorX = cursorY = 0;
         cursorOn = true;
         showCursor = true;
 
         Display disp = parent.getDisplay();
+
+        this.setMenu(createContextMenu());
 
         font = new Font(disp, "Mono", 10, SWT.NONE);
         fontBold = FontDescriptor.createFrom(font).setStyle(SWT.BOLD).createFont(disp);
@@ -167,6 +172,19 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
         cursorBlinker.start();
     }
 
+    private Menu createContextMenu() {
+        Menu menu = new Menu(this);
+        MenuItem clearItem = new MenuItem(menu, SWT.NONE);
+        clearItem.setText("Clear");
+        clearItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                clear();
+            }
+        });
+        return menu;
+    }
+
     public void setTextModifiedListener(Runnable textModifiedListener) {
         this.textModifiedListener = textModifiedListener;
     }
@@ -205,6 +223,21 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
         textLock.lock();
         try {
             writeNoRepaint(c);
+            requestRedraw();
+        } finally {
+            textLock.unlock();
+        }
+        textModifiedListener.run();
+    }
+
+    public void clear() {
+        textLock.lock();
+        try {
+            this.first = 0;
+            this.len = 1;
+            this.lines[0] = "";
+            this.attrs[0] = Lists.newArrayList();
+            cursorX = cursorY = 0;
             requestRedraw();
         } finally {
             textLock.unlock();
