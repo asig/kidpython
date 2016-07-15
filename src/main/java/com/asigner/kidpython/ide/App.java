@@ -78,7 +78,6 @@ public class App {
         }
     }
 
-    private  int l = 0;
     /**
      * Create contents of the window.
      */
