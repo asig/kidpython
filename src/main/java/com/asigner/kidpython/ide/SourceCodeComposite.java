@@ -9,6 +9,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
+import java.util.List;
+
 public class SourceCodeComposite extends Composite {
 
     private Settings settings;
@@ -100,10 +102,16 @@ public class SourceCodeComposite extends Composite {
         selectingSource = false;
     }
 
+    public void setErrors(List< com.asigner.kidpython.compiler.Error> errors) {
+
+    }
+
+    public void clearErrors() {
+
+    }
+
     @Override
     protected void checkSubclass() {
         // Disable the check that prevents subclassing of SWT components
     }
-
-
 }

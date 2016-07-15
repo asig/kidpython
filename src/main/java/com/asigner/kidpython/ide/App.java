@@ -8,9 +8,8 @@ import com.asigner.kidpython.compiler.runtime.Instruction;
 import com.asigner.kidpython.compiler.runtime.NativeFunctions;
 import com.asigner.kidpython.compiler.runtime.VirtualMachine;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
-import com.asigner.kidpython.ide.console.ConsoleInputStream;
-import com.asigner.kidpython.ide.console.ConsoleOutputStream;
 import com.asigner.kidpython.ide.turtle.TurtleCanvas;
+import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
 import com.asigner.kidpython.ide.util.SWTResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -25,8 +24,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.List;
 
@@ -38,8 +35,6 @@ public class App {
     private SourceCodeComposite sourceCodeComposite;
     private ConsoleComposite consoleComposite;
 
-    private InputStream consoleInputStream;
-    private OutputStream consoleOutputStream;
     private PrintWriter consoleOut;
     private VirtualMachine virtualMachine;
     private NativeFunctions nativeFunctions;
@@ -143,17 +138,16 @@ public class App {
         shell.setMaximized(true);
         shell.open();
 
-        consoleInputStream = new ConsoleInputStream(consoleComposite);
-        consoleOutputStream = new ConsoleOutputStream(consoleComposite);
-        consoleOut = new PrintWriter(consoleOutputStream, true);
-        nativeFunctions = new NativeFunctions(consoleInputStream, consoleOutputStream, turtleCanvas);
-        virtualMachine = new VirtualMachine(consoleOutputStream, consoleInputStream, nativeFunctions);
+        consoleOut = new PrintWriter(consoleComposite.getOutputStream(), true);
+        nativeFunctions = new NativeFunctions(turtleCanvas, consoleComposite);
+        virtualMachine = new VirtualMachine(consoleComposite.getOutputStream(), consoleComposite.getInputStream(), nativeFunctions);
 
         updateVmButtons();
 
         virtualMachine.addListener(new VirtualMachine.EventListener() {
             @Override
             public void vmStateChanged() {
+                showVmStateMessage();
                 updateVmButtons();
             }
 
@@ -204,8 +198,27 @@ public class App {
                     break;
             }
         });
-
     }
+
+    private void showVmStateMessage() {
+        VirtualMachine.State state = virtualMachine.getState();
+        switch (state) {
+            case RUNNING:
+                status("Programmausführung gestartet.");
+                break;
+            case STOPPED:
+                status("Programmausführung gestoppt.");
+                break;
+            case PAUSED:
+                status("Programmausführung pausiert.");
+                break;
+        }
+    }
+
+    private void status(String s) {
+        consoleOut.println(AnsiEscapeCodes.FG_BLUE + s + AnsiEscapeCodes.FG_BLACK);
+    }
+
     private void createVmToolbar() {
         ToolBar vmToolbar = new ToolBar(shell, SWT.BORDER);
         vmToolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -220,7 +233,7 @@ public class App {
             virtualMachine.pause();
         });
         vmStop = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stop@2x.png"), event -> {
-            stopVm();
+            virtualMachine.stop();
         });
         vmStepOver = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepover_co@2x.png"), event -> {
             stepInto();
@@ -242,12 +255,19 @@ public class App {
     }
 
     private void runCode(String source) {
+        sourceCodeComposite.clearErrors();
         Parser p = new Parser(source);
         Stmt stmt = p.parse();
         if (stmt == null) {
+            consoleOut.print(AnsiEscapeCodes.BOLD);
+            consoleOut.print(AnsiEscapeCodes.FG_YELLOW);
+            consoleOut.print(AnsiEscapeCodes.BG_RED);
+            consoleOut.print("Fehler beim Compilieren:");
+            consoleOut.println(AnsiEscapeCodes.RESET);
             for (Error e : p.getErrors()) {
                 consoleOut.println(e);
             }
+            sourceCodeComposite.setErrors(p.getErrors());
             return;
         }
 
@@ -261,10 +281,6 @@ public class App {
 
         virtualMachine.setProgram(program);
         virtualMachine.start();
-    }
-
-    private void stopVm() {
-        virtualMachine.stop();
     }
 
     private void stepInto() {

@@ -442,7 +442,7 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
         Color c1 = getDisplay().getSystemColor(SWT.COLOR_WHITE);
         Color c2 = getDisplay().getSystemColor(SWT.COLOR_BLACK);
         gc.setFont(font);
-        if (cursorOn && showCursor) {
+        if (cursorOn && showCursor && this.isFocusControl()) {
             gc.setForeground(c1);
             gc.setBackground(c2);
         } else {

@@ -1,10 +1,11 @@
 package com.asigner.kidpython.compiler.runtime;
 
+import com.asigner.kidpython.ide.console.ConsoleComposite;
 import com.asigner.kidpython.ide.turtle.TurtleCanvas;
+import org.eclipse.swt.widgets.Display;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,10 +15,12 @@ public class NativeFunctions {
     private final PrintStream stdout;
     private final InputStream stdin;
     private final TurtleCanvas turtle;
+    private final ConsoleComposite consoleComposite;
 
-    public NativeFunctions(InputStream stdin, OutputStream stdout, TurtleCanvas turtle) {
-        this.stdin = stdin;
-        this.stdout = new PrintStream(stdout);
+    public NativeFunctions(TurtleCanvas turtle, ConsoleComposite consoleComposite) {
+        this.consoleComposite = consoleComposite;
+        this.stdin = consoleComposite.getInputStream();
+        this.stdout = new PrintStream(consoleComposite.getOutputStream());
         this.turtle = turtle;
     }
 
@@ -40,6 +43,7 @@ public class NativeFunctions {
 
     public Value input(List<Value> values) {
         print(values);
+        Display.getDefault().syncExec(consoleComposite::forceFocus);
         try {
             while(stdin.available() > 0) {
                 stdin.read();

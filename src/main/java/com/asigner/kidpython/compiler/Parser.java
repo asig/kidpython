@@ -115,7 +115,6 @@ public class Parser {
 
     private final Scanner scanner;
     private Token lookahead;
-    private int tmpVarCnt;
     private int inFunction;
     private List<Error> errors;
 

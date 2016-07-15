@@ -8,29 +8,29 @@ TODO
     [X] Support ANSI codes for coloring (ECMA-48)
     [X] Support input                                                                                                                                                xx
     [ ] "Clear" button
-    [ ] Show cursor only if it has the focus
+    [X] Show cursor only if it has the focus
 
 [ ] Virtual Machine
     [ ] Virtual Machine Events
-        [ ] Execution started
-        [ ] Execution stopped
+        [X] Execution started
+        [X] Execution stopped
         [ ] New Line Reached
         [ ] New Event Reached
 
 [ ] IDE/Code Editor
     [ ] Show error messages in code
-    [ ] Show error messages in console
+    [X] Show error messages in console
     [ ] Rename tabs
-    [ ] Show "start executing program", "Program terminated" messages
+    [X] Show "start executing program", "Program terminated" messages
     [ ] Single step
     [ ] Support pausing program
     [ ] Export code to file
     [X] add "well know" style to stylesheets
-    [ ] smaller size of console when starting
+    [X] smaller size of console when starting
 
 [ ] Runtime
     [X] implement "input"
-    [ ] only show cursor when input is pending
+    [X] only show cursor when input is pending
     [X] implement \n special codes
     [X] implement "len" function
     [ ] implement math functions
