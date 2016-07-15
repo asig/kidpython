@@ -22,6 +22,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.BG_BLACK;
 import static com.asigner.kidpython.ide.util.AnsiEscapeCodes.BG_BLUE;
@@ -72,7 +74,9 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
 
     private static final int BLACK = 0;
     private static final int WHITE = 7;
-    private final Color[] colors = new Color[8];
+    private final Color[] COLORS = new Color[8];
+
+    private final Lock textLock = new ReentrantLock();
 
     private final Font font;
     private final Font fontBold;
@@ -132,14 +136,14 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
         fontMetrics = gc.getFontMetrics();
         gc.dispose();
 
-        colors[0] = disp.getSystemColor(SWT.COLOR_BLACK);
-        colors[1] = disp.getSystemColor(SWT.COLOR_RED);
-        colors[2] = disp.getSystemColor(SWT.COLOR_GREEN);
-        colors[3] = disp.getSystemColor(SWT.COLOR_YELLOW);
-        colors[4] = disp.getSystemColor(SWT.COLOR_BLUE);
-        colors[5] = disp.getSystemColor(SWT.COLOR_MAGENTA);
-        colors[6] = disp.getSystemColor(SWT.COLOR_CYAN);
-        colors[7] = disp.getSystemColor(SWT.COLOR_WHITE);
+        COLORS[0] = disp.getSystemColor(SWT.COLOR_BLACK);
+        COLORS[1] = disp.getSystemColor(SWT.COLOR_RED);
+        COLORS[2] = disp.getSystemColor(SWT.COLOR_GREEN);
+        COLORS[3] = disp.getSystemColor(SWT.COLOR_YELLOW);
+        COLORS[4] = disp.getSystemColor(SWT.COLOR_BLUE);
+        COLORS[5] = disp.getSystemColor(SWT.COLOR_MAGENTA);
+        COLORS[6] = disp.getSystemColor(SWT.COLOR_CYAN);
+        COLORS[7] = disp.getSystemColor(SWT.COLOR_WHITE);
 
         curAttr = new Attr();
         curAttr.fg = BLACK;
@@ -185,16 +189,26 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
     }
 
     public void write(String s) {
-        for (char c : s.toCharArray()) {
-            writeNoRepaint(c);
+        textLock.lock();
+        try {
+            for (char c : s.toCharArray()) {
+                writeNoRepaint(c);
+            }
+            requestRedraw();
+        } finally {
+            textLock.unlock();
         }
-        requestRedraw();
         textModifiedListener.run();
     }
 
     public void write(char c) {
-        writeNoRepaint(c);
-        requestRedraw();
+        textLock.lock();
+        try {
+            writeNoRepaint(c);
+            requestRedraw();
+        } finally {
+            textLock.unlock();
+        }
         textModifiedListener.run();
     }
 
@@ -283,7 +297,7 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
 
         GC gc = e.gc;
         Rectangle rect = this.getClientArea();
-        gc.setBackground(colors[WHITE]);
+        gc.setBackground(COLORS[WHITE]);
         gc.fillRectangle(rect);
 
         gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
@@ -293,13 +307,17 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
 
         int firstLine = e.y/lineHeight;
         int lastLine = (e.y + e.height + lineHeight - 1)/lineHeight;
-//        System.out.println(String.format("PaintEvent: drawing text from %d to %d", firstLine, lastLine));
         int y = firstLine * lineHeight;
-        for (int i = firstLine; i <= lastLine && i < len; i++) {
-            drawLine(gc, lines[(first + i) % LINES], attrs[(first + i) % LINES], y);
-            y += lineHeight;
+        try {
+            textLock.lock();
+            for (int i = firstLine; i <= lastLine && i < len; i++) {
+                drawLine(gc, lines[(first + i) % LINES], attrs[(first + i) % LINES], y);
+                y += lineHeight;
+            }
+            drawCursor(gc);
+        } finally {
+            textLock.unlock();
         }
-        drawCursor(gc);
     }
 
     private void drawLine(GC gc, String line, List<Integer> attrs, int y) {
@@ -327,8 +345,8 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
 
     private void setAttr(GC gc, Attr attr) {
 
-        gc.setForeground(colors[attr.inverse ? attr.bg : attr.fg]);
-        gc.setBackground(colors[attr.inverse ? attr.fg : attr.bg]);
+        gc.setForeground(COLORS[attr.inverse ? attr.bg : attr.fg]);
+        gc.setBackground(COLORS[attr.inverse ? attr.fg : attr.bg]);
 
         if (attr.bold && attr.italic) {
             gc.setFont(fontBoldItalic);
