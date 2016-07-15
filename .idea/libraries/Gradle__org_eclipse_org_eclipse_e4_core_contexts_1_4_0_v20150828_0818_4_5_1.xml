@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="Gradle: org.eclipse:org.eclipse.e4.core.contexts_1.4.0.v20150828-0818:4.5.1">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/920bc015b4b9468e0a2078f4380f2b34fc288cc/org.eclipse.e4.core.contexts_1.4.0.v20150828-0818-4.5.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/org.eclipse/platform-minimal/4.5.1/jars/org.eclipse.e4.core.contexts_1.4.0.v20150828-0818.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

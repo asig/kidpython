@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="Gradle: org.eclipse:org.eclipse.jface.databinding_1.7.0.v20150406-2148:4.5.1">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/554badfb70413444af4eb7c1c4101ac575e3b913/org.eclipse.jface.databinding_1.7.0.v20150406-2148-4.5.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/org.eclipse/platform-minimal/4.5.1/jars/org.eclipse.jface.databinding_1.7.0.v20150406-2148.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

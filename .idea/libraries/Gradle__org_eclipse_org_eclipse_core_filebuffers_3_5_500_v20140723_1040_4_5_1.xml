@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="Gradle: org.eclipse:org.eclipse.core.filebuffers_3.5.500.v20140723-1040:4.5.1">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/b39619f99450d255633210b0a20769799578b333/org.eclipse.core.filebuffers_3.5.500.v20140723-1040-4.5.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/org.eclipse/platform-minimal/4.5.1/jars/org.eclipse.core.filebuffers_3.5.500.v20140723-1040.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

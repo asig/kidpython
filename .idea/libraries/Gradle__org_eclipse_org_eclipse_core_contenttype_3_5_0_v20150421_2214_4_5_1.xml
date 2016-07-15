@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="Gradle: org.eclipse:org.eclipse.core.contenttype_3.5.0.v20150421-2214:4.5.1">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse/platform-minimal/4.5.1/b60e8a50bf037ff53a3b3d7ae75740d7165ce17f/org.eclipse.core.contenttype_3.5.0.v20150421-2214-4.5.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/org.eclipse/platform-minimal/4.5.1/jars/org.eclipse.core.contenttype_3.5.0.v20150421-2214.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
