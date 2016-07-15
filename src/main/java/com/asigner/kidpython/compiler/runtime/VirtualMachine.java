@@ -150,7 +150,7 @@ public class VirtualMachine {
                 break;
 
                 case STOP:
-                    stop();
+                    VirtualMachine.this.stop();
                     break;
 
                 case MKFIELDREF: {
