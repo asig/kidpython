@@ -149,6 +149,8 @@ public class App {
         nativeFunctions = new NativeFunctions(consoleInputStream, consoleOutputStream, turtleCanvas);
         virtualMachine = new VirtualMachine(consoleOutputStream, consoleInputStream, nativeFunctions);
 
+        updateVmButtons();
+
         virtualMachine.addListener(new VirtualMachine.EventListener() {
             @Override
             public void vmStateChanged() {
@@ -162,10 +164,12 @@ public class App {
 
             @Override
             public void programSet() {
+                updateVmButtons();
             }
 
             @Override
             public void reset() {
+                updateVmButtons();
             }
         });
     }
@@ -187,8 +191,8 @@ public class App {
                     vmPause.setEnabled(false);
                     vmResume.setEnabled(false);
                     vmStop.setEnabled(false);
-                    vmStepInto.setEnabled(false);
-                    vmStepOver.setEnabled(false);
+                    vmStepInto.setEnabled(true);
+                    vmStepOver.setEnabled(true);
                     break;
                 case PAUSED:
                     vmStart.setEnabled(false);
