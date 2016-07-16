@@ -104,7 +104,7 @@ public class Parser {
             DOT
     );
 
-    private Set<Token.Type> TERM_START_SET = Sets.newHashSet(
+    private Set<Token.Type> FACTOR_START_SET = Sets.newHashSet(
             NUM_LIT,
             STRING_LIT,
             FUNC,
@@ -440,17 +440,6 @@ public class Parser {
     }
 
     private ExprNode arithExpr() {
-        ExprNode node = factor();
-        while (lookahead.getType() == ASTERISK || lookahead.getType() == SLASH) {
-            BinOpNode.Op op = lookahead.getType() == ASTERISK ? MUL : DIV;
-            match(lookahead.getType());
-            ExprNode node2 = factor();
-            node = new BinOpNode(node.getPos(), op, node, node2);
-        }
-        return node;
-    }
-
-    private ExprNode factor() {
         ExprNode node = term();
         while (lookahead.getType() == PLUS || lookahead.getType() == MINUS) {
             BinOpNode.Op op = lookahead.getType() == PLUS ? ADD : SUB;
@@ -462,6 +451,17 @@ public class Parser {
     }
 
     private ExprNode term() {
+        ExprNode node = factor();
+        while (lookahead.getType() == ASTERISK || lookahead.getType() == SLASH) {
+            BinOpNode.Op op = lookahead.getType() == ASTERISK ? MUL : DIV;
+            match(lookahead.getType());
+            ExprNode node2 = factor();
+            node = new BinOpNode(node.getPos(), op, node, node2);
+        }
+        return node;
+    }
+
+    private ExprNode factor() {
         Position pos = lookahead.getPos();
         ExprNode node;
         switch (lookahead.getType()) {
@@ -524,7 +524,7 @@ public class Parser {
                 inFunction--;
                 return new MakeFuncNode(pos, body, params);
             default:
-                error(Error.unexpectedToken(lookahead, TERM_START_SET));
+                error(Error.unexpectedToken(lookahead, FACTOR_START_SET));
                 return new ConstNode(pos, new NumberValue(new BigDecimal(0)));
         }
     }
