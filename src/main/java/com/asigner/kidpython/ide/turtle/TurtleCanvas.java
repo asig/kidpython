@@ -11,14 +11,7 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.RGBA;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.graphics.Transform;
+import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -82,7 +75,7 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
     private List<Button> buttons = Lists.newArrayList();
 
     public TurtleCanvas(Composite parent, int style) {
-        super(parent, style);
+        super(parent, style | SWT.NO_BACKGROUND);
 
         elusiveFont = new Font(this.getDisplay(), "elusiveicons", BTN_SIZE/3, SWT.NORMAL);
 
@@ -296,10 +289,28 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
     }
 
     private void draw(PaintEvent e) {
-        GC gc = e.gc;
+        // Create the image to fill the canvas
+        Image image = new Image(this.getDisplay(), this.getBounds());
+
+        // Set up the offscreen gc
+        GC gcImage = new GC(image);
+
+        // Clear the background
+        gcImage.setBackground(this.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+        gcImage.fillRectangle(image.getBounds());
+
+        drawContent(gcImage);
+
+        // Draw the offscreen buffer to the screen
+        e.gc.drawImage(image, 0, 0);
+
+        // Clean up
+        image.dispose();
+        gcImage.dispose();
+    }
+
+    private void drawContent(GC gc) {
         Rectangle rect = this.getClientArea();
-        gc.setBackground(e.display.getSystemColor(SWT.COLOR_WHITE));
-        gc.fillRectangle(rect);
 
         Transform t = new Transform(gc.getDevice());
         t.translate((rect.x + rect.width)/2.0f - offsetX, (rect.y + rect.height)/2.0f - offsetY);

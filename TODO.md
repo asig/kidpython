@@ -3,6 +3,12 @@ TODO
 
 [ ] Bugs
     [X] Write to parameters are not done in the func frame, but in global?
+    [ ] ForEach loop: only first command is executed. e.g.:
+        for i in [1] do
+          print(i + "\n")
+          print(2*i + "\n")
+        end
+
     
 [ ] Console
     [X] Support ANSI codes for coloring (ECMA-48)
@@ -42,6 +48,7 @@ TODO
     [X] Reset buttons
     [X] Make canvas draggable
     [X] implement "clear"
+    [X] Implement "Double Buffering"
 
 [ ] Language
     [ ] Default parameters

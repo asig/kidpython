@@ -110,7 +110,7 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
     private Runnable textModifiedListener = () -> {};
 
     public ConsoleCanvas(Composite parent, int style) {
-        super(parent, style);
+        super(parent, style | SWT.NO_BACKGROUND);
 
         addPaintListener(this);
         addKeyListener(this);
@@ -197,7 +197,7 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
                 // Just repaint the cursor area
                 int x = cursorX * fontMetrics.getAverageCharWidth();
                 int y = cursorY * fontMetrics.getHeight();
-                display.syncExec(() -> redraw(x, y, fontMetrics.getAverageCharWidth(), fontMetrics.getHeight(), false));
+                display.asyncExec(() -> redraw(x, y, fontMetrics.getAverageCharWidth() + 1, fontMetrics.getHeight(), false));
             }
         }
     }
@@ -317,7 +317,8 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
         }
         int finalY = y;
         int finalH = h;
-        getDisplay().syncExec(() -> redraw(0, finalY, Integer.MAX_VALUE, finalH, false));
+        Rectangle r = getClientArea();
+        getDisplay().syncExec(() -> redraw(r.x, r.y + finalY, r.width, finalH, false));
     }
 
     @Override
