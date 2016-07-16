@@ -36,7 +36,7 @@ public class CodeEditor extends StyledText {
 
         this.setBackground(stylesheet.getDefaultBackground());
 
-        font = new Font(parent.getDisplay(), "Mono", 10, SWT.NONE);
+        font = new Font(parent.getDisplay(), "Roboto Mono", 10, SWT.NONE);
         this.addDisposeListener(new DisposeListener() {
             @Override
             public void widgetDisposed(DisposeEvent disposeEvent) {

@@ -17,7 +17,6 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class SWTResources {
 
-    private static Font elusiveFont;
     private static final Map<RGBA, Color> colors = Maps.newHashMap();
     private static final Map<String, Image> images = Maps.newHashMap();
 
@@ -50,9 +49,15 @@ public class SWTResources {
     }
 
     static {
+        loadFont("/com/asigner/kidpython/ide/fonts/elusiveicons-webfont.ttf");
+        loadFont("/com/asigner/kidpython/ide/fonts/UbuntuMono-Regular.ttf");
+        loadFont("/com/asigner/kidpython/ide/fonts/RobotoMono-Regular.ttf");
+    }
+
+    private static void loadFont(String path) {
         try {
             Path tmpFont = Files.createTempFile("font", ".ttf");
-            Files.copy(SWTResources.class.getResourceAsStream("/com/asigner/kidpython/ide/fonts/elusiveicons-webfont.ttf"), tmpFont, REPLACE_EXISTING);
+            Files.copy(SWTResources.class.getResourceAsStream(path), tmpFont, REPLACE_EXISTING);
             Display.getDefault().loadFont(tmpFont.toString());
         } catch (IOException e) {
             e.printStackTrace();
