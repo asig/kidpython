@@ -128,7 +128,8 @@ public class CodeGenerator implements NodeVisitor {
         emit(new Instruction(stmt, ITER_NEXT));
         emit(new Instruction(stmt, ASSIGN));
 
-        stmt.getBody().accept(this);
+        generateStmtBlock(stmt.getBody());
+
         emit(new Instruction(stmt, B, loopPc));
 
         patch(branchFalsePc, new Instruction(stmt, BF, instrs.size()));

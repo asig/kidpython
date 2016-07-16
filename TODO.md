@@ -3,7 +3,7 @@ TODO
 
 [ ] Bugs
     [X] Write to parameters are not done in the func frame, but in global?
-    [ ] ForEach loop: only first command is executed. e.g.:
+    [X] ForEach loop: only first command is executed. e.g.:
         for i in [1] do
           print(i + "\n")
           print(2*i + "\n")
