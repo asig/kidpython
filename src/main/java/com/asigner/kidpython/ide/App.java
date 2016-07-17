@@ -219,7 +219,7 @@ public class App {
     }
 
     private void createVmToolbar() {
-        ToolBar vmToolbar = new ToolBar(shell, SWT.BORDER);
+        ToolBar vmToolbar = new ToolBar(shell, SWT.NONE);
         vmToolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
         vmStart = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/nav_go@2x.png"), event -> {
