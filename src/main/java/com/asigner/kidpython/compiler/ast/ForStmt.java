@@ -22,6 +22,26 @@ public class ForStmt extends Stmt {
         this.body = body;
     }
 
+    public ExprNode getCtrlVar() {
+        return ctrlVar;
+    }
+
+    public ExprNode getStart() {
+        return start;
+    }
+
+    public ExprNode getEnd() {
+        return end;
+    }
+
+    public ExprNode getStep() {
+        return step;
+    }
+
+    public Stmt getBody() {
+        return body;
+    }
+
     @Override
     public void accept(NodeVisitor visitor) {
         visitor.visit(this);

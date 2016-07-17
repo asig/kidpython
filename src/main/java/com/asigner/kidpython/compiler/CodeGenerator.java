@@ -24,41 +24,14 @@ import com.asigner.kidpython.compiler.ast.expr.MakeMapNode;
 import com.asigner.kidpython.compiler.ast.expr.MapAccessNode;
 import com.asigner.kidpython.compiler.ast.expr.UnOpNode;
 import com.asigner.kidpython.compiler.ast.expr.VarNode;
-import com.asigner.kidpython.compiler.runtime.BooleanValue;
-import com.asigner.kidpython.compiler.runtime.FuncValue;
-import com.asigner.kidpython.compiler.runtime.Instruction;
-import com.asigner.kidpython.compiler.runtime.VarRefValue;
+import com.asigner.kidpython.compiler.runtime.*;
 import com.asigner.kidpython.util.Pair;
 import com.google.common.collect.Lists;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.ADD;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.ASSIGN;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.B;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.BF;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.CALL;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.DIV;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.EQ;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.GE;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.GT;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.ITER_HAS_NEXT;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.ITER_NEXT;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.LE;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.LT;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.MKFIELDREF;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.MKITER;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.MKLIST;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.MKMAP;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.MUL;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.NE;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.NEG;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.NOT;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.POP;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.PUSH;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.RET;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.STOP;
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.SUB;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.*;
 
 public class CodeGenerator implements NodeVisitor {
 
@@ -137,7 +110,44 @@ public class CodeGenerator implements NodeVisitor {
 
     @Override
     public void visit(ForStmt stmt) {
-        throw new UnsupportedOperationException("Not implemented yet!");
+        // for i = 0 to 5 step 1
+
+        // i = 0
+        stmt.getCtrlVar().accept(this);
+        stmt.getStart().accept(this);
+        emit(new Instruction(stmt, ASSIGN));
+
+        // if step > 0 then
+        //   if i >= end goto end-of-loop
+        // else
+        //   if i <= end goto end-of-loop
+        int loopStartPc = instrs.size();
+        stmt.getStep().accept(this);
+        emit(new Instruction(stmt, PUSH, new NumberValue(BigDecimal.ZERO)));
+        emit(new Instruction(stmt, GT));
+        int branchToEnd1Pc = emit(new Instruction(stmt, BT, 0));
+        int branchToLoopBodyPc = emit(new Instruction(stmt, B, 0));
+        stmt.getCtrlVar().accept(this);
+        stmt.getEnd().accept(this);
+        emit(new Instruction(stmt, LE));
+        int branchToEnd2Pc = emit(new Instruction(stmt, BT, 0));
+
+        int loopBodyPc = instrs.size();
+        patch(branchToLoopBodyPc, new Instruction(stmt, B, loopBodyPc));
+
+        generateStmtBlock(stmt.getBody());
+
+        // i = i + step
+        stmt.getCtrlVar().accept(this);
+        stmt.getCtrlVar().accept(this);
+        stmt.getStep().accept(this);
+        emit(new Instruction(stmt, ADD));
+        emit(new Instruction(stmt, ASSIGN));
+
+        // jump loopStart
+        emit(new Instruction(stmt, B, loopStartPc));
+        patch(branchToEnd1Pc, new Instruction(stmt, BT, instrs.size()));
+        patch(branchToEnd2Pc, new Instruction(stmt, BT, instrs.size()));
     }
 
     @Override
