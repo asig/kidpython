@@ -11,18 +11,17 @@ import com.asigner.kidpython.ide.console.ConsoleComposite;
 import com.asigner.kidpython.ide.turtle.TurtleCanvas;
 import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
 import com.asigner.kidpython.ide.util.SWTResources;
+import org.eclipse.jface.action.CoolBarManager;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 
 import java.io.PrintWriter;
 import java.util.List;
@@ -40,12 +39,14 @@ public class App {
     private NativeFunctions nativeFunctions;
 
     // VirtualMachine toolbar
-    ToolItem vmStart;
-    ToolItem vmPause;
-    ToolItem vmResume;
-    ToolItem vmStop;
-    ToolItem vmStepInto;
-    ToolItem vmStepOver;
+    BaseAction vmStartAction;
+    BaseAction vmPauseAction;
+    BaseAction vmResumeAction;
+    BaseAction vmStopAction;
+    BaseAction vmStepIntoAction;
+    BaseAction vmStepOverAction;
+
+    private CoolBarManager coolBarManager;
 
     /**
      * Launch the application.
@@ -104,18 +105,8 @@ public class App {
             System.exit(0);
         });
 
-        createVmToolbar();
-//        addToolbarItem(toolBar, "PRINT", event -> {
-//            consoleComposite.write("Hello " + AnsiEscapeCodes.IMAGE_NEGATIVE + "Hello" + AnsiEscapeCodes.IMAGE_POSITIVE + "\u001B[0m, \u001B[1m\u001B[3m\u001b[41m\u001b[33mWorld!\u001b[0m " + l + "\n");
-//            l = l+1;
-//        });
-//        ToolItem separator = new ToolItem(toolBar, SWT.SEPARATOR);
-//        addToolbarItem(toolBar, "Turtle", event -> {
-//            turtleCanvas.setSlowMotion(true);
-//            turtleCanvas.setPen(new RGB(255,0,255), 10);
-//            turtleCanvas.move(100);
-//            turtleCanvas.turn(47);
-//        });
+        createActions();
+        createToolbar();
 
         SashForm sashForm = new SashForm(shell, SWT.VERTICAL);
         sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -172,28 +163,28 @@ public class App {
             VirtualMachine.State state = virtualMachine.getState();
             switch (state) {
                 case RUNNING:
-                    vmStart.setEnabled(false);
-                    vmPause.setEnabled(true);
-                    vmResume.setEnabled(false);
-                    vmStop.setEnabled(true);
-                    vmStepInto.setEnabled(false);
-                    vmStepOver.setEnabled(false);
+                    vmStartAction.setEnabled(false);
+                    vmPauseAction.setEnabled(true);
+                    vmResumeAction.setEnabled(false);
+                    vmStopAction.setEnabled(true);
+                    vmStepIntoAction.setEnabled(false);
+                    vmStepOverAction.setEnabled(false);
                     break;
                 case STOPPED:
-                    vmStart.setEnabled(true);
-                    vmPause.setEnabled(false);
-                    vmResume.setEnabled(false);
-                    vmStop.setEnabled(false);
-                    vmStepInto.setEnabled(true);
-                    vmStepOver.setEnabled(true);
+                    vmStartAction.setEnabled(true);
+                    vmPauseAction.setEnabled(false);
+                    vmResumeAction.setEnabled(false);
+                    vmStopAction.setEnabled(false);
+                    vmStepIntoAction.setEnabled(true);
+                    vmStepOverAction.setEnabled(true);
                     break;
                 case PAUSED:
-                    vmStart.setEnabled(false);
-                    vmPause.setEnabled(false);
-                    vmResume.setEnabled(true);
-                    vmStop.setEnabled(true);
-                    vmStepInto.setEnabled(true);
-                    vmStepOver.setEnabled(true);
+                    vmStartAction.setEnabled(false);
+                    vmPauseAction.setEnabled(false);
+                    vmResumeAction.setEnabled(true);
+                    vmStopAction.setEnabled(true);
+                    vmStepIntoAction.setEnabled(true);
+                    vmStepOverAction.setEnabled(true);
                     break;
             }
         });
@@ -218,39 +209,34 @@ public class App {
         consoleOut.println(AnsiEscapeCodes.FG_BLUE + s + AnsiEscapeCodes.FG_BLACK);
     }
 
-    private void createVmToolbar() {
-        ToolBar vmToolbar = new ToolBar(shell, SWT.NONE);
-        vmToolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-        vmStart = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/nav_go@2x.png"), event -> {
+    private void createActions() {
+        vmStartAction = new BaseAction("Run", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/nav_go@2x.png"), () -> {
             runCode(sourceCodeComposite.getText());
         });
-        vmPause = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/suspend_co@2x.png"), event -> {
-            virtualMachine.pause();
-        });
-        vmResume = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/resume_co@2x.png"), event -> {
-            virtualMachine.pause();
-        });
-        vmStop = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stop@2x.png"), event -> {
-            virtualMachine.stop();
-        });
-        vmStepOver = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepover_co@2x.png"), event -> {
-            stepInto();
-        });
-        vmStepInto = addToolbarItem(vmToolbar, SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepinto_co@2x.png"), event -> {
-            stepOver();
-        });
-
-        vmStart.setEnabled(true);
-        vmStop.setEnabled(false);
-        vmToolbar.pack();
+        vmPauseAction = new BaseAction("Pause", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/suspend_co@2x.png"), () -> virtualMachine.pause() );
+        vmResumeAction = new BaseAction("Resume", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/resume_co@2x.png"), () -> virtualMachine.start() );
+        vmStopAction = new BaseAction("Stop", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stop@2x.png"), () -> virtualMachine.stop());
+        vmStepIntoAction = new BaseAction("Step Into", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepinto_co@2x.png"), this::stepInto);
+        vmStepOverAction = new BaseAction("Step Over", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepover_co@2x.png"), this::stepOver);
     }
 
-    private ToolItem addToolbarItem(ToolBar toolbar, Image image, Listener handler) {
-        ToolItem item = new ToolItem(toolbar, SWT.PUSH);
-        item.setImage(image);
-        item.addListener(SWT.Selection, handler);
-        return item;
+    private void createToolbar() {
+        coolBarManager = new CoolBarManager(SWT.FLAT);
+        final ToolBarManager toolBarManager = new ToolBarManager(SWT.FLAT | SWT.NO_FOCUS);
+        coolBarManager.add(toolBarManager);
+        toolBarManager.add(vmStartAction);
+
+        toolBarManager.add(vmPauseAction);
+        toolBarManager.add(vmResumeAction);
+        toolBarManager.add(vmStopAction);
+        toolBarManager.add(vmStepIntoAction);
+        toolBarManager.add(vmStepOverAction);
+
+//        final ToolBarManager toolBarManager_1 = new ToolBarManager(SWT.FLAT | SWT.NO_FOCUS);
+//        coolBarManager.add(toolBarManager_1);
+//        toolBarManager_1.add(new TestAction("TEST2", ImageDescriptor.createFromImage(SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/nav_go@2x.png"))));
+
+        coolBarManager.createControl(shell);
     }
 
     private void runCode(String source) {
