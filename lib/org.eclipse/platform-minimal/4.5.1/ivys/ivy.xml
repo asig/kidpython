@@ -37,6 +37,7 @@
         <artifact name="org.eclipse.jface.text_3.10.0.v20150603-1752" conf="common" type="jar" ext="jar"/>
         <artifact name="org.eclipse.swt_3.104.1.v20150825-0743" conf="common" type="jar" ext="jar"/>
         <artifact name="org.eclipse.text_3.5.400.v20150505-1044" conf="common" type="jar" ext="jar"/>
+        <artifact name="org.eclipse.equinox.common_3.7.0.v20150402-1709" conf="common" type="jar" ext="jar"/>
 
         <artifact name="org.eclipse.core.filesystem.linux.x86_1.4.200.v20140124-1940" conf="linux-gtk-x86" type="jar" ext="jar"/>
         <artifact name="org.eclipse.core.net.linux.x86_1.1.300.v20140124-2013" conf="linux-gtk-x86" type="jar" ext="jar"/>
