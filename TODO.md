@@ -50,6 +50,10 @@ TODO
     [X] implement "clear"
     [X] Implement "Double Buffering"
 
+[ ] Manual
+    [ ] explain turtle
+    [ ] explain syntax
+    [ ] explain input/output
 [ ] Language
     [ ] Default parameters
     [ ] range operator "..":  a..b == range(a,b)
