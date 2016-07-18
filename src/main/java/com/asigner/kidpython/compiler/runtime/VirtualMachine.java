@@ -419,7 +419,7 @@ public class VirtualMachine {
     }
 
     public void start() {
-        if (state != STOPPED) {
+        if (state != STOPPED && state != PAUSED) {
             return;
         }
         setState(RUNNING);
@@ -532,7 +532,7 @@ public class VirtualMachine {
                 case STRING:
                     return Optional.of(v1.asString().compareTo(v2.asString()));
                 case NUMBER:
-                    return Optional.of(v1.asString().compareTo(v2.asString()));
+                    return Optional.of(v1.asNumber().compareTo(v2.asNumber()));
             }
         }
         return Optional.empty();
