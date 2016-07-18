@@ -1,9 +1,11 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "1.2.3"
+}
+
 apply from: "repositories.gradle"
 
 apply plugin: 'java'
 apply plugin: 'application'
-apply plugin: 'idea'
-apply plugin: 'eclipse'
 
 dependencies {
     compile group: 'org.eclipse', name: 'platform-minimal', version: '4.5.1', configuration: 'win32-x86_64'
@@ -18,4 +20,5 @@ task copyToLib(type: Copy) {
     into "$buildDir/output/lib"
     from configurations.runtime
 }
+
 mainClassName = "com.asigner.kidpython.ide.App"
