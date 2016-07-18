@@ -1,6 +1,7 @@
 package com.asigner.kidpython.compiler.runtime;
 
 import com.asigner.kidpython.compiler.ast.Stmt;
+import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -112,10 +113,12 @@ public class VirtualMachine {
                     while (state == RUNNING) {
                         executeInstruction();
                     }
-                } catch (Exception e) {
+                } catch (Error e) {
+                    stdout.print(AnsiEscapeCodes.FG_RED);
                     stdout.println("Oooops, something went wrong...");
                     e.printStackTrace(stdout);
                     stdout.println("Stopping execution");
+                    stdout.print(AnsiEscapeCodes.RESET);
                     VirtualMachine.this.stop();
                 }
             }
@@ -137,7 +140,7 @@ public class VirtualMachine {
                     Value rhs = load(valueStack.pop());
                     Value lhs = valueStack.pop();
                     if (lhs.getType() != REFERENCE) {
-                        throw new ExecutionException("Can't assign to non-reference!");
+                        throw new ExecutionException(instr.getSourceNode().getPos(), "Can't assign to non-reference!");
                     }
                     if (lhs instanceof VarRefValue) {
                         setVar(((VarRefValue) lhs).getVar(), rhs);
@@ -164,7 +167,7 @@ public class VirtualMachine {
                         mapValue = load(mapRef);
                     }
                     if (mapValue.getType() != MAP) {
-                        throw new ExecutionException("Variable is not a map");
+                        throw new ExecutionException(instr.getSourceNode().getPos(), "Variable is not a map");
                     }
                     valueStack.push(new FieldRefValue((MapValue) mapValue, key));
                 }
@@ -202,7 +205,7 @@ public class VirtualMachine {
                 case ITER_NEXT: {
                     Value val = load(valueStack.pop());
                     if (val.getType() != ITERATOR) {
-                        throw new ExecutionException("Not an iterator!");
+                        throw new ExecutionException(instr.getSourceNode().getPos(), "Not an iterator!");
                     }
                     IterValue ival = (IterValue) val;
                     valueStack.push(ival.getIterator().next());
@@ -212,7 +215,7 @@ public class VirtualMachine {
                 case ITER_HAS_NEXT: {
                     Value val = load(valueStack.pop());
                     if (val.getType() != ITERATOR) {
-                        throw new ExecutionException("Not an iterator!");
+                        throw new ExecutionException(instr.getSourceNode().getPos(), "Not an iterator!");
                     }
                     IterValue ival = (IterValue) val;
                     valueStack.push(new BooleanValue(ival.getIterator().hasNext()));
@@ -253,7 +256,7 @@ public class VirtualMachine {
                     } else if (func instanceof FuncValue) {
                         enterFunction((FuncValue) func, params);
                     } else {
-                        throw new ExecutionException("Can't call non-function value");
+                        throw new ExecutionException(instr.getSourceNode().getPos(), "Can't call non-function value");
                     }
                 }
 
