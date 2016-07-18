@@ -125,11 +125,19 @@ public class CodeGenerator implements NodeVisitor {
         stmt.getStep().accept(this);
         emit(new Instruction(stmt, PUSH, new NumberValue(BigDecimal.ZERO)));
         emit(new Instruction(stmt, GT));
-        int branchToEnd1Pc = emit(new Instruction(stmt, BT, 0));
-        int branchToLoopBodyPc = emit(new Instruction(stmt, B, 0));
+        int branchToStepNegativePc = emit(new Instruction(stmt, BF, 0));
         stmt.getCtrlVar().accept(this);
         stmt.getEnd().accept(this);
-        emit(new Instruction(stmt, LE));
+        emit(new Instruction(stmt, GT));
+        int branchToEnd1Pc = emit(new Instruction(stmt, BT, 0));
+        int branchToLoopBodyPc = emit(new Instruction(stmt, B, 0));
+
+        int stepNegative = instrs.size();
+        patch(branchToStepNegativePc, new Instruction(stmt, BF, stepNegative));
+
+        stmt.getCtrlVar().accept(this);
+        stmt.getEnd().accept(this);
+        emit(new Instruction(stmt, LT));
         int branchToEnd2Pc = emit(new Instruction(stmt, BT, 0));
 
         int loopBodyPc = instrs.size();
