@@ -51,7 +51,7 @@ public class CodeEditor extends StyledText {
         this.addLineBackgroundListener(new LineBackgroundListener() {
             @Override
             public void lineGetBackground(LineBackgroundEvent lineBackgroundEvent) {
-                int line = getLineAtOffset(lineBackgroundEvent.lineOffset);
+                int line = getLineAtOffset(lineBackgroundEvent.lineOffset) + 1; // activeLine is 1-based
                 if (line == activeLine) {
                     lineBackgroundEvent.lineBackground = SWTResources.getColor(new RGB(255,0,0));
                 }

@@ -130,7 +130,7 @@ public class VirtualMachine {
             Node stmt = instr.getSourceNode();
             if (stmt != lastStmt) {
                 lastStmt = stmt;
-                listeners.stream().forEach(l -> l.newStatementReached(stmt));
+                cloneListeners().stream().forEach(l -> l.newStatementReached(stmt));
             }
             System.err.println(String.format("Executing: %04d %s", pc - 1, instr));
             switch (instr.getOpCode()) {
@@ -383,7 +383,7 @@ public class VirtualMachine {
     public void setProgram(List<Instruction> instrs) {
         reset();
         this.program = instrs.toArray(new Instruction[instrs.size()]);
-        listeners.stream().forEach(EventListener::programSet);
+        cloneListeners().stream().forEach(EventListener::programSet);
     }
 
     public State getState() {
@@ -396,11 +396,15 @@ public class VirtualMachine {
             if (newState != state) {
                 state = newState;
                 stateChanged.signalAll();
-                listeners.stream().forEach(EventListener::vmStateChanged);
+                cloneListeners().stream().forEach(EventListener::vmStateChanged);
             }
         } finally {
             stateLock.unlock();
         }
+    }
+
+    private List<EventListener> cloneListeners() {
+        return Lists.newArrayList(listeners);
     }
 
     public void reset() {
@@ -422,7 +426,7 @@ public class VirtualMachine {
         turtle.put(new StringValue("move"), new NativeFuncValue(nativeFunctions::turtleMove));
         globalFrame.setVar("turtle", new MapValue(turtle));
 
-        listeners.stream().forEach(EventListener::reset);
+        cloneListeners().stream().forEach(EventListener::reset);
     }
 
     public void stop() {
@@ -440,6 +444,10 @@ public class VirtualMachine {
             return;
         }
         setState(RUNNING);
+    }
+
+    public Instruction getCurrentInstruction() {
+        return program[pc];
     }
 
     private void enterFunction(FuncValue func, List<Value> paramValues) {

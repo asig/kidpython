@@ -39,15 +39,18 @@ public class App {
     private VirtualMachine virtualMachine;
     private NativeFunctions nativeFunctions;
 
-    BaseAction vmStartAction;
-    BaseAction vmPauseAction;
-    BaseAction vmResumeAction;
-    BaseAction vmStopAction;
-    BaseAction vmStepIntoAction;
-    BaseAction vmStepOverAction;
-    BaseAction helpAction;
+    private BaseAction vmStartAction;
+    private BaseAction vmPauseAction;
+    private BaseAction vmResumeAction;
+    private BaseAction vmStopAction;
+    private BaseAction vmStepIntoAction;
+    private BaseAction vmStepOverAction;
+    private BaseAction helpAction;
 
     private CoolBarManager coolBarManager;
+
+    private boolean steppingInto;
+    private boolean steppingOver;
 
     /**
      * Launch the application.
@@ -159,6 +162,8 @@ public class App {
             @Override
             public void reset() {
                 updateVmButtons();
+                steppingInto = false;
+                steppingOver = false;
                 sourceCodeComposite.getEditor().setActiveLine(-1);
             }
         });
@@ -216,9 +221,7 @@ public class App {
     }
 
     private void createActions() {
-        vmStartAction = new BaseAction("Run", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/nav_go@2x.png"), () -> {
-            runCode(sourceCodeComposite.getText());
-        });
+        vmStartAction = new BaseAction("Run", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/nav_go@2x.png"), this::runCode);
         vmPauseAction = new BaseAction("Pause", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/suspend_co@2x.png"), () -> virtualMachine.pause() );
         vmResumeAction = new BaseAction("Resume", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/resume_co@2x.png"), () -> virtualMachine.start() );
         vmStopAction = new BaseAction("Stop", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stop@2x.png"), () -> virtualMachine.stop());
@@ -246,9 +249,9 @@ public class App {
         coolBarManager.createControl(shell);
     }
 
-    private void runCode(String source) {
+    private void loadCode() {
         sourceCodeComposite.clearErrors();
-        Parser p = new Parser(source);
+        Parser p = new Parser(sourceCodeComposite.getText());
         Stmt stmt = p.parse();
         if (stmt == null) {
             consoleOut.print(AnsiEscapeCodes.BOLD);
@@ -272,14 +275,50 @@ public class App {
         System.out.flush();
 
         virtualMachine.setProgram(program);
+    }
+
+    private void runCode() {
+        loadCode();
         virtualMachine.start();
     }
 
     private void stepInto() {
+
         // Implement me
     }
 
     private void stepOver() {
-        // Implement me
+        if (virtualMachine.getState() != VirtualMachine.State.PAUSED) {
+            loadCode();
+        }
+        int nextLine = virtualMachine.getCurrentInstruction().getSourceNode().getPos().getLine() + 1;
+        virtualMachine.addListener(new VirtualMachine.EventListener() {
+            @Override
+            public void vmStateChanged() {
+                if (virtualMachine.getState() == VirtualMachine.State.STOPPED) {
+                    virtualMachine.removeListener(this);
+                }
+            }
+
+            @Override
+            public void newStatementReached(Node stmt) {
+                int line = stmt.getPos().getLine();
+                if (line == nextLine) {
+                    virtualMachine.removeListener(this);
+                    virtualMachine.pause();
+                }
+            }
+
+            @Override
+            public void programSet() {
+                virtualMachine.removeListener(this);
+            }
+
+            @Override
+            public void reset() {
+                virtualMachine.removeListener(this);
+            }
+        });
+        virtualMachine.start();
     }
 }
