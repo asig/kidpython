@@ -33,6 +33,7 @@ TODO
     [ ] Export code to file
     [X] add "well know" style to stylesheets
     [X] smaller size of console when starting
+    [ ] code completion
 
 [ ] Runtime
     [X] implement "input"
