@@ -1,8 +1,5 @@
 package com.asigner.kidpython.compiler.runtime;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +13,7 @@ public abstract class Value {
         NUMBER,
         LIST,
         MAP,
+        RANGE,
         ITERATOR,
         REFERENCE,
         UNDEFINED,

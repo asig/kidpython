@@ -51,7 +51,7 @@ public class ScannerTest {
 
     @Test
     public void testToken() throws Exception {
-        Scanner scanner = new Scanner("func for to end if then else step in do while repeat until return and or ()[]{}+-*/= <> < <= > >= , . : 1 12. 12.34 abc a2b \"foo\" 'bar'");
+        Scanner scanner = new Scanner("function for to end if then else step in do while repeat until return and or ()[]{}+-*/= <> < <= > >= , . .. : 1 12. 12.34 abc a2b \"foo\" 'bar'");
         Token t;
         t = scanner.next(); assertEquals(Token.Type.FUNC, t.getType());
         t = scanner.next(); assertEquals(Token.Type.FOR, t.getType());
@@ -87,6 +87,7 @@ public class ScannerTest {
         t = scanner.next(); assertEquals(Token.Type.GE, t.getType());
         t = scanner.next(); assertEquals(Token.Type.COMMA, t.getType());
         t = scanner.next(); assertEquals(Token.Type.DOT, t.getType());
+        t = scanner.next(); assertEquals(Token.Type.DOTDOT, t.getType());
         t = scanner.next(); assertEquals(Token.Type.COLON, t.getType());
 
         t = scanner.next(); assertEquals(Token.Type.NUM_LIT, t.getType());  assertEquals("1", t.getValue());
@@ -102,7 +103,7 @@ public class ScannerTest {
 
     @Test
     public void testComments() throws Exception {
-        Scanner scanner = new Scanner("func // UNTIL END OF LINE\nfor /* to end if */ /* then */ else if");
+        Scanner scanner = new Scanner("function // UNTIL END OF LINE\nfor /* to end if */ /* then */ else if");
         Token t;
         t = scanner.next(); assertEquals(Token.Type.FUNC, t.getType());
         t = scanner.next(); assertEquals(Token.Type.FOR, t.getType());

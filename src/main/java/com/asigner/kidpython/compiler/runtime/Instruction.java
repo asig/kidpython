@@ -22,6 +22,7 @@ public class Instruction {
         MKLIST,
         MKMAP,
         MKITER,
+        MKRANGE,
 
         BT,
         BF,

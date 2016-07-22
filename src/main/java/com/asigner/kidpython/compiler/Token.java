@@ -32,6 +32,7 @@ public class Token {
         RBRACE,
         COMMA,
         DOT,
+        DOTDOT,
         COLON,
 
         EQ,

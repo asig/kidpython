@@ -143,7 +143,15 @@ public class Scanner {
                 case '=': return new Token(Token.Type.EQ, pos);
                 case ',': return new Token(Token.Type.COMMA, pos);
                 case ':': return new Token(Token.Type.COLON, pos);
-                case '.': return new Token(Token.Type.DOT, pos);
+                case '.': {
+                    char c2 = getch();
+                    if (c2 == '.') {
+                        return new Token(Token.Type.DOTDOT, pos);
+                    } else {
+                        ungetch();
+                        return new Token(Token.Type.DOT, pos);
+                    }
+                }
                 case 0: return new Token(Token.Type.EOT, pos);
             }
             return new Token(Token.Type.UNKNOWN, pos, String.valueOf(c));

@@ -8,6 +8,7 @@ import com.asigner.kidpython.compiler.ast.expr.MakeIterNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeListNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeMapNode;
 import com.asigner.kidpython.compiler.ast.expr.MapAccessNode;
+import com.asigner.kidpython.compiler.ast.expr.RangeNode;
 import com.asigner.kidpython.compiler.ast.expr.UnOpNode;
 import com.asigner.kidpython.compiler.ast.expr.VarNode;
 
@@ -32,5 +33,6 @@ public interface NodeVisitor {
     void visit(MakeMapNode node);
     void visit(MapAccessNode node);
     void visit(VarNode node);
+    void visit(RangeNode node);
 
 }

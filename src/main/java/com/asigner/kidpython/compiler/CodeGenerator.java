@@ -22,16 +22,48 @@ import com.asigner.kidpython.compiler.ast.expr.MakeIterNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeListNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeMapNode;
 import com.asigner.kidpython.compiler.ast.expr.MapAccessNode;
+import com.asigner.kidpython.compiler.ast.expr.RangeNode;
 import com.asigner.kidpython.compiler.ast.expr.UnOpNode;
 import com.asigner.kidpython.compiler.ast.expr.VarNode;
-import com.asigner.kidpython.compiler.runtime.*;
+import com.asigner.kidpython.compiler.runtime.BooleanValue;
+import com.asigner.kidpython.compiler.runtime.FuncValue;
+import com.asigner.kidpython.compiler.runtime.Instruction;
+import com.asigner.kidpython.compiler.runtime.NumberValue;
+import com.asigner.kidpython.compiler.runtime.VarRefValue;
 import com.asigner.kidpython.util.Pair;
 import com.google.common.collect.Lists;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.*;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.ADD;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.ASSIGN;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.B;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.BF;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.BT;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.CALL;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.DIV;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.EQ;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.GE;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.GT;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.ITER_HAS_NEXT;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.ITER_NEXT;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.LE;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.LT;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.MKFIELDREF;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.MKITER;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.MKLIST;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.MKMAP;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.MKRANGE;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.MUL;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.NE;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.NEG;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.NOT;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.POP;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.PUSH;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.RET;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.STOP;
+import static com.asigner.kidpython.compiler.runtime.Instruction.OpCode.SUB;
 
 public class CodeGenerator implements NodeVisitor {
 
@@ -338,6 +370,13 @@ public class CodeGenerator implements NodeVisitor {
     @Override
     public void visit(VarNode node) {
         emit(new Instruction(node, PUSH, new VarRefValue(node.getVar())));
+    }
+
+    @Override
+    public void visit(RangeNode node) {
+        node.getStart().accept(this);
+        node.getEnd().accept(this);
+        emit(new Instruction(node, MKRANGE));
     }
 
     private int emit(Instruction instr) {

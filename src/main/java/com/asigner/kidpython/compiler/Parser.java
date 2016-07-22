@@ -18,6 +18,7 @@ import com.asigner.kidpython.compiler.ast.expr.MakeFuncNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeListNode;
 import com.asigner.kidpython.compiler.ast.expr.MakeMapNode;
 import com.asigner.kidpython.compiler.ast.expr.MapAccessNode;
+import com.asigner.kidpython.compiler.ast.expr.RangeNode;
 import com.asigner.kidpython.compiler.ast.expr.UnOpNode;
 import com.asigner.kidpython.compiler.ast.expr.VarNode;
 import com.asigner.kidpython.compiler.runtime.NumberValue;
@@ -38,6 +39,7 @@ import static com.asigner.kidpython.compiler.Token.Type.COLON;
 import static com.asigner.kidpython.compiler.Token.Type.COMMA;
 import static com.asigner.kidpython.compiler.Token.Type.DO;
 import static com.asigner.kidpython.compiler.Token.Type.DOT;
+import static com.asigner.kidpython.compiler.Token.Type.DOTDOT;
 import static com.asigner.kidpython.compiler.Token.Type.ELSE;
 import static com.asigner.kidpython.compiler.Token.Type.END;
 import static com.asigner.kidpython.compiler.Token.Type.EOT;
@@ -421,7 +423,7 @@ public class Parser {
     }
 
     private ExprNode orExpr() {
-        ExprNode node = arithExpr();
+        ExprNode node = rangeExpr();
         if(RELOPS.contains(lookahead.getType())) {
             BinOpNode.Op op = null;
             switch (lookahead.getType()) {
@@ -433,8 +435,18 @@ public class Parser {
                 case GT: op = BinOpNode.Op.GT; break;
             }
             match(lookahead.getType());
-            ExprNode node2 = arithExpr();
+            ExprNode node2 = rangeExpr();
             node = new BinOpNode(node.getPos(), op, node, node2);
+        }
+        return node;
+    }
+
+    private ExprNode rangeExpr() {
+        ExprNode node = arithExpr();
+        if (lookahead.getType() == DOTDOT) {
+            match(lookahead.getType());
+            ExprNode node2 = arithExpr();
+            node = new RangeNode(node.getPos(), node, node2);
         }
         return node;
     }

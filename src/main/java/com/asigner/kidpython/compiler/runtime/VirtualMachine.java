@@ -208,6 +208,13 @@ public class VirtualMachine {
                 }
                 break;
 
+                case MKRANGE: {
+                    Value end = load(valueStack.pop());
+                    Value start = load(valueStack.pop());
+                    valueStack.push(new RangeValue(start, end));
+                }
+                break;
+
                 case ITER_NEXT: {
                     Value val = load(valueStack.pop());
                     if (val.getType() != ITERATOR) {
