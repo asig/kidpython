@@ -1,6 +1,6 @@
 package com.asigner.kidpython.compiler.runtime;
 
-import com.asigner.kidpython.compiler.ast.Stmt;
+import com.asigner.kidpython.compiler.ast.Node;
 import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -31,7 +31,7 @@ public class VirtualMachine {
 
     public interface EventListener {
         void vmStateChanged();
-        void newStatementReached(Stmt stmt);
+        void newStatementReached(Node stmt);
         void programSet();
         void reset();
     }
@@ -79,6 +79,7 @@ public class VirtualMachine {
     private Frame globalFrame;
     private Instruction[] program;
     private int pc;
+    private Node lastStmt;
 
     private Lock stateLock = new ReentrantLock();
     private Condition stateChanged = stateLock.newCondition();
@@ -126,6 +127,11 @@ public class VirtualMachine {
 
         private void executeInstruction() {
             Instruction instr = program[pc++];
+            Node stmt = instr.getSourceNode();
+            if (stmt != lastStmt) {
+                lastStmt = stmt;
+                listeners.stream().forEach(l -> l.newStatementReached(stmt));
+            }
             System.err.println(String.format("Executing: %04d %s", pc - 1, instr));
             switch (instr.getOpCode()) {
                 case PUSH:
@@ -396,6 +402,7 @@ public class VirtualMachine {
         this.globalFrame = new Frame(null, 0);
         this.program = null;
         this.pc = 0;
+        this.lastStmt = null;
 
         globalFrame.setVar("print", new NativeFuncValue(nativeFunctions::print));
         globalFrame.setVar("input", new NativeFuncValue(nativeFunctions::input));

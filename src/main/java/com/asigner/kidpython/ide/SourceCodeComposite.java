@@ -79,6 +79,10 @@ public class SourceCodeComposite extends Composite {
         return editor.getText();
     }
 
+    public CodeEditor getEditor() {
+        return editor;
+    }
+
     private void selectSource(int idx) {
         if (selectingSource) {
             return;

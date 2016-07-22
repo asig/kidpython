@@ -32,6 +32,8 @@ import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.WHITESPACE;
 
 public class CodeLineStyler implements LineStyleListener {
 
+    private final StyledText styledText;
+
     private Stylesheet stylesheet;
     private CodeScanner scanner;
     private List<Range> multiLineComments;
@@ -78,7 +80,8 @@ public class CodeLineStyler implements LineStyleListener {
     }
 
 
-    public CodeLineStyler(Stylesheet stylesheet) {
+    public CodeLineStyler(StyledText styledText, Stylesheet stylesheet) {
+        this.styledText = styledText;
         this.stylesheet = stylesheet;
         scanner = new CodeScanner();
         multiLineComments = new ArrayList<>();
@@ -155,8 +158,6 @@ public class CodeLineStyler implements LineStyleListener {
         //event.bulletIndex = styledText.getLineAtOffset(event.lineOffset);
         // See http://stackoverflow.com/questions/11057442/java-swt-show-line-numbers-for-styledtext
 
-        StyledText styledText = (StyledText)e.getSource();
-
         int bulletLength = Math.max(3, Integer.toString(styledText.getLineCount()).length());
 
         StyleRange styleRange = new StyleRange();
@@ -222,7 +223,7 @@ public class CodeLineStyler implements LineStyleListener {
         protected int startToken;
 
         private Set<String> keywords = Sets.newHashSet(
-                "func",
+                "function",
                 "for",
                 "end",
                 "if",

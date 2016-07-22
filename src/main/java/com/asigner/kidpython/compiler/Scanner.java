@@ -8,7 +8,7 @@ import java.util.Map;
 public class Scanner {
 
     private static final Map<String, Token.Type> keywords = ImmutableMap.<String, Token.Type>builder()
-            .put("func", Token.Type.FUNC)
+            .put("function", Token.Type.FUNC)
             .put("for", Token.Type.FOR)
             .put("end", Token.Type.END)
             .put("if", Token.Type.IF)

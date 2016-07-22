@@ -3,6 +3,7 @@ package com.asigner.kidpython.ide;
 import com.asigner.kidpython.compiler.CodeGenerator;
 import com.asigner.kidpython.compiler.Error;
 import com.asigner.kidpython.compiler.Parser;
+import com.asigner.kidpython.compiler.ast.Node;
 import com.asigner.kidpython.compiler.ast.Stmt;
 import com.asigner.kidpython.compiler.runtime.Instruction;
 import com.asigner.kidpython.compiler.runtime.NativeFunctions;
@@ -38,13 +39,13 @@ public class App {
     private VirtualMachine virtualMachine;
     private NativeFunctions nativeFunctions;
 
-    // VirtualMachine toolbar
     BaseAction vmStartAction;
     BaseAction vmPauseAction;
     BaseAction vmResumeAction;
     BaseAction vmStopAction;
     BaseAction vmStepIntoAction;
     BaseAction vmStepOverAction;
+    BaseAction helpAction;
 
     private CoolBarManager coolBarManager;
 
@@ -139,21 +140,26 @@ public class App {
             public void vmStateChanged() {
                 showVmStateMessage();
                 updateVmButtons();
+                if (virtualMachine.getState() == VirtualMachine.State.STOPPED) {
+                    sourceCodeComposite.getEditor().setActiveLine(-1);
+                }
             }
 
             @Override
-            public void newStatementReached(Stmt stmt) {
-
+            public void newStatementReached(Node stmt) {
+                sourceCodeComposite.getEditor().setActiveLine(stmt.getPos().getLine());
             }
 
             @Override
             public void programSet() {
                 updateVmButtons();
+                sourceCodeComposite.getEditor().setActiveLine(-1);
             }
 
             @Override
             public void reset() {
                 updateVmButtons();
+                sourceCodeComposite.getEditor().setActiveLine(-1);
             }
         });
     }
@@ -218,23 +224,24 @@ public class App {
         vmStopAction = new BaseAction("Stop", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stop@2x.png"), () -> virtualMachine.stop());
         vmStepIntoAction = new BaseAction("Step Into", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepinto_co@2x.png"), this::stepInto);
         vmStepOverAction = new BaseAction("Step Over", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepover_co@2x.png"), this::stepOver);
+
+        helpAction = new BaseAction("Help", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/help@2x.png"), () -> {});
     }
 
     private void createToolbar() {
         coolBarManager = new CoolBarManager(SWT.FLAT);
-        final ToolBarManager toolBarManager = new ToolBarManager(SWT.FLAT | SWT.NO_FOCUS);
-        coolBarManager.add(toolBarManager);
-        toolBarManager.add(vmStartAction);
+        final ToolBarManager vmToolBarManager = new ToolBarManager(SWT.FLAT | SWT.NO_FOCUS);
+        coolBarManager.add(vmToolBarManager);
+        vmToolBarManager.add(vmStartAction);
+        vmToolBarManager.add(vmPauseAction);
+        vmToolBarManager.add(vmResumeAction);
+        vmToolBarManager.add(vmStopAction);
+        vmToolBarManager.add(vmStepIntoAction);
+        vmToolBarManager.add(vmStepOverAction);
 
-        toolBarManager.add(vmPauseAction);
-        toolBarManager.add(vmResumeAction);
-        toolBarManager.add(vmStopAction);
-        toolBarManager.add(vmStepIntoAction);
-        toolBarManager.add(vmStepOverAction);
-
-//        final ToolBarManager toolBarManager_1 = new ToolBarManager(SWT.FLAT | SWT.NO_FOCUS);
-//        coolBarManager.add(toolBarManager_1);
-//        toolBarManager_1.add(new TestAction("TEST2", ImageDescriptor.createFromImage(SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/nav_go@2x.png"))));
+        final ToolBarManager helpToolBarManager = new ToolBarManager(SWT.FLAT | SWT.NO_FOCUS);
+        coolBarManager.add(helpToolBarManager);
+        helpToolBarManager.add(helpAction);
 
         coolBarManager.createControl(shell);
     }

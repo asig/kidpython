@@ -2,7 +2,10 @@
 
 package com.asigner.kidpython.ide.editor;
 
+import com.asigner.kidpython.ide.util.SWTResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.LineBackgroundEvent;
+import org.eclipse.swt.custom.LineBackgroundListener;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -10,6 +13,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 
 public class CodeEditor extends StyledText {
@@ -27,12 +31,13 @@ public class CodeEditor extends StyledText {
     private final CodeLineStyler lineStyler;
     private Font font;
     private int lastLineCount = 0; // Used to trigger redraws for line numbering
+    private int activeLine =  -1;
 
     public CodeEditor(Composite parent, int style) {
         super(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 
         Stylesheet stylesheet = Stylesheet.MONOKAI_SUBLIME;
-        lineStyler = new CodeLineStyler(stylesheet);
+        lineStyler = new CodeLineStyler(this, stylesheet);
 
         this.setBackground(stylesheet.getDefaultBackground());
 
@@ -41,6 +46,15 @@ public class CodeEditor extends StyledText {
             @Override
             public void widgetDisposed(DisposeEvent disposeEvent) {
                 font.dispose();
+            }
+        });
+        this.addLineBackgroundListener(new LineBackgroundListener() {
+            @Override
+            public void lineGetBackground(LineBackgroundEvent lineBackgroundEvent) {
+                int line = getLineAtOffset(lineBackgroundEvent.lineOffset);
+                if (line == activeLine) {
+                    lineBackgroundEvent.lineBackground = SWTResources.getColor(new RGB(255,0,0));
+                }
             }
         });
 
@@ -57,6 +71,13 @@ public class CodeEditor extends StyledText {
             }
         });
 
+    }
+
+    public void setActiveLine(int line) {
+        if (line != activeLine) {
+            activeLine = line;
+            this.getDisplay().syncExec(this::redraw);
+        }
     }
 
     public State saveState() {
