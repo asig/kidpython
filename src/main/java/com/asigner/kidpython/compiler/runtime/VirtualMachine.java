@@ -497,9 +497,15 @@ public class VirtualMachine {
         if (value.getType() == Value.Type.REFERENCE) {
             if (value instanceof VarRefValue) {
                 value = getVar(((VarRefValue) value).getVar());
+                if (value == null) {
+                    value = UndefinedValue.INSTANCE;
+                }
             } else if (value instanceof FieldRefValue) {
                 FieldRefValue frv = (FieldRefValue) value;
                 value = frv.getMap().asMap().get(frv.getKey());
+                if (value == null) {
+                    value = UndefinedValue.INSTANCE;
+                }
             }
         }
         return value;
