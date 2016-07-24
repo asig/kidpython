@@ -4,7 +4,9 @@ import com.asigner.kidpython.compiler.CodeGenerator;
 import com.asigner.kidpython.compiler.Error;
 import com.asigner.kidpython.compiler.Parser;
 import com.asigner.kidpython.compiler.ast.Node;
+import com.asigner.kidpython.compiler.ast.ReturnStmt;
 import com.asigner.kidpython.compiler.ast.Stmt;
+import com.asigner.kidpython.compiler.ast.expr.CallNode;
 import com.asigner.kidpython.compiler.runtime.Instruction;
 import com.asigner.kidpython.compiler.runtime.NativeFunctions;
 import com.asigner.kidpython.compiler.runtime.VirtualMachine;
@@ -49,8 +51,7 @@ public class App {
 
     private CoolBarManager coolBarManager;
 
-    private boolean steppingInto;
-    private boolean steppingOver;
+    private boolean highlightLines = false;
 
     /**
      * Launch the application.
@@ -143,28 +144,34 @@ public class App {
             public void vmStateChanged() {
                 showVmStateMessage();
                 updateVmButtons();
-                if (virtualMachine.getState() == VirtualMachine.State.STOPPED) {
-                    sourceCodeComposite.getEditor().setActiveLine(-1);
+                switch (virtualMachine.getState()) {
+                    case STOPPED:
+                        highlightLine(-1);
+                        break;
+                    case RUNNING:
+                        if (!highlightLines) {
+                            highlightLine(-1);
+                        }
                 }
             }
 
             @Override
             public void newStatementReached(Node stmt) {
-                sourceCodeComposite.getEditor().setActiveLine(stmt.getPos().getLine());
+                if (highlightLines) {
+                    highlightLine(stmt.getPos().getLine());
+                }
             }
 
             @Override
             public void programSet() {
                 updateVmButtons();
-                sourceCodeComposite.getEditor().setActiveLine(-1);
+                highlightLine(-1);
             }
 
             @Override
             public void reset() {
                 updateVmButtons();
-                steppingInto = false;
-                steppingOver = false;
-                sourceCodeComposite.getEditor().setActiveLine(-1);
+                highlightLine(-1);
             }
         });
     }
@@ -249,6 +256,10 @@ public class App {
         coolBarManager.createControl(shell);
     }
 
+    private void highlightLine(int line) {
+        sourceCodeComposite.getEditor().setActiveLine(line);
+    }
+
     private void loadCode() {
         sourceCodeComposite.clearErrors();
         Parser p = new Parser(sourceCodeComposite.getText());
@@ -283,15 +294,12 @@ public class App {
     }
 
     private void stepInto() {
-
-        // Implement me
-    }
-
-    private void stepOver() {
         if (virtualMachine.getState() != VirtualMachine.State.PAUSED) {
             loadCode();
         }
-        int nextLine = virtualMachine.getCurrentInstruction().getSourceNode().getPos().getLine() + 1;
+
+        int thisLine = virtualMachine.getCurrentInstruction().getSourceNode().getPos().getLine();
+
         virtualMachine.addListener(new VirtualMachine.EventListener() {
             @Override
             public void vmStateChanged() {
@@ -303,9 +311,57 @@ public class App {
             @Override
             public void newStatementReached(Node stmt) {
                 int line = stmt.getPos().getLine();
-                if (line == nextLine) {
+                if (line != thisLine) {
+                    highlightLine(line);
                     virtualMachine.removeListener(this);
                     virtualMachine.pause();
+                }
+            }
+
+            @Override
+            public void programSet() {
+                virtualMachine.removeListener(this);
+            }
+
+            @Override
+            public void reset() {
+                virtualMachine.removeListener(this);
+            }
+        });
+        virtualMachine.start();
+    }
+
+    private void stepOver() {
+        if (virtualMachine.getState() != VirtualMachine.State.PAUSED) {
+            loadCode();
+        }
+
+        int thisLine = virtualMachine.getCurrentInstruction().getSourceNode().getPos().getLine();
+
+        virtualMachine.addListener(new VirtualMachine.EventListener() {
+
+            int callDepth = 0;
+
+            @Override
+            public void vmStateChanged() {
+                if (virtualMachine.getState() == VirtualMachine.State.STOPPED) {
+                    virtualMachine.removeListener(this);
+                }
+            }
+
+            @Override
+            public void newStatementReached(Node stmt) {
+                if (stmt instanceof CallNode) {
+                    callDepth++;
+                } else if (stmt instanceof ReturnStmt) {
+                    callDepth--;
+                } else {
+                    int line = stmt.getPos().getLine();
+                    if (line != thisLine && callDepth == 0) {
+                        highlightLine(line);
+                        virtualMachine.removeListener(this);
+                        virtualMachine.pause();
+                    }
                 }
             }
 
