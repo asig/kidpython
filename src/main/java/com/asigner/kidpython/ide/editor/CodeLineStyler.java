@@ -88,6 +88,10 @@ public class CodeLineStyler implements LineStyleListener {
         lineNumberFont = new Font(Display.getDefault(), "Mono", 8, SWT.NONE);
     }
 
+    public void setStylesheet(Stylesheet stylesheet) {
+        this.stylesheet = stylesheet;
+    }
+
     private Range findMultiLineComment(int pos) {
         for (Range r : multiLineComments) {
             if (r.contains(pos)) {

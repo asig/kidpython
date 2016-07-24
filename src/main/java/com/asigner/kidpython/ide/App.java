@@ -4,24 +4,34 @@ import com.asigner.kidpython.compiler.CodeGenerator;
 import com.asigner.kidpython.compiler.Error;
 import com.asigner.kidpython.compiler.Parser;
 import com.asigner.kidpython.compiler.ast.Node;
-import com.asigner.kidpython.compiler.ast.ReturnStmt;
 import com.asigner.kidpython.compiler.ast.Stmt;
-import com.asigner.kidpython.compiler.ast.expr.CallNode;
+import com.asigner.kidpython.compiler.runtime.FuncValue;
 import com.asigner.kidpython.compiler.runtime.Instruction;
 import com.asigner.kidpython.compiler.runtime.NativeFunctions;
 import com.asigner.kidpython.compiler.runtime.VirtualMachine;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
+import com.asigner.kidpython.ide.editor.Stylesheet;
 import com.asigner.kidpython.ide.turtle.TurtleCanvas;
 import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
 import com.asigner.kidpython.ide.util.SWTResources;
+import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.CoolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -120,6 +130,7 @@ public class App {
         SashForm sashForm2 = new SashForm(sashForm, SWT.HORIZONTAL);
         sashForm2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         sourceCodeComposite = new SourceCodeComposite(sashForm2, SWT.NONE);
+        sourceCodeComposite.setStylesheet(Stylesheet.ALL[Settings.load().getSelectedStylesheet()]);
         turtleCanvas = new TurtleCanvas(sashForm2, SWT.NONE);
 
         // Lower part of toplevel sash
@@ -172,6 +183,14 @@ public class App {
             public void reset() {
                 updateVmButtons();
                 highlightLine(-1);
+            }
+
+            @Override
+            public void enteringFunction(FuncValue func) {
+            }
+
+            @Override
+            public void leavingFunction() {
             }
         });
     }
@@ -251,6 +270,51 @@ public class App {
 
         final ToolBarManager helpToolBarManager = new ToolBarManager(SWT.FLAT | SWT.NO_FOCUS);
         coolBarManager.add(helpToolBarManager);
+        helpToolBarManager.add(new ControlContribution("stylesheet") {
+            @Override
+            protected Control createControl(Composite parent) {
+                final Composite composite = new Composite(parent, SWT.NULL);
+                composite.setLayout(GridLayoutFactory.fillDefaults().margins(0, 0).numColumns(2).create());
+
+                //START >>  label1
+                final Label label1 = new Label(composite, SWT.NONE);
+                label1.setText("Stylesheet");
+                label1.setLayoutData(GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).grab(false, true).create());
+                //END <<  label1
+
+                final Settings settings = Settings.load();
+                Combo combo = new Combo(composite, SWT.READ_ONLY);
+                for (Stylesheet sheet : Stylesheet.ALL) {
+                    combo.add(sheet.getName());
+                }
+                combo.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent selectionEvent) {
+                        int selected = combo.getSelectionIndex();
+                        sourceCodeComposite.setStylesheet(Stylesheet.ALL[selected]);
+                        settings.setSelectedStylesheet(selected);
+                    }
+                });
+                combo.select(settings.getSelectedStylesheet());
+
+                return composite;
+            }
+        });
+        helpToolBarManager.add(new ControlContribution("trace-code") {
+            @Override
+            protected Control createControl(Composite parent) {
+                Button checkbox = new Button(parent, SWT.CHECK);
+                checkbox.setText("Follow code execution");
+                checkbox.setSelection(highlightLines);
+                checkbox.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        highlightLines = checkbox.getSelection();
+                    }
+                });
+                return checkbox;
+            }
+        });
         helpToolBarManager.add(helpAction);
 
         coolBarManager.createControl(shell);
@@ -327,6 +391,14 @@ public class App {
             public void reset() {
                 virtualMachine.removeListener(this);
             }
+
+            @Override
+            public void enteringFunction(FuncValue func) {
+            }
+
+            @Override
+            public void leavingFunction() {
+            }
         });
         virtualMachine.start();
     }
@@ -351,17 +423,11 @@ public class App {
 
             @Override
             public void newStatementReached(Node stmt) {
-                if (stmt instanceof CallNode) {
-                    callDepth++;
-                } else if (stmt instanceof ReturnStmt) {
-                    callDepth--;
-                } else {
-                    int line = stmt.getPos().getLine();
-                    if (line != thisLine && callDepth == 0) {
-                        highlightLine(line);
-                        virtualMachine.removeListener(this);
-                        virtualMachine.pause();
-                    }
+                int line = stmt.getPos().getLine();
+                if (line != thisLine && callDepth == 0) {
+                    highlightLine(line);
+                    virtualMachine.removeListener(this);
+                    virtualMachine.pause();
                 }
             }
 
@@ -373,6 +439,16 @@ public class App {
             @Override
             public void reset() {
                 virtualMachine.removeListener(this);
+            }
+
+            @Override
+            public void enteringFunction(FuncValue func) {
+                callDepth++;
+            }
+
+            @Override
+            public void leavingFunction() {
+                callDepth--;
             }
         });
         virtualMachine.start();

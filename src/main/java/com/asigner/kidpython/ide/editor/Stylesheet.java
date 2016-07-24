@@ -66,6 +66,14 @@ public class Stylesheet {
             .setStyle(CodeLineStyler.Token.WELL_KNOWN, new RGB(0, 0, 0), null, SWT.NONE)
             .setStyle(CodeLineStyler.Token.OTHER,      new RGB(0, 0, 0), null, SWT.NONE);
 
+    public static final Stylesheet[] ALL = new Stylesheet[] {
+            BORLAND,
+            MONOKAI_SUBLIME,
+            RAINBOW,
+            DRACULA,
+            BLACK_AND_WHITE
+    };
+
     static class Style {
         private final Color fg;
         private final Color bg;

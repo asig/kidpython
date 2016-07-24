@@ -34,6 +34,8 @@ public class VirtualMachine {
         void newStatementReached(Node stmt);
         void programSet();
         void reset();
+        void enteringFunction(FuncValue func); // Only called for non-native functions
+        void leavingFunction(); // Only called for non-native functions
     }
 
     public enum State {
@@ -451,6 +453,7 @@ public class VirtualMachine {
     }
 
     private void enterFunction(FuncValue func, List<Value> paramValues) {
+        cloneListeners().stream().forEach(l -> l.enteringFunction(func));
         Frame frame = new Frame(funcFrame, pc);
         funcFrame = frame;
         List<String> params = func.getParams();
@@ -461,6 +464,7 @@ public class VirtualMachine {
     }
 
     private void leaveFunction() {
+        cloneListeners().stream().forEach(EventListener::leavingFunction);
         pc = funcFrame.getReturnAddress();
         funcFrame = funcFrame.getParent();
     }

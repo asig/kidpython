@@ -36,7 +36,7 @@ public class CodeEditor extends StyledText {
     public CodeEditor(Composite parent, int style) {
         super(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 
-        Stylesheet stylesheet = Stylesheet.MONOKAI_SUBLIME;
+        Stylesheet stylesheet = Stylesheet.ALL[0];
         lineStyler = new CodeLineStyler(this, stylesheet);
 
         this.setBackground(stylesheet.getDefaultBackground());
@@ -71,6 +71,12 @@ public class CodeEditor extends StyledText {
             }
         });
 
+    }
+
+    public void setStylesheet(Stylesheet stylesheet) {
+        lineStyler.setStylesheet(stylesheet);
+        this.setBackground(stylesheet.getDefaultBackground());
+        this.getDisplay().syncExec(this::redraw);
     }
 
     public void setActiveLine(int line) {

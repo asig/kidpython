@@ -15,11 +15,17 @@ import java.util.List;
 public class Settings {
     private static final int SOURCES = 10;
 
+    @JsonProperty("selected_stylesheet")
+    private int selectedStylesheet = 0;
+
     @JsonProperty("selected_source")
     private int selectedSource;
 
     @JsonProperty("sources")
     private List<Source> sources;
+
+    @JsonIgnore
+    private static Settings instance = null;
 
     private Settings() {
         selectedSource = 0;
@@ -30,18 +36,21 @@ public class Settings {
     }
 
     public static Settings load() {
-        Settings settings = new Settings();
-        File f = new File(getFileName());
-        if (f.exists()) {
-            ObjectMapper m = new ObjectMapper();
-            JsonFactory factory = m.getFactory();
-            try {
-                settings = factory.createParser(f).readValueAs(Settings.class);
-            } catch (IOException e) {
-                e.printStackTrace();
+        if (instance == null) {
+            Settings settings = new Settings();
+            File f = new File(getFileName());
+            if (f.exists()) {
+                ObjectMapper m = new ObjectMapper();
+                JsonFactory factory = m.getFactory();
+                try {
+                    settings = factory.createParser(f).readValueAs(Settings.class);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+            instance = settings;
         }
-        return settings;
+        return instance;
     }
 
     public void save() {
@@ -66,6 +75,7 @@ public class Settings {
 
     public void setSource(int idx, Source source) {
         sources.set(idx, source);
+        save();
     }
 
     public int getSelectedSource() {
@@ -74,6 +84,15 @@ public class Settings {
 
     public void setSelectedSource(int selectedSource) {
         this.selectedSource = selectedSource;
+    }
+
+    public int getSelectedStylesheet() {
+        return selectedStylesheet;
+    }
+
+    public void setSelectedStylesheet(int selectedStylesheet) {
+        this.selectedStylesheet = selectedStylesheet;
+        save();
     }
 
     private static String getFileName() {

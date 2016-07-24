@@ -1,6 +1,7 @@
 package com.asigner.kidpython.ide;
 
 import com.asigner.kidpython.ide.editor.CodeEditor;
+import com.asigner.kidpython.ide.editor.Stylesheet;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -81,6 +82,10 @@ public class SourceCodeComposite extends Composite {
 
     public CodeEditor getEditor() {
         return editor;
+    }
+
+    public void setStylesheet(Stylesheet stylesheet) {
+        editor.setStylesheet(stylesheet);
     }
 
     private void selectSource(int idx) {
