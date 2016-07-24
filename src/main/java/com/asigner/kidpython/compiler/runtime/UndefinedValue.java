@@ -19,7 +19,7 @@ public class UndefinedValue extends Value {
 
     @Override
     public String asString() {
-        throw new RuntimeException("Can't coerce undefined to a string");
+        throw new ExecutionException("Can't coerce undefined to a string");
     }
 
     @Override
@@ -29,7 +29,7 @@ public class UndefinedValue extends Value {
 
     @Override
     public Iterator<? extends Value> asIterator() {
-        throw new RuntimeException("Can't coerce undefined to an iterator");
+        throw new ExecutionException("Can't coerce undefined to an iterator");
     };
 
     @Override
