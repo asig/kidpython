@@ -2,8 +2,8 @@
 
 package com.asigner.kidpython.ide.turtle;
 
-import com.asigner.kidpython.ide.util.SWTResources;
 import com.google.common.collect.Lists;
+import org.eclipse.jface.action.Action;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -11,7 +11,13 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -19,6 +25,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.jfree.swt.SWTGraphics2D;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -40,12 +49,12 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
     private static final String ELUSIVE_SCREENSHOT = "\uf1ec";
 
     public static class Line {
-        private final Color color;
+        private final RGB color;
         private final int width;
         private final Point start;
         private final Point end;
 
-        Line(Point start, Point end, Color color, int width) {
+        Line(Point start, Point end, RGB color, int width) {
             this.start = start;
             this.end = end;
             this.color = color;
@@ -59,10 +68,11 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
     private double posX, posY;
     private boolean penDown;
     private boolean turtleVisible;
-    private Color penColor;
+    private RGB penColor;
     private int penWidth;
     private float zoom;
-    private int offsetX, offsetY;
+    private int offsetX;
+    private int offsetY;
 
     private boolean lmbDown = false;
     private int lastMouseX;
@@ -79,11 +89,11 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
 
         elusiveFont = new Font(this.getDisplay(), "elusiveicons", BTN_SIZE/3, SWT.NORMAL);
 
-        addButton(ELUSIVE_REMOVE_CIRCLE, this::reset);
-        addButton(ELUSIVE_DOWNLOAD_ALT, this::download);
-        addButton(ELUSIVE_ZOOM_IN, this::zoomIn);
-        addButton(ELUSIVE_ZOOM_OUT, this::zoomOut);
-        addButton(ELUSIVE_SCREENSHOT, this::center);
+        addButton(ELUSIVE_REMOVE_CIRCLE, new ResetAction(this));
+        addButton(ELUSIVE_DOWNLOAD_ALT, new DownloadAction(this));
+        addButton(ELUSIVE_ZOOM_IN, new ZoomInAction(this));
+        addButton(ELUSIVE_ZOOM_OUT, new ZoomOutAction(this));
+        addButton(ELUSIVE_SCREENSHOT, new CenterAction(this));
 
         reset();
 
@@ -133,11 +143,6 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         }
     }
 
-    private void center() {
-        offsetX = offsetY = 0;
-        Display.getCurrent().asyncExec(this::redraw);
-    }
-
     private void onResize(Event e) {
         Rectangle rect = getClientArea ();
         int x = rect.x + rect.width - buttons.size()*BTN_SIZE - BTN_BORDER;
@@ -161,7 +166,7 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         slowMotion = false;
         posX = posY = angle = 0;
         penDown = true;
-        penColor = SWTResources.getColor(new RGB(0,0,0));
+        penColor = new RGB(0,0,0);
         penWidth = 1;
         turtleVisible = true;
         zoom = 1;
@@ -172,21 +177,27 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
     public void download() {
     }
 
+    public void setOffset(int ofsX, int ofsY) {
+        offsetX = ofsX;
+        offsetY = ofsY;
+        this.getDisplay().asyncExec(this::redraw);
+    }
+
     public void zoomIn() {
         if (zoom < ZOOM_MAX) {
             zoom = zoom + .1f;
-            Display.getCurrent().asyncExec(this::redraw);
+            this.getDisplay().asyncExec(this::redraw);
         }
     }
 
     public void zoomOut() {
         if (zoom > ZOOM_MIN) {
             zoom = zoom - .1f;
-            Display.getCurrent().asyncExec(this::redraw);
+            this.getDisplay().asyncExec(this::redraw);
         }
     }
 
-    private void addButton(String label, Runnable handler) {
+    private void addButton(String label, Action action) {
         Button button = new Button(this, SWT.PUSH | SWT.FLAT | SWT.CENTER);
         button.setFont(elusiveFont);
         button.setText(label);
@@ -195,7 +206,7 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         button.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                handler.run();
+                action.run();
             }
         });
         buttons.add(button);
@@ -280,11 +291,7 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
     }
 
     public void setPen(RGB color, int width) {
-        setPen(new RGBA(color.red, color.green, color.blue, 255), width);
-    }
-
-    public void setPen(RGBA color, int width) {
-        penColor = SWTResources.getColor(color);
+        penColor = color;
         penWidth = width;
     }
 
@@ -317,37 +324,40 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         t.scale(zoom, zoom);
         gc.setTransform(t);
 
-        gc.setLineCap(SWT.CAP_ROUND);
+        SWTGraphics2D g2d = new SWTGraphics2D(gc);
+        drawUntransformed(g2d);
+    }
+
+    public void drawUntransformed(Graphics2D g2d) {
         try {
             linesLock.lock();
             for (Line line : lines) {
-                drawLine(gc, line);
+                drawLine(g2d, line);
             }
         } finally {
             linesLock.unlock();
         }
-        drawTurtle(gc);
+        drawTurtle(g2d);
     }
 
-    private void drawTurtle(GC gc) {
+    private void drawTurtle(Graphics2D g2d) {
         if (!turtleVisible) {
             return;
         }
-        SWTGraphics2D g2s = new SWTGraphics2D(gc);
-        AffineTransform orig = g2s.getTransform();
+        AffineTransform orig = g2d.getTransform();
         AffineTransform t = new AffineTransform();
         t.translate(posX, posY);
         t.scale(.25,.25);
         t.rotate(Math.toRadians(angle));
-        g2s.transform(t);
-        Turtle.paint(g2s);
-        g2s.setTransform(orig);
+        g2d.transform(t);
+        Turtle.paint(g2d);
+        g2d.setTransform(orig);
     }
 
-    private void drawLine(GC gc, Line line) {
-        gc.setForeground(line.color);
-        gc.setLineWidth(line.width);
-        gc.drawLine(line.start.x, line.start.y, line.end.x, line.end.y);
+    private void drawLine(Graphics2D g2d, Line line) {
+        g2d.setColor(new Color(line.color.red, line.color.green, line.color.blue));
+        g2d.setStroke(new BasicStroke(line.width, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
+        g2d.drawLine(line.start.x, line.start.y, line.end.x, line.end.y);
     }
 
     @Override
