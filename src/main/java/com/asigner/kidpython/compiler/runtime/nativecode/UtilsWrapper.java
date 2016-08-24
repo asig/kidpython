@@ -1,7 +1,15 @@
-package com.asigner.kidpython.compiler.runtime;
+// Copyright 2016 Andreas Signer. All rights reserved.
 
+package com.asigner.kidpython.compiler.runtime.nativecode;
+
+import com.asigner.kidpython.compiler.runtime.ExecutionException;
+import com.asigner.kidpython.compiler.runtime.NativeFuncValue;
+import com.asigner.kidpython.compiler.runtime.NumberValue;
+import com.asigner.kidpython.compiler.runtime.StringValue;
+import com.asigner.kidpython.compiler.runtime.UndefinedValue;
+import com.asigner.kidpython.compiler.runtime.Value;
+import com.asigner.kidpython.compiler.runtime.VirtualMachine;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
-import com.asigner.kidpython.ide.turtle.TurtleCanvas;
 import org.eclipse.swt.widgets.Display;
 
 import java.io.IOException;
@@ -10,22 +18,17 @@ import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class NativeFunctions {
+public class UtilsWrapper extends NativeCodeWrapper {
 
     private final PrintStream stdout;
     private final InputStream stdin;
-    private final TurtleCanvas turtle;
     private final ConsoleComposite consoleComposite;
 
-    public NativeFunctions(TurtleCanvas turtle, ConsoleComposite consoleComposite) {
+    public UtilsWrapper(ConsoleComposite consoleComposite) {
         this.consoleComposite = consoleComposite;
         this.stdin = consoleComposite.getInputStream();
         this.stdout = new PrintStream(consoleComposite.getOutputStream());
-        this.turtle = turtle;
     }
-
-    // =========================
-    // Input/Output
 
     public Value print(List<Value> values) {
         for (Value v : values) {
@@ -62,12 +65,6 @@ public class NativeFunctions {
         }
     }
 
-    // Input/Output
-    // =========================
-
-    // =========================
-    // Utils
-
     public Value utilsLen(List<Value> values) {
         checkArgs(values, 1);
         Value v = values.get(0);
@@ -83,59 +80,10 @@ public class NativeFunctions {
         }
     }
 
-    // Utils
-    // =========================
-
-    // =========================
-    // Turtle
-
-    public Value turtleTurn(List<Value> values) {
-        checkArgs(values, 1);
-        turtle.turn(values.get(0).asNumber().intValue());
-        return UndefinedValue.INSTANCE;
-    }
-
-    public Value turtlePenDown(List<Value> values) {
-        checkArgs(values, 0);
-        turtle.usePen(true);
-        return UndefinedValue.INSTANCE;
-    }
-
-    public Value turtlePenUp(List<Value> values) {
-        checkArgs(values, 0);
-        turtle.usePen(false);
-        return UndefinedValue.INSTANCE;
-    }
-
-    public Value turtleMove(List<Value> values) {
-        checkArgs(values, 1);
-        turtle.move(values.get(0).asNumber().doubleValue());
-        return UndefinedValue.INSTANCE;
-    }
-
-    // Turtle
-    // =========================
-
-    // =========================
-    // Math
-
-    public Value mathSin(List<Value> values) {
-        checkArgs(values, 1);
-        return new NumberValue(new BigDecimal(Math.sin(values.get(0).asNumber().doubleValue())));
-    }
-
-    public Value mathCos(List<Value> values) {
-        checkArgs(values, 1);
-        return new NumberValue(new BigDecimal(Math.cos(values.get(0).asNumber().doubleValue())));
-    }
-
-    // Math
-    // =========================
-
-    private void checkArgs(List<Value> values, int count) {
-        if (values.size() != count) {
-            throw new ExecutionException("Must pass exactly " + count + " values");
-        }
-
+    @Override
+    public void registerWith(VirtualMachine.Frame frame) {
+        frame.setVar("print", new NativeFuncValue(this::print));
+        frame.setVar("input", new NativeFuncValue(this::input));
+        frame.setVar("len", new NativeFuncValue(this::utilsLen));
     }
 }

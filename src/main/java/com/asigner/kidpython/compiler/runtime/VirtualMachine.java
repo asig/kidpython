@@ -1,6 +1,9 @@
 package com.asigner.kidpython.compiler.runtime;
 
 import com.asigner.kidpython.compiler.ast.Node;
+import com.asigner.kidpython.compiler.runtime.nativecode.MathWrapper;
+import com.asigner.kidpython.compiler.runtime.nativecode.TurtleWrapper;
+import com.asigner.kidpython.compiler.runtime.nativecode.UtilsWrapper;
 import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -44,7 +47,7 @@ public class VirtualMachine {
         RUNNING
     }
 
-    private static class Frame {
+    public static class Frame {
         private final Frame parent;
         private int returnAddress;
         private final Map<String, Value> vars;
@@ -93,7 +96,9 @@ public class VirtualMachine {
 
     private final PrintStream stdout;
     private final InputStream stdin;
-    private final NativeFunctions nativeFunctions;
+    private final TurtleWrapper turtleWrapper;
+    private final MathWrapper mathWrapper;
+    private final UtilsWrapper utilsWrapper;
 
     class ExecutorThread extends Thread {
 
@@ -365,8 +370,10 @@ public class VirtualMachine {
         }
     }
 
-    public VirtualMachine(OutputStream stdout, InputStream stdin, NativeFunctions nativeFunctions) {
-        this.nativeFunctions = nativeFunctions;
+    public VirtualMachine(OutputStream stdout, InputStream stdin, TurtleWrapper turtleWrapper, MathWrapper mathWrapper, UtilsWrapper utilsWrapper) {
+        this.turtleWrapper = turtleWrapper;
+        this.mathWrapper = mathWrapper;
+        this.utilsWrapper = utilsWrapper;
         this.stdout = new PrintStream(stdout);
         this.stdin = stdin;
         reset();
@@ -417,16 +424,9 @@ public class VirtualMachine {
         this.pc = 0;
         this.lastStmt = null;
 
-        globalFrame.setVar("print", new NativeFuncValue(nativeFunctions::print));
-        globalFrame.setVar("input", new NativeFuncValue(nativeFunctions::input));
-        globalFrame.setVar("len", new NativeFuncValue(nativeFunctions::utilsLen));
-
-        Map<Value, Value> turtle = Maps.newHashMap();
-        turtle.put(new StringValue("turn"), new NativeFuncValue(nativeFunctions::turtleTurn));
-        turtle.put(new StringValue("penDown"), new NativeFuncValue(nativeFunctions::turtlePenDown));
-        turtle.put(new StringValue("penUp"), new NativeFuncValue(nativeFunctions::turtlePenUp));
-        turtle.put(new StringValue("move"), new NativeFuncValue(nativeFunctions::turtleMove));
-        globalFrame.setVar("turtle", new MapValue(turtle));
+        utilsWrapper.registerWith(globalFrame);
+        turtleWrapper.registerWith(globalFrame);
+        mathWrapper.registerWith(globalFrame);
 
         cloneListeners().stream().forEach(EventListener::reset);
     }

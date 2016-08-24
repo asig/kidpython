@@ -7,8 +7,10 @@ import com.asigner.kidpython.compiler.ast.Node;
 import com.asigner.kidpython.compiler.ast.Stmt;
 import com.asigner.kidpython.compiler.runtime.FuncValue;
 import com.asigner.kidpython.compiler.runtime.Instruction;
-import com.asigner.kidpython.compiler.runtime.NativeFunctions;
 import com.asigner.kidpython.compiler.runtime.VirtualMachine;
+import com.asigner.kidpython.compiler.runtime.nativecode.MathWrapper;
+import com.asigner.kidpython.compiler.runtime.nativecode.TurtleWrapper;
+import com.asigner.kidpython.compiler.runtime.nativecode.UtilsWrapper;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
 import com.asigner.kidpython.ide.editor.Stylesheet;
 import com.asigner.kidpython.ide.turtle.TurtleCanvas;
@@ -49,7 +51,6 @@ public class App {
 
     private PrintWriter consoleOut;
     private VirtualMachine virtualMachine;
-    private NativeFunctions nativeFunctions;
 
     private BaseAction vmStartAction;
     private BaseAction vmPauseAction;
@@ -145,8 +146,8 @@ public class App {
         shell.open();
 
         consoleOut = new PrintWriter(consoleComposite.getOutputStream(), true);
-        nativeFunctions = new NativeFunctions(turtleCanvas, consoleComposite);
-        virtualMachine = new VirtualMachine(consoleComposite.getOutputStream(), consoleComposite.getInputStream(), nativeFunctions);
+        virtualMachine = new VirtualMachine(consoleComposite.getOutputStream(), consoleComposite.getInputStream(),
+                new TurtleWrapper(turtleCanvas), new MathWrapper(), new UtilsWrapper(consoleComposite));
 
         updateVmButtons();
 
