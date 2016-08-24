@@ -9,6 +9,7 @@ import com.asigner.kidpython.compiler.runtime.FuncValue;
 import com.asigner.kidpython.compiler.runtime.Instruction;
 import com.asigner.kidpython.compiler.runtime.VirtualMachine;
 import com.asigner.kidpython.compiler.runtime.nativecode.MathWrapper;
+import com.asigner.kidpython.compiler.runtime.nativecode.NativeCodeWrapper;
 import com.asigner.kidpython.compiler.runtime.nativecode.TurtleWrapper;
 import com.asigner.kidpython.compiler.runtime.nativecode.UtilsWrapper;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
@@ -16,6 +17,8 @@ import com.asigner.kidpython.ide.editor.Stylesheet;
 import com.asigner.kidpython.ide.turtle.TurtleCanvas;
 import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
 import com.asigner.kidpython.ide.util.SWTResources;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.CoolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
@@ -40,6 +43,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Set;
 
 public class App {
 
@@ -137,6 +141,15 @@ public class App {
         // Lower part of toplevel sash
         consoleComposite = new ConsoleComposite(sashForm, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 
+        List<NativeCodeWrapper> nativeCodeWrappers = Lists.newArrayList(
+                new TurtleWrapper(turtleCanvas), new MathWrapper(), new UtilsWrapper(consoleComposite)
+        );
+        Set<String> wellKnownWords = Sets.newHashSet();
+        for (NativeCodeWrapper wrapper : nativeCodeWrappers) {
+            wellKnownWords.addAll(wrapper.getExposedNames());
+        }
+        sourceCodeComposite.getEditor().setWellKnownWords(wellKnownWords);
+
         sashForm.setWeights(new int[]{3, 1});
 
         shell.setText("Simple menu");
@@ -146,8 +159,7 @@ public class App {
         shell.open();
 
         consoleOut = new PrintWriter(consoleComposite.getOutputStream(), true);
-        virtualMachine = new VirtualMachine(consoleComposite.getOutputStream(), consoleComposite.getInputStream(),
-                new TurtleWrapper(turtleCanvas), new MathWrapper(), new UtilsWrapper(consoleComposite));
+        virtualMachine = new VirtualMachine(consoleComposite.getOutputStream(), consoleComposite.getInputStream(), nativeCodeWrappers);
 
         updateVmButtons();
 

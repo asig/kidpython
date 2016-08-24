@@ -6,6 +6,7 @@ import com.asigner.kidpython.compiler.runtime.NativeFuncValue;
 import com.asigner.kidpython.compiler.runtime.NumberValue;
 import com.asigner.kidpython.compiler.runtime.Value;
 import com.asigner.kidpython.compiler.runtime.VirtualMachine;
+import com.google.common.collect.Lists;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -33,4 +34,10 @@ public class MathWrapper extends NativeCodeWrapper {
         frame.setVar("cos", new NativeFuncValue(this::cos));
         frame.setVar("sqrt", new NativeFuncValue(this::sqrt));
     }
+
+    @Override
+    public List<String> getExposedNames() {
+        return Lists.newArrayList("sin", "cos", "sqrt");
+    }
+
 }

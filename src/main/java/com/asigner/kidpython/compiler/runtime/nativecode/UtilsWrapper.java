@@ -10,6 +10,7 @@ import com.asigner.kidpython.compiler.runtime.UndefinedValue;
 import com.asigner.kidpython.compiler.runtime.Value;
 import com.asigner.kidpython.compiler.runtime.VirtualMachine;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
+import com.google.common.collect.Lists;
 import org.eclipse.swt.widgets.Display;
 
 import java.io.IOException;
@@ -85,5 +86,10 @@ public class UtilsWrapper extends NativeCodeWrapper {
         frame.setVar("print", new NativeFuncValue(this::print));
         frame.setVar("input", new NativeFuncValue(this::input));
         frame.setVar("len", new NativeFuncValue(this::utilsLen));
+    }
+
+    @Override
+    public List<String> getExposedNames() {
+        return Lists.newArrayList("print", "input", "len");
     }
 }

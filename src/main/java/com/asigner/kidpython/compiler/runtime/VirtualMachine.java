@@ -1,10 +1,9 @@
 package com.asigner.kidpython.compiler.runtime;
 
 import com.asigner.kidpython.compiler.ast.Node;
-import com.asigner.kidpython.compiler.runtime.nativecode.MathWrapper;
-import com.asigner.kidpython.compiler.runtime.nativecode.TurtleWrapper;
-import com.asigner.kidpython.compiler.runtime.nativecode.UtilsWrapper;
+import com.asigner.kidpython.compiler.runtime.nativecode.NativeCodeWrapper;
 import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -96,9 +95,7 @@ public class VirtualMachine {
 
     private final PrintStream stdout;
     private final InputStream stdin;
-    private final TurtleWrapper turtleWrapper;
-    private final MathWrapper mathWrapper;
-    private final UtilsWrapper utilsWrapper;
+    private final List<NativeCodeWrapper> nativeWrappers;
 
     class ExecutorThread extends Thread {
 
@@ -370,10 +367,8 @@ public class VirtualMachine {
         }
     }
 
-    public VirtualMachine(OutputStream stdout, InputStream stdin, TurtleWrapper turtleWrapper, MathWrapper mathWrapper, UtilsWrapper utilsWrapper) {
-        this.turtleWrapper = turtleWrapper;
-        this.mathWrapper = mathWrapper;
-        this.utilsWrapper = utilsWrapper;
+    public VirtualMachine(OutputStream stdout, InputStream stdin, List<NativeCodeWrapper> nativeWrappers) {
+        this.nativeWrappers = ImmutableList.copyOf(nativeWrappers);
         this.stdout = new PrintStream(stdout);
         this.stdin = stdin;
         reset();
@@ -424,9 +419,7 @@ public class VirtualMachine {
         this.pc = 0;
         this.lastStmt = null;
 
-        utilsWrapper.registerWith(globalFrame);
-        turtleWrapper.registerWith(globalFrame);
-        mathWrapper.registerWith(globalFrame);
+        nativeWrappers.stream().forEach(w -> w.registerWith(globalFrame));
 
         cloneListeners().stream().forEach(EventListener::reset);
     }

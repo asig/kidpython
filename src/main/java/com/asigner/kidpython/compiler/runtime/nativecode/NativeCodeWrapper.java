@@ -17,4 +17,5 @@ public abstract class NativeCodeWrapper {
     }
 
     public abstract void registerWith(VirtualMachine.Frame frame);
+    public abstract List<String> getExposedNames();
 }

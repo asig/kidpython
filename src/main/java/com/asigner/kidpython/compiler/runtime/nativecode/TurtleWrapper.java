@@ -9,6 +9,7 @@ import com.asigner.kidpython.compiler.runtime.UndefinedValue;
 import com.asigner.kidpython.compiler.runtime.Value;
 import com.asigner.kidpython.compiler.runtime.VirtualMachine;
 import com.asigner.kidpython.ide.turtle.TurtleCanvas;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import java.util.List;
@@ -64,4 +65,10 @@ public class TurtleWrapper extends NativeCodeWrapper {
 
         frame.setVar("turtle", new MapValue(turtle));
     }
+
+    @Override
+    public List<String> getExposedNames() {
+        return Lists.newArrayList("turtle", "turn", "penDown", "penUp", "move", "home");
+    }
+
 }

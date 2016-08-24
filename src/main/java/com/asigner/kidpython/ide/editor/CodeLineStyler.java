@@ -1,5 +1,6 @@
 package com.asigner.kidpython.ide.editor;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.eclipse.swt.SWT;
@@ -38,6 +39,7 @@ public class CodeLineStyler implements LineStyleListener {
     private CodeScanner scanner;
     private List<Range> multiLineComments;
     private Font lineNumberFont;
+    private Set<String> wellKnown = Sets.newHashSet();
 
     private static class Range {
         int start;
@@ -90,6 +92,10 @@ public class CodeLineStyler implements LineStyleListener {
 
     public void setStylesheet(Stylesheet stylesheet) {
         this.stylesheet = stylesheet;
+    }
+
+    public void setWellKnownWords(Set<String> wellKnown) {
+        this.wellKnown = ImmutableSet.copyOf(wellKnown);
     }
 
     private Range findMultiLineComment(int pos) {
@@ -243,17 +249,6 @@ public class CodeLineStyler implements LineStyleListener {
                 "return",
                 "and",
                 "or"
-        );
-
-        private Set<String> wellKnown = Sets.newHashSet(
-                "print",
-                "input",
-                "len",
-                "turn",
-                "penDown",
-                "penUp",
-                "move",
-                "turtle"
         );
 
         /**
