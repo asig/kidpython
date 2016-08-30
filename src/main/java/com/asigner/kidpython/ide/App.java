@@ -55,6 +55,8 @@ public class App {
 
     protected Shell shell;
 
+    private CodeRepository codeRepository;
+
     private TurtleCanvas turtleCanvas;
     private SourceCodeComposite sourceCodeComposite;
     private ConsoleComposite consoleComposite;
@@ -90,6 +92,8 @@ public class App {
     }
 
     public App() {
+        codeRepository = new CodeRepository(new LocalPersistenceStrategy());
+        codeRepository.load();
     }
 
     /**
@@ -152,8 +156,8 @@ public class App {
         // Upper part of toplevel sash
         SashForm sashForm2 = new SashForm(sashForm, SWT.HORIZONTAL);
         sashForm2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-        sourceCodeComposite = new SourceCodeComposite(sashForm2, SWT.NONE);
-        sourceCodeComposite.setStylesheet(Stylesheet.ALL[Settings.load().getSelectedStylesheet()]);
+        sourceCodeComposite = new SourceCodeComposite(sashForm2, SWT.NONE, codeRepository);
+        sourceCodeComposite.setStylesheet(Stylesheet.ALL[codeRepository.getSelectedStylesheet()]);
         turtleCanvas = new TurtleCanvas(sashForm2, SWT.NONE);
 
         // Lower part of toplevel sash
@@ -327,7 +331,6 @@ public class App {
                 label1.setLayoutData(GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).grab(false, true).create());
                 //END <<  label1
 
-                final Settings settings = Settings.load();
                 Combo combo = new Combo(composite, SWT.READ_ONLY);
                 for (Stylesheet sheet : Stylesheet.ALL) {
                     combo.add(sheet.getName());
@@ -337,10 +340,10 @@ public class App {
                     public void widgetSelected(SelectionEvent selectionEvent) {
                         int selected = combo.getSelectionIndex();
                         sourceCodeComposite.setStylesheet(Stylesheet.ALL[selected]);
-                        settings.setSelectedStylesheet(selected);
+                        codeRepository.setSelectedStylesheet(selected);
                     }
                 });
-                combo.select(settings.getSelectedStylesheet());
+                combo.select(codeRepository.getSelectedStylesheet());
 
                 return composite;
             }

@@ -291,6 +291,9 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
 
     public void turn(int angle) {
         this.angle = (this.angle + angle) % 360;
+        if (turtleVisible) {
+            Display.getCurrent().asyncExec(this::redraw);
+        }
     }
 
     public void showTurtle(boolean show) {

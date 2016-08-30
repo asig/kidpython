@@ -14,7 +14,7 @@ import java.util.List;
 
 public class SourceCodeComposite extends Composite {
 
-    private Settings settings;
+    private CodeRepository codeRepository;
 
     private CodeEditor.State[] editorStates;
     private Button[] buttons;
@@ -28,26 +28,26 @@ public class SourceCodeComposite extends Composite {
      * @param parent
      * @param style
      */
-    public SourceCodeComposite(Composite parent, int style) {
+    public SourceCodeComposite(Composite parent, int style, CodeRepository codeRepository) {
         super(parent, style);
         setLayout(new GridLayout(1, false));
 
-        settings = Settings.load();
+        this.codeRepository = codeRepository;
         this.addDisposeListener(disposeEvent -> {
-            settings.getSource(selectedSource).setCode(editor.getText());
-            settings.save();
+            codeRepository.getSource(selectedSource).setCode(editor.getText());
+            codeRepository.save();
         });
         Thread saver = new Thread(() -> {
             for(;;) {
                 try {
                     Thread.sleep(5000);
-                    settings.save();
+                    codeRepository.save();
                 } catch (InterruptedException ignored) {
                 }
             }});
         saver.setDaemon(true);
         saver.start();
-        int nofSources = settings.getNofSources();
+        int nofSources = codeRepository.getNofSources();
 
         Composite composite = new Composite(this, SWT.NONE);
         composite.setLayout(new GridLayout(nofSources, false));
@@ -57,11 +57,11 @@ public class SourceCodeComposite extends Composite {
         buttons = new Button[nofSources];
         for (int i = 0; i < nofSources; i++) {
             final int sourceIdx = i;
-            editorStates[i] = new CodeEditor.State(settings.getSource(i).getCode());
+            editorStates[i] = new CodeEditor.State(codeRepository.getSource(i).getCode());
             buttons[i] = new Button(composite, SWT.TOGGLE);
             buttons[i].setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
             buttons[i].setBounds(0, 0, 93, 29);
-            buttons[i].setText(settings.getSource(i).getName());
+            buttons[i].setText(codeRepository.getSource(i).getName());
             buttons[i].addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -73,7 +73,7 @@ public class SourceCodeComposite extends Composite {
         editor = new CodeEditor(this, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
         editor.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
-        selectSource(settings.getSelectedSource());
+        selectSource(codeRepository.getSelectedSource());
     }
 
     public String getText() {
@@ -97,11 +97,11 @@ public class SourceCodeComposite extends Composite {
         if (selectedSource > -1) {
             buttons[selectedSource].setSelection(false);
             editorStates[selectedSource] = editor.saveState();
-            settings.getSource(selectedSource).setCode(editor.getText());
-            settings.save();
+            codeRepository.getSource(selectedSource).setCode(editor.getText());
+            codeRepository.save();
         }
         selectedSource = idx;
-        settings.setSelectedSource(selectedSource);
+        codeRepository.setSelectedSource(selectedSource);
         if (selectedSource > -1) {
             buttons[selectedSource].setSelection(true);
             editor.restoreState(editorStates[selectedSource]);
