@@ -15,44 +15,54 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.objenesis:objenesis:1.0" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.equinox.common_3.7.0.v20150402-1709:4.5.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.mockito:mockito-core:1.9.5" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: junit:junit:4.12" level="project" />
-    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.7.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.7.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.7.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.guava:guava:19.0" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.text_3.5.400.v20150505-1044:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.swt_3.104.1.v20150825-0743:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.jface.text_3.10.0.v20150603-1752:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.jface.databinding_1.7.0.v20150406-2148:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.jface_3.11.0.v20150602-1400:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.e4.core.services_2.0.0.v20150403-1912:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.e4.core.di.extensions_0.13.0.v20150421-2214:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.e4.core.di.annotations_1.4.0.v20150528-1451:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.e4.core.di_1.5.0.v20150421-2214:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.e4.core.contexts_1.4.0.v20150828-0818:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.e4.core.commands_0.11.0.v20150422-0725:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.variables_3.2.800.v20130819-1716:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.runtime.compatibility_3.2.300.v20150423-0821:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.runtime_3.11.1.v20150903-1804:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.resources_3.10.1.v20150725-1910:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.net_1.2.300.v20141118-1725:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.jobs_3.7.0.v20150330-2103:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.filesystem.java7_1.0.100.v20150423-0754:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.filesystem_1.5.0.v20150725-1910:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.filebuffers_3.5.500.v20140723-1040:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.externaltools_1.0.300.v20140219-0051:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.expressions_3.5.0.v20150421-2214:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.databinding.property_1.5.0.v20150422-0725:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.databinding.observable_1.5.0.v20150422-0725:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.databinding.beans_1.3.0.v20150422-0725:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.databinding_1.5.0.v20150422-0725:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.contenttype_3.5.0.v20150421-2214:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.commands_3.7.0.v20150422-0725:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.filesystem.linux.x86_64_1.2.200.v20140124-1940:4.5.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.net.linux.x86_64_1.1.100.v20140124-2013:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: xml-apis:xml-apis:2.0.2" level="project" />
+    <orderEntry type="library" name="Gradle: xml-apis:xml-apis-ext:1.3.04" level="project" />
+    <orderEntry type="library" name="Gradle: xalan:xalan:2.7.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.xmlgraphics:batik-xml:1.8" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.xmlgraphics:batik-ext:1.8" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.xmlgraphics:batik-css:1.8" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.xmlgraphics:batik-util:1.8" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.xmlgraphics:batik-awt-util:1.8" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.xmlgraphics:batik-dom:1.8" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.xmlgraphics:batik-svggen:1.8" level="project" />
     <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.swt.gtk.linux.x86_64_3.104.1.v20150825-0743:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.net.linux.x86_64_1.1.100.v20140124-2013:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.filesystem.linux.x86_64_1.2.200.v20140124-1940:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.commands_3.7.0.v20150422-0725:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.contenttype_3.5.0.v20150421-2214:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.databinding_1.5.0.v20150422-0725:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.databinding.beans_1.3.0.v20150422-0725:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.databinding.observable_1.5.0.v20150422-0725:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.databinding.property_1.5.0.v20150422-0725:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.expressions_3.5.0.v20150421-2214:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.externaltools_1.0.300.v20140219-0051:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.filebuffers_3.5.500.v20140723-1040:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.filesystem_1.5.0.v20150725-1910:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.filesystem.java7_1.0.100.v20150423-0754:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.jobs_3.7.0.v20150330-2103:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.net_1.2.300.v20141118-1725:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.resources_3.10.1.v20150725-1910:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.runtime_3.11.1.v20150903-1804:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.runtime.compatibility_3.2.300.v20150423-0821:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.core.variables_3.2.800.v20130819-1716:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.e4.core.commands_0.11.0.v20150422-0725:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.e4.core.contexts_1.4.0.v20150828-0818:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.e4.core.di_1.5.0.v20150421-2214:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.e4.core.di.annotations_1.4.0.v20150528-1451:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.e4.core.di.extensions_0.13.0.v20150421-2214:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.e4.core.services_2.0.0.v20150403-1912:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.jface_3.11.0.v20150602-1400:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.jface.databinding_1.7.0.v20150406-2148:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.jface.text_3.10.0.v20150603-1752:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.swt_3.104.1.v20150825-0743:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.text_3.5.400.v20150505-1044:4.5.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.guava:guava:19.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.7.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.7.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.7.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: junit:junit:4.12" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.mockito:mockito-core:1.9.5" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse:org.eclipse.equinox.common_3.7.0.v20150402-1709:4.5.1" level="project" />
   </component>
 </module>
