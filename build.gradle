@@ -12,20 +12,93 @@ apply from: "repositories.gradle"
 apply plugin: 'java'
 apply plugin: 'application'
 
+configurations {
+    providedCompile
+
+    compile
+
+    // OS specific runtimes
+    runtimeLinux
+    runtimeMac
+    runtimeWin
+}
+
+distributions {
+    win {
+        contents {
+            with distributions.main.getContents()
+            from configurations.runtimeWin
+        }
+    }
+
+    mac {
+        contents {
+            with distributions.main.getContents()
+            from configurations.runtimeMac
+        }
+    }
+
+    linux {
+        contents {
+            with distributions.main.getContents()
+            from configurations.runtimeLinux
+        }
+    }
+}
+
 dependencies {
-    compile group: 'org.eclipse', name: 'platform-minimal', version: '4.5.1', configuration: 'macosx-cocoa-x86_64'
+    // For compilation, we don't care which eclipse we're using
+    providedCompile group: 'org.eclipse', name: 'platform-minimal', version: '4.5.1', configuration: 'linux-gtk-x86_64'
+
     compile 'com.google.guava:guava:19.0'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.0'
     compile 'org.apache.xmlgraphics:batik-svggen:1.8'
     compile 'org.apache.xmlgraphics:batik-dom:1.8'
 
+    // Store snippets in dropbox
+    compile 'com.dropbox.core:dropbox-core-sdk:2.1.1'
+
+    // OS-dependent runtimes
+    runtimeLinux group: 'org.eclipse', name: 'platform-minimal', version: '4.5.1', configuration: 'linux-gtk-x86_64'
+    runtimeMac group: 'org.eclipse', name: 'platform-minimal', version: '4.5.1', configuration: 'macosx-cocoa-x86_64'
+    runtimeWin group: 'org.eclipse', name: 'platform-minimal', version: '4.5.1', configuration: 'win32-x86'
+
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.9.5'
 }
 
-task copyToLib(type: Copy) {
-    into "$buildDir/output/lib"
-    from configurations.runtime
+// Setup OS dependent runtime path
+def osDependentRuntime;
+String osName = System.getProperty("os.name").toLowerCase();
+if (osName.contains("windows")) {
+    osDependentRuntime = configurations.runtimeWin
+} else if (osName.contains("linux")) {
+    osDependentRuntime = configurations.runtimeLinux
+} else {
+    osDependentRuntime = configurations.runtimeMac
+}
+
+compileJava {
+    classpath += configurations.providedCompile
+}
+
+test {
+    classpath += osDependentRuntime;
+}
+
+run {
+    classpath += osDependentRuntime;
+
+    def os = System.getProperty("os.name").split(" ")[0]
+    if (os == "Mac") {
+        jvmArgs "-XstartOnFirstThread"
+    }
+}
+
+distTar {
+    dependsOn winDistTar
+    dependsOn linuxDistTar
+    dependsOn macDistTar
 }
 
 mainClassName = "com.asigner.kidpython.ide.App"

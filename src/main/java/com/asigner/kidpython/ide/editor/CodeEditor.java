@@ -16,6 +16,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 
+import java.util.Set;
+
 public class CodeEditor extends StyledText {
 
     public static class State {
@@ -70,7 +72,11 @@ public class CodeEditor extends StyledText {
                 lastLineCount = lineCount;
             }
         });
+    }
 
+    public void setWellKnownWords(Set<String> wellKnown) {
+        lineStyler.setWellKnownWords(wellKnown);
+        this.getDisplay().syncExec(this::redraw);
     }
 
     public void setStylesheet(Stylesheet stylesheet) {
