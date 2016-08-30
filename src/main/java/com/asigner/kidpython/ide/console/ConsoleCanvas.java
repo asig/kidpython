@@ -197,7 +197,7 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
                 // Just repaint the cursor area
                 int x = cursorX * fontMetrics.getAverageCharWidth();
                 int y = cursorY * fontMetrics.getHeight();
-                display.asyncExec(() -> redraw(x, y, fontMetrics.getAverageCharWidth() + 1, fontMetrics.getHeight(), false));
+                display.asyncExec(() -> { if (!isDisposed()) redraw(x, y, fontMetrics.getAverageCharWidth() + 1, fontMetrics.getHeight(), false); });
             }
         }
     }
