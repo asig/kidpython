@@ -1,13 +1,30 @@
 package com.asigner.kidpython.ide.sync;
 
+import com.asigner.kidpython.ide.DropboxPersistenceStrategy;
 import com.asigner.kidpython.ide.PersistenceStrategy;
+import com.asigner.kidpython.ide.Settings;
+import com.asigner.kidpython.runtime.BooleanValue;
+import com.dropbox.core.DbxAppInfo;
+import com.dropbox.core.DbxException;
+import com.dropbox.core.DbxRequestConfig;
+import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.ListFolderResult;
+import com.dropbox.core.v2.files.Metadata;
+import com.dropbox.core.v2.files.UploadUploader;
+import com.dropbox.core.v2.users.FullAccount;
+
+import java.io.IOException;
+import java.io.OutputStream;
 
 public class DropboxSyncService implements SyncService {
 
-    @Override
-    public void connect() {
+    private static final String APP_KEY = "wgcfdvmpgau5h5m";
+    private static final String APP_SECRET = "qn9g8ytz4f4ko47";
 
-    }
+    private static final String KEY_CONNECTED = "DropboxSyncService.connected";
+    private static final String KEY_ACCESS_TOKEN = "DropboxSyncService.token";
+
+    private Settings settings = Settings.getInstance();
 
     @Override
     public String getName() {
@@ -15,17 +32,61 @@ public class DropboxSyncService implements SyncService {
     }
 
     @Override
+    public void connect() {
+        settings.set(KEY_ACCESS_TOKEN, "");
+        settings.set(KEY_CONNECTED, Boolean.toString(true));
+    }
+
+    @Override
     public boolean isConnected() {
-        return false;
+        return Boolean.parseBoolean(settings.get(KEY_CONNECTED, "false"));
     }
 
     @Override
     public void disconnect() {
-
+        settings.set(KEY_CONNECTED, Boolean.toString(false));
     }
 
     @Override
     public PersistenceStrategy getPersistenceStrategy() {
-        return null;
+        String token = settings.get(KEY_ACCESS_TOKEN);
+        DbxRequestConfig config = DbxRequestConfig.newBuilder("ProgrammableFun/1.0").build();
+        DbxClientV2 client = new DbxClientV2(config, token);
+        return new DropboxPersistenceStrategy(client);
     }
+
+    public static void main(String ... args) throws IOException, DbxException {
+        DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
+
+        DbxRequestConfig config = DbxRequestConfig.newBuilder("JavaTutorial/1.0").build();
+//        DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(config, appInfo);
+//        String authorizeUrl = webAuth.start();
+//        System.out.println("1. Go to: " + authorizeUrl);
+//        System.out.println("2. Click \"Allow\" (you might have to log in first)");
+//        System.out.println("3. Copy the authorization code.");
+//        String authCode = new BufferedReader(new InputStreamReader(System.in)).readLine().trim();
+//        System.out.println("authCode = " + authCode);
+//        DbxAuthFinish finish = webAuth.finish(authCode);
+//        String token = finish.getAccessToken();
+//        System.out.println("token = " + token);
+
+        String token = "8YqEFOo6dWwAAAAAAAADj38QpG_9_Rdg94FOloyfaz9yhwdInsT5RRwF2qeV1Ax7";
+        DbxClientV2 client = new DbxClientV2(config, token);
+
+        FullAccount account = client.users().getCurrentAccount();
+        System.out.println(account.getName().getDisplayName());
+
+        ListFolderResult res = client.files().listFolder("");
+        for (Metadata m : res.getEntries()) {
+            System.out.println(m.getPathLower());
+        }
+
+        UploadUploader uploader = client.files().upload("/foo");
+        OutputStream os = uploader.getOutputStream();
+        os.write("Hello, World!\n".getBytes());
+        uploader.finish();
+        uploader.close();
+
+    }
+
 }

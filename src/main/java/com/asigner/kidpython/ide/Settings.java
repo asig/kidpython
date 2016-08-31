@@ -102,21 +102,24 @@ public class Settings {
 //        }
     }
 
-    private void setProp(String key, String newVal) {
+    public Settings set(String key, String newVal) {
         String oldVal = properties.getProperty(key);
         if (!(oldVal != null && oldVal.equals(newVal))) {
             properties.setProperty(key, newVal);
             fireSettingsChanged(key);
         }
+        return this;
     }
 
-    private void setProp(String key, boolean newVal) {
-        boolean oldVal = Boolean.parseBoolean(properties.getProperty(key));
-        if (oldVal != newVal) {
-            properties.setProperty(key, Boolean.toString(newVal));
-            fireSettingsChanged(key);
-        }
+    public String get(String key) {
+        return properties.getProperty(key);
     }
+
+    public String get(String key, String dflt) {
+        String res = properties.getProperty(key);
+        return res == null ? dflt : res;
+    }
+}
 
 
 
