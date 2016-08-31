@@ -1,4 +1,4 @@
-package com.asigner.kidpython.compiler.runtime;
+package com.asigner.kidpython.runtime;
 
 import com.google.common.collect.Lists;
 
@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-import static com.asigner.kidpython.compiler.runtime.Value.Type.RANGE;
+import static com.asigner.kidpython.runtime.Value.Type.RANGE;
 
 public class RangeValue extends Value {
 

@@ -1,6 +1,6 @@
 // Copyright 2016 Andreas Signer. All rights reserved.
 
-package com.asigner.kidpython.compiler.runtime;
+package com.asigner.kidpython.runtime;
 
 import java.util.List;
 import java.util.Objects;

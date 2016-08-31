@@ -4,7 +4,7 @@ package com.asigner.kidpython.compiler.ast;
 
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.ast.expr.ExprNode;
-import com.asigner.kidpython.compiler.runtime.ExecutionException;
+import com.asigner.kidpython.runtime.ExecutionException;
 
 public class AssignmentStmt extends Stmt {
 

@@ -1,11 +1,11 @@
 // Copyright 2016 Andreas Signer. All rights reserved.
 
-package com.asigner.kidpython.compiler.runtime.nativecode;
+package com.asigner.kidpython.runtime.nativecode;
 
-import com.asigner.kidpython.compiler.runtime.NativeFuncValue;
-import com.asigner.kidpython.compiler.runtime.NumberValue;
-import com.asigner.kidpython.compiler.runtime.Value;
-import com.asigner.kidpython.compiler.runtime.VirtualMachine;
+import com.asigner.kidpython.runtime.NativeFuncValue;
+import com.asigner.kidpython.runtime.NumberValue;
+import com.asigner.kidpython.runtime.Value;
+import com.asigner.kidpython.runtime.VirtualMachine;
 import com.google.common.collect.Lists;
 
 import java.math.BigDecimal;

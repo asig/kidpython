@@ -1,4 +1,4 @@
-package com.asigner.kidpython.compiler.runtime;
+package com.asigner.kidpython.runtime;
 
 import com.asigner.kidpython.compiler.Position;
 

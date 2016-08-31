@@ -1,6 +1,6 @@
 // Copyright 2016 Andreas Signer. All rights reserved.
 
-package com.asigner.kidpython.compiler.runtime;
+package com.asigner.kidpython.runtime;
 
 import java.util.Iterator;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.asigner.kidpython.compiler.runtime.Value.Type.MAP;
+import static com.asigner.kidpython.runtime.Value.Type.MAP;
 
 public class MapValue extends Value {
     private final Map<Value, Value> mapVal;

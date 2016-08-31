@@ -1,13 +1,13 @@
 // Copyright 2016 Andreas Signer. All rights reserved.
 
-package com.asigner.kidpython.compiler.runtime.nativecode;
+package com.asigner.kidpython.runtime.nativecode;
 
-import com.asigner.kidpython.compiler.runtime.MapValue;
-import com.asigner.kidpython.compiler.runtime.NativeFuncValue;
-import com.asigner.kidpython.compiler.runtime.StringValue;
-import com.asigner.kidpython.compiler.runtime.UndefinedValue;
-import com.asigner.kidpython.compiler.runtime.Value;
-import com.asigner.kidpython.compiler.runtime.VirtualMachine;
+import com.asigner.kidpython.runtime.MapValue;
+import com.asigner.kidpython.runtime.NativeFuncValue;
+import com.asigner.kidpython.runtime.StringValue;
+import com.asigner.kidpython.runtime.UndefinedValue;
+import com.asigner.kidpython.runtime.Value;
+import com.asigner.kidpython.runtime.VirtualMachine;
 import com.asigner.kidpython.ide.turtle.TurtleCanvas;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

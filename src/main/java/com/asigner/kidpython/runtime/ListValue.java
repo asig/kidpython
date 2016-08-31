@@ -1,12 +1,12 @@
 // Copyright 2016 Andreas Signer. All rights reserved.
 
-package com.asigner.kidpython.compiler.runtime;
+package com.asigner.kidpython.runtime;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-import static com.asigner.kidpython.compiler.runtime.Value.Type.LIST;
+import static com.asigner.kidpython.runtime.Value.Type.LIST;
 
 public class ListValue extends Value {
     private final List<Value> listVal;

@@ -1,7 +1,7 @@
-package com.asigner.kidpython.compiler.runtime;
+package com.asigner.kidpython.runtime;
 
 import com.asigner.kidpython.compiler.ast.Node;
-import com.asigner.kidpython.compiler.runtime.nativecode.NativeCodeWrapper;
+import com.asigner.kidpython.runtime.nativecode.NativeCodeWrapper;
 import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -19,15 +19,15 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.asigner.kidpython.compiler.runtime.Value.Type.BOOLEAN;
-import static com.asigner.kidpython.compiler.runtime.Value.Type.ITERATOR;
-import static com.asigner.kidpython.compiler.runtime.Value.Type.MAP;
-import static com.asigner.kidpython.compiler.runtime.Value.Type.NUMBER;
-import static com.asigner.kidpython.compiler.runtime.Value.Type.REFERENCE;
-import static com.asigner.kidpython.compiler.runtime.Value.Type.STRING;
-import static com.asigner.kidpython.compiler.runtime.VirtualMachine.State.PAUSED;
-import static com.asigner.kidpython.compiler.runtime.VirtualMachine.State.RUNNING;
-import static com.asigner.kidpython.compiler.runtime.VirtualMachine.State.STOPPED;
+import static com.asigner.kidpython.runtime.Value.Type.BOOLEAN;
+import static com.asigner.kidpython.runtime.Value.Type.ITERATOR;
+import static com.asigner.kidpython.runtime.Value.Type.MAP;
+import static com.asigner.kidpython.runtime.Value.Type.NUMBER;
+import static com.asigner.kidpython.runtime.Value.Type.REFERENCE;
+import static com.asigner.kidpython.runtime.Value.Type.STRING;
+import static com.asigner.kidpython.runtime.VirtualMachine.State.PAUSED;
+import static com.asigner.kidpython.runtime.VirtualMachine.State.RUNNING;
+import static com.asigner.kidpython.runtime.VirtualMachine.State.STOPPED;
 
 public class VirtualMachine {
 
@@ -491,7 +491,7 @@ public class VirtualMachine {
     }
 
     private Value load(Value value) {
-        if (value.getType() == Value.Type.REFERENCE) {
+        if (value.getType() == REFERENCE) {
             if (value instanceof VarRefValue) {
                 value = getVar(((VarRefValue) value).getVar());
                 if (value == null) {
