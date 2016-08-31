@@ -95,6 +95,14 @@ run {
     }
 }
 
+// Use this task if you need all runtime deps in one place. Helpful for me when playing with Eclipse (to get a
+// decent SWT UI designer...)
+task copyToLib(type: Copy) {
+    into "$buildDir/output/lib"
+    from configurations.runtime
+    from osDependentRuntime
+}
+
 distTar {
     dependsOn winDistTar
     dependsOn linuxDistTar
