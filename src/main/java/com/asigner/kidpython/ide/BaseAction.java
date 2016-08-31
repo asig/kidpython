@@ -15,6 +15,11 @@ public class BaseAction extends Action {
         this.handler = handler;
     }
 
+    public BaseAction(String text, Runnable handler) {
+        super(text);
+        this.handler = handler;
+    }
+
     @Override
     public void run() {
         handler.run();

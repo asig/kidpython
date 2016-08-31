@@ -5,6 +5,12 @@ import com.asigner.kidpython.compiler.Error;
 import com.asigner.kidpython.compiler.Parser;
 import com.asigner.kidpython.compiler.ast.Node;
 import com.asigner.kidpython.compiler.ast.Stmt;
+import com.asigner.kidpython.ide.console.ConsoleComposite;
+import com.asigner.kidpython.ide.editor.Stylesheet;
+import com.asigner.kidpython.ide.platform.CocoaUiEnhancer;
+import com.asigner.kidpython.ide.turtle.TurtleCanvas;
+import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
+import com.asigner.kidpython.ide.util.SWTResources;
 import com.asigner.kidpython.runtime.FuncValue;
 import com.asigner.kidpython.runtime.Instruction;
 import com.asigner.kidpython.runtime.VirtualMachine;
@@ -12,15 +18,8 @@ import com.asigner.kidpython.runtime.nativecode.MathWrapper;
 import com.asigner.kidpython.runtime.nativecode.NativeCodeWrapper;
 import com.asigner.kidpython.runtime.nativecode.TurtleWrapper;
 import com.asigner.kidpython.runtime.nativecode.UtilsWrapper;
-import com.asigner.kidpython.ide.console.ConsoleComposite;
-import com.asigner.kidpython.ide.editor.Stylesheet;
-import com.asigner.kidpython.ide.platform.CocoaUiEnhancer;
-import com.asigner.kidpython.ide.turtle.TurtleCanvas;
-import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
-import com.asigner.kidpython.ide.util.SWTResources;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.CoolBarManager;
 import org.eclipse.jface.action.IAction;
@@ -122,12 +121,12 @@ public class App {
         Image icon = new Image(display, App.class.getResourceAsStream("icons/icon.png"));
         shell.setImage(icon);
 
-        createActions();
-
         Listener quitListener = event -> {
             shell.getDisplay().dispose();
             System.exit(0);
         };
+
+        createActions();
 
         boolean isMac = System.getProperty( "os.name" ).equals( "Mac OS X" );
         if (isMac) {
@@ -145,8 +144,13 @@ public class App {
         MenuItem exitItem = new MenuItem(fileMenu, SWT.PUSH);
         exitItem.setText("&Exit");
         shell.setMenuBar(menuBar);
-
         exitItem.addListener(SWT.Selection, quitListener);
+
+        if (!isMac) {
+            MenuItem preferencesItem = new MenuItem(fileMenu, SWT.PUSH);
+            preferencesItem.setText(preferencesAction.getText());
+            preferencesItem.addListener(SWT.Selection, event -> preferencesAction.run());
+        }
 
         createToolbar();
 
@@ -288,22 +292,9 @@ public class App {
         vmStopAction = new BaseAction("Stop", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stop@2x.png"), () -> virtualMachine.stop());
         vmStepIntoAction = new BaseAction("Step Into", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepinto_co@2x.png"), this::stepInto);
         vmStepOverAction = new BaseAction("Step Over", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepover_co@2x.png"), this::stepOver);
-
-        aboutAction = new Action() {
-            @Override
-            public void run() {
-                System.err.println("About Action executed");
-            }
-        };
-
-        preferencesAction = new Action() {
-            @Override
-            public void run() {
-                System.err.println("Preferences Action executed");
-            }
-        };
-
-        helpAction = new BaseAction("Help", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/help@2x.png"), () -> {});
+        aboutAction = new BaseAction("About", this::showAbout);
+        preferencesAction = new BaseAction("Preferences", this::showPreferences);
+        helpAction = new BaseAction("Help", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/help@2x.png"), this::showHelp);
     }
 
     private void createToolbar() {
@@ -500,5 +491,18 @@ public class App {
             }
         });
         virtualMachine.start();
+    }
+
+    private void showAbout() {
+        System.err.println("show about dialog");
+    }
+
+    private void showHelp() {
+        System.err.println("Launch browser with help page");
+    }
+
+    private void showPreferences() {
+        CloudConnectDialog dlg = new CloudConnectDialog(shell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+        dlg.open();
     }
 }
