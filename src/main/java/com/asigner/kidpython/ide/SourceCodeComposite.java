@@ -33,6 +33,8 @@ public class SourceCodeComposite extends Composite {
         setLayout(new GridLayout(1, false));
 
         this.codeRepository = codeRepository;
+        codeRepository.addListener(newStrategy -> init());
+
         this.addDisposeListener(disposeEvent -> {
             codeRepository.getSource(selectedSource).setCode(editor.getText());
             codeRepository.save();
@@ -74,6 +76,13 @@ public class SourceCodeComposite extends Composite {
         editor.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
         selectSource(codeRepository.getSelectedSource());
+    }
+
+    private void init() {
+        for (int i = 0; i < buttons.length; i++) {
+            editorStates[i] = new CodeEditor.State(codeRepository.getSource(i).getCode());
+            buttons[i].setText(codeRepository.getSource(i).getName());
+        }
     }
 
     public String getText() {

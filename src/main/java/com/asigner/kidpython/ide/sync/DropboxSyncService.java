@@ -3,15 +3,19 @@ package com.asigner.kidpython.ide.sync;
 import com.asigner.kidpython.ide.DropboxPersistenceStrategy;
 import com.asigner.kidpython.ide.PersistenceStrategy;
 import com.asigner.kidpython.ide.Settings;
-import com.asigner.kidpython.runtime.BooleanValue;
 import com.dropbox.core.DbxAppInfo;
+import com.dropbox.core.DbxAuthFinish;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
+import com.dropbox.core.DbxWebAuthNoRedirect;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.files.UploadUploader;
 import com.dropbox.core.v2.users.FullAccount;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.program.Program;
+import org.eclipse.swt.widgets.Display;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,6 +39,30 @@ public class DropboxSyncService implements SyncService {
     public void connect() {
         settings.set(KEY_ACCESS_TOKEN, "");
         settings.set(KEY_CONNECTED, Boolean.toString(true));
+
+        DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
+        DropboxConnectDialog dlg = new DropboxConnectDialog(Display.getDefault().getActiveShell(), SWT.APPLICATION_MODAL | SWT.DIALOG_TRIM);
+        DbxRequestConfig config = DbxRequestConfig.newBuilder("ProgrammableFun/1.0").build();
+        DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(config, appInfo);
+        String authorizeUrl = webAuth.start();
+        dlg.setAuthorizeUrl(authorizeUrl);
+        Program.launch(authorizeUrl);
+
+        dlg.open();
+
+        String authCode = dlg.getCode();
+        DbxAuthFinish finish = null;
+        try {
+            finish = webAuth.finish(authCode);
+            String token = finish.getAccessToken();
+            settings.set(KEY_ACCESS_TOKEN, token);
+            settings.set(KEY_CONNECTED, true);
+        } catch (DbxException e) {
+            // TODO(asigner): Show error message
+            e.printStackTrace();
+        }
+
+        settings.save();
     }
 
     @Override
@@ -44,7 +72,9 @@ public class DropboxSyncService implements SyncService {
 
     @Override
     public void disconnect() {
+        settings.remove(KEY_ACCESS_TOKEN);
         settings.set(KEY_CONNECTED, Boolean.toString(false));
+        settings.save();
     }
 
     @Override
@@ -56,7 +86,6 @@ public class DropboxSyncService implements SyncService {
     }
 
     public static void main(String ... args) throws IOException, DbxException {
-        DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
 
         DbxRequestConfig config = DbxRequestConfig.newBuilder("JavaTutorial/1.0").build();
 //        DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(config, appInfo);

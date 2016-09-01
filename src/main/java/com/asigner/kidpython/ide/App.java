@@ -8,6 +8,7 @@ import com.asigner.kidpython.compiler.ast.Stmt;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
 import com.asigner.kidpython.ide.editor.Stylesheet;
 import com.asigner.kidpython.ide.platform.CocoaUiEnhancer;
+import com.asigner.kidpython.ide.sync.SyncService;
 import com.asigner.kidpython.ide.turtle.TurtleCanvas;
 import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
 import com.asigner.kidpython.ide.util.SWTResources;
@@ -91,7 +92,14 @@ public class App {
     }
 
     public App() {
-        codeRepository = new CodeRepository(new LocalPersistenceStrategy());
+        PersistenceStrategy persistenceStrategy = new LocalPersistenceStrategy();
+        for (SyncService syncService : SyncService.ALL) {
+            if (syncService.isConnected()) {
+                persistenceStrategy = syncService.getPersistenceStrategy();
+                break;
+            }
+        }
+        codeRepository = new CodeRepository(persistenceStrategy);
         codeRepository.load();
     }
 

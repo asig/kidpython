@@ -1,24 +1,25 @@
 package com.asigner.kidpython.ide;
 
+import com.asigner.kidpython.ide.sync.SyncService;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 
 public class CloudConnectDialog extends Dialog {
 
-    protected Object result;
-    protected Shell shlCloudSync;
+    private Object result;
+    private Shell shlCloudSync;
+    private CodeRepository codeRepository;
 
     /**
      * Create the dialog.
@@ -27,14 +28,15 @@ public class CloudConnectDialog extends Dialog {
      */
     public CloudConnectDialog(Shell parent, int style) {
         super(parent, style);
-        setText("SWT Dialog");
+        setText("Preferences");
     }
 
     /**
      * Open the dialog.
      * @return the result
      */
-    public Object open() {
+    public Object open(CodeRepository codeRepository) {
+        this.codeRepository = codeRepository;
         createContents();
         shlCloudSync.open();
         shlCloudSync.layout();
@@ -61,17 +63,9 @@ public class CloudConnectDialog extends Dialog {
         grpServices.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true, 1, 1));
         grpServices.setText("Services");
 
-
-        CLabel lblNewLabel = new CLabel(grpServices, SWT.NONE);
-        lblNewLabel.setText("Dropbox");
-
-        Button btnCheckButton = new Button(grpServices, SWT.CHECK);
-        btnCheckButton.setText("Connected");
-
-        Button btnNewButton = new Button(grpServices, SWT.NONE);
-        btnNewButton.setText("New Button");
-        new Label(grpServices, SWT.NONE);
-        new Label(grpServices, SWT.NONE);
+        for (SyncService service : SyncService.ALL) {
+            addService(grpServices, service);
+        }
 
         Composite composite = new Composite(shlCloudSync, SWT.NONE);
         composite.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false, 1, 1));
@@ -89,4 +83,37 @@ public class CloudConnectDialog extends Dialog {
 
     }
 
+    private void addService(Composite parent, SyncService service) {
+        CLabel lblNewLabel = new CLabel(parent, SWT.NONE);
+        lblNewLabel.setText(service.getName());
+
+        Button btnCheckButton = new Button(parent, SWT.CHECK);
+        btnCheckButton.setText("Connected");
+        btnCheckButton.setSelection(service.isConnected());
+
+        Button btn = new Button(parent, SWT.NONE);
+        btn.setText(service.isConnected() ? "Disconnect" : "Connect");
+        btn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (service.isConnected()) {
+                    service.disconnect();
+                } else {
+                    service.connect();
+                    if (service.isConnected()) {
+                        // Disconnect all other services
+                        for (SyncService s : SyncService.ALL) {
+                            if (s != service) {
+                                s.disconnect();
+                            }
+                        }
+                        // set the new one
+                        codeRepository.switchStrategy(service.getPersistenceStrategy());
+                    }
+                }
+                btnCheckButton.setSelection(service.isConnected());
+                btn.setText(service.isConnected() ? "Disconnect" : "Connect");
+            }
+        });
+    }
 }

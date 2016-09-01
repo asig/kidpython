@@ -9,13 +9,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 public class CodeRepository {
 
-    private final PersistenceStrategy persistenceStrategy;
+    interface Listener {
+        void strategyChanged(PersistenceStrategy newStrategy);
+    }
+
+    private final List<Listener> listeners = Lists.newArrayList();
+
+    private PersistenceStrategy persistenceStrategy;
 
     private static class Content {
         @JsonProperty("selected_stylesheet")
@@ -40,14 +45,7 @@ public class CodeRepository {
     private Content content = new Content();
 
     public void load() {
-        try {
-            byte[] data = persistenceStrategy.load();
-            ObjectMapper m = new ObjectMapper();
-            JsonFactory factory = m.getFactory();
-            content = factory.createParser(data).readValueAs(Content.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        loadFrom(persistenceStrategy);
     }
 
     public void save() {
@@ -62,6 +60,24 @@ public class CodeRepository {
         }
     }
 
+    private void loadFrom(PersistenceStrategy strategy) {
+        try {
+            byte[] data = strategy.load();
+            ObjectMapper m = new ObjectMapper();
+            JsonFactory factory = m.getFactory();
+            content = factory.createParser(data).readValueAs(Content.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void switchStrategy(PersistenceStrategy strategy) {
+        save();
+        loadFrom(strategy);
+        persistenceStrategy = strategy;
+        listeners.forEach(l -> l.strategyChanged(strategy));
+    }
+
     @JsonIgnore
     public int getNofSources() {
         return SOURCES;
@@ -69,11 +85,6 @@ public class CodeRepository {
 
     public Source getSource(int idx) {
         return content.sources.get(idx);
-    }
-
-    public void setSource(int idx, Source source) {
-        content.sources.set(idx, source);
-        save();
     }
 
     public int getSelectedSource() {
@@ -96,4 +107,9 @@ public class CodeRepository {
     public CodeRepository(PersistenceStrategy persistenceStrategy) {
         this.persistenceStrategy = persistenceStrategy;
     }
+
+    public void addListener(Listener listener) {
+        listeners.add(listener);
+    }
+
 }

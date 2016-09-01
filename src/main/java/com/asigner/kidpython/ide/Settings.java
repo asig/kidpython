@@ -6,8 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 
 public class Settings {
@@ -102,12 +100,22 @@ public class Settings {
 //        }
     }
 
+    public Settings remove(String key) {
+        properties.remove(key);
+        return this;
+    }
+
     public Settings set(String key, String newVal) {
         String oldVal = properties.getProperty(key);
         if (!(oldVal != null && oldVal.equals(newVal))) {
             properties.setProperty(key, newVal);
             fireSettingsChanged(key);
         }
+        return this;
+    }
+
+    public Settings set(String key, boolean newVal) {
+        this.set(key, Boolean.toString(newVal) );
         return this;
     }
 

@@ -8,4 +8,8 @@ public interface SyncService {
     void connect();
     void disconnect();
     PersistenceStrategy getPersistenceStrategy();
+
+    static final SyncService[] ALL = new SyncService[] {
+            new DropboxSyncService()
+    };
 }

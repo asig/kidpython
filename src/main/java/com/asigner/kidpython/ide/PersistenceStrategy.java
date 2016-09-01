@@ -2,7 +2,6 @@
 
 package com.asigner.kidpython.ide;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public interface PersistenceStrategy {
