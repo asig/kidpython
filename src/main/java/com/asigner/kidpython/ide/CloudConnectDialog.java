@@ -88,6 +88,7 @@ public class CloudConnectDialog extends Dialog {
         lblNewLabel.setText(service.getName());
 
         Button btnCheckButton = new Button(parent, SWT.CHECK);
+        btnCheckButton.setEnabled(false);
         btnCheckButton.setText("Connected");
         btnCheckButton.setSelection(service.isConnected());
 
@@ -98,6 +99,7 @@ public class CloudConnectDialog extends Dialog {
             public void widgetSelected(SelectionEvent e) {
                 if (service.isConnected()) {
                     service.disconnect();
+                    codeRepository.switchStrategy(new LocalPersistenceStrategy());
                 } else {
                     service.connect();
                     if (service.isConnected()) {

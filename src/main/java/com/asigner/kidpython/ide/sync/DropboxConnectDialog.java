@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class DropboxConnectDialog extends Dialog {
 
-    protected Object result;
+    private boolean result;
     protected Shell shell;
     private Text codeCtrl;
 
@@ -45,7 +45,8 @@ public class DropboxConnectDialog extends Dialog {
      * Open the dialog.
      * @return the result
      */
-    public Object open() {
+    public boolean open() {
+        result = false;
         createContents();
         shell.open();
         shell.layout();
@@ -63,7 +64,7 @@ public class DropboxConnectDialog extends Dialog {
      */
     private void createContents() {
         shell = new Shell(getParent(), getStyle());
-        shell.setSize(450, 300);
+        shell.setSize(800, 400);
         shell.setText(getText());
         shell.setLayout(new GridLayout(1, false));
 
@@ -78,8 +79,8 @@ public class DropboxConnectDialog extends Dialog {
         CLabel lblNewLabel_1 = new CLabel(grpGoTo, SWT.NONE);
         lblNewLabel_1.setText("If not, please visit this URL:");
 
-        Link link = new Link(grpGoTo, SWT.NONE);
-        link.setText("<a>" + authorizeUrl + "</a>");
+        Text link = new Text(grpGoTo, SWT.NONE);
+        link.setText(authorizeUrl);
 
         Group grpLogIn = new Group(shell, SWT.NONE);
         grpLogIn.setText("2. Log in and grant access");
@@ -106,6 +107,7 @@ public class DropboxConnectDialog extends Dialog {
         btnConnect.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                result = true;
                 code = codeCtrl.getText();
                 shell.dispose();
             }

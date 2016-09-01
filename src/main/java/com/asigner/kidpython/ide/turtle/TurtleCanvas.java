@@ -139,7 +139,7 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
             lastMouseY = mouseEvent.y;
             offsetX += dx;
             offsetY += dy;
-            Display.getCurrent().asyncExec(this::redraw);
+            getDisplay().asyncExec(this::redraw);
         }
     }
 
@@ -171,7 +171,7 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         turtleVisible = true;
         zoom = 1;
         offsetX = offsetY = 0;
-        Display.getCurrent().asyncExec(this::redraw);
+        getDisplay().asyncExec(this::redraw);
     }
 
     public void download() {
@@ -292,7 +292,7 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
     public void turn(int angle) {
         this.angle = (this.angle + angle) % 360;
         if (turtleVisible) {
-            Display.getCurrent().asyncExec(this::redraw);
+            this.getDisplay().asyncExec(this::redraw);
         }
     }
 
@@ -300,7 +300,7 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         boolean oldTurtle = turtleVisible;
         turtleVisible = show;
         if (oldTurtle != turtleVisible) {
-            Display.getCurrent().asyncExec(this::redraw);
+            this.getDisplay().asyncExec(this::redraw);
         }
     }
 

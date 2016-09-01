@@ -62,15 +62,12 @@ public class CodeEditor extends StyledText {
 
         addLineStyleListener(lineStyler);
         setFont(font);
-        addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent modifyEvent) {
-                int lineCount = getLineCount();
-                if (lastLineCount != lineCount || lineStyler.parseMultiLineComments(getText())) {
-                    redraw();
-                }
-                lastLineCount = lineCount;
+        addModifyListener(modifyEvent -> {
+            int lineCount = getLineCount();
+            if (lastLineCount != lineCount || lineStyler.parseMultiLineComments(getText())) {
+                redraw();
             }
+            lastLineCount = lineCount;
         });
     }
 

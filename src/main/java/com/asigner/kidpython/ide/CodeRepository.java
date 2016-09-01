@@ -10,17 +10,21 @@ import com.google.common.collect.Lists;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class CodeRepository {
+
+    private static final String KEY_PERSISTENCE_STRATEGY = "CodeRepository.PersistenceStrategy";
+
+//    private final Settings settings;
 
     interface Listener {
         void strategyChanged(PersistenceStrategy newStrategy);
     }
-
-    private final List<Listener> listeners = Lists.newArrayList();
-
-    private PersistenceStrategy persistenceStrategy;
 
     private static class Content {
         @JsonProperty("selected_stylesheet")
@@ -42,7 +46,41 @@ public class CodeRepository {
 
     private final static int SOURCES = 10;
 
+    private final List<Listener> listeners = Lists.newArrayList();
+    private final BlockingQueue<byte[]> outstanding = new LinkedBlockingQueue<>();
+    private final Thread syncerThread;
+
     private Content content = new Content();
+    private volatile PersistenceStrategy persistenceStrategy;
+
+    public CodeRepository(PersistenceStrategy persistenceStrategy) {
+//        settings = Settings.getInstance();
+//        try {
+//            String className = settings.get(KEY_PERSISTENCE_STRATEGY, LocalPersistenceStrategy.class.getName());
+//            Class<?> clazz = Class.forName(className);
+//            Constructor<?> ctor = clazz.getConstructor();
+//            this.persistenceStrategy = (PersistenceStrategy) ctor.newInstance();
+//        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+//            this.persistenceStrategy = new LocalPersistenceStrategy();
+//        }
+        this.persistenceStrategy = persistenceStrategy;
+        syncerThread = new Thread(() -> {
+            for (;;) {
+                List<byte[]> buf = Lists.newArrayListWithCapacity(1024);
+                outstanding.drainTo(buf);
+                if (buf.size() > 0) {
+                    byte[] lastData = buf.get(buf.size() - 1);
+                    try {
+                        this.persistenceStrategy.save(lastData);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        syncerThread.setDaemon(true);
+        syncerThread.start();
+    }
 
     public void load() {
         loadFrom(persistenceStrategy);
@@ -54,7 +92,7 @@ public class CodeRepository {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
             factory.createGenerator(bos, JsonEncoding.UTF8).writeObject(content);
-            persistenceStrategy.save(bos.toByteArray());
+            outstanding.offer(bos.toByteArray());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -76,6 +114,8 @@ public class CodeRepository {
         loadFrom(strategy);
         persistenceStrategy = strategy;
         listeners.forEach(l -> l.strategyChanged(strategy));
+//        settings.set(KEY_PERSISTENCE_STRATEGY, strategy.getClass().getName());
+//        settings.save();
     }
 
     @JsonIgnore
@@ -102,10 +142,6 @@ public class CodeRepository {
     public void setSelectedStylesheet(int selectedStylesheet) {
         content.selectedStylesheet = selectedStylesheet;
         save();
-    }
-
-    public CodeRepository(PersistenceStrategy persistenceStrategy) {
-        this.persistenceStrategy = persistenceStrategy;
     }
 
     public void addListener(Listener listener) {

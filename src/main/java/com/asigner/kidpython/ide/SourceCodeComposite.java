@@ -39,16 +39,6 @@ public class SourceCodeComposite extends Composite {
             codeRepository.getSource(selectedSource).setCode(editor.getText());
             codeRepository.save();
         });
-        Thread saver = new Thread(() -> {
-            for(;;) {
-                try {
-                    Thread.sleep(5000);
-                    codeRepository.save();
-                } catch (InterruptedException ignored) {
-                }
-            }});
-        saver.setDaemon(true);
-        saver.start();
         int nofSources = codeRepository.getNofSources();
 
         Composite composite = new Composite(this, SWT.NONE);
@@ -74,6 +64,10 @@ public class SourceCodeComposite extends Composite {
 
         editor = new CodeEditor(this, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
         editor.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+        editor.addModifyListener(event -> {
+            codeRepository.getSource(selectedSource).setCode(editor.getText());
+            codeRepository.save();
+        });
 
         selectSource(codeRepository.getSelectedSource());
     }
@@ -111,6 +105,7 @@ public class SourceCodeComposite extends Composite {
         }
         selectedSource = idx;
         codeRepository.setSelectedSource(selectedSource);
+        codeRepository.save();
         if (selectedSource > -1) {
             buttons[selectedSource].setSelection(true);
             editor.restoreState(editorStates[selectedSource]);

@@ -511,6 +511,6 @@ public class App {
 
     private void showPreferences() {
         CloudConnectDialog dlg = new CloudConnectDialog(shell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-        dlg.open();
+        dlg.open(codeRepository);
     }
 }

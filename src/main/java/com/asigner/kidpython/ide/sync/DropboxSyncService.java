@@ -48,18 +48,18 @@ public class DropboxSyncService implements SyncService {
         dlg.setAuthorizeUrl(authorizeUrl);
         Program.launch(authorizeUrl);
 
-        dlg.open();
-
-        String authCode = dlg.getCode();
-        DbxAuthFinish finish = null;
-        try {
-            finish = webAuth.finish(authCode);
-            String token = finish.getAccessToken();
-            settings.set(KEY_ACCESS_TOKEN, token);
-            settings.set(KEY_CONNECTED, true);
-        } catch (DbxException e) {
-            // TODO(asigner): Show error message
-            e.printStackTrace();
+        if (dlg.open()) {
+            String authCode = dlg.getCode();
+            DbxAuthFinish finish = null;
+            try {
+                finish = webAuth.finish(authCode);
+                String token = finish.getAccessToken();
+                settings.set(KEY_ACCESS_TOKEN, token);
+                settings.set(KEY_CONNECTED, true);
+            } catch (DbxException e) {
+                // TODO(asigner): Show error message
+                e.printStackTrace();
+            }
         }
 
         settings.save();

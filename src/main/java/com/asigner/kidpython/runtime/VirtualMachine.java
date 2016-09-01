@@ -118,7 +118,7 @@ public class VirtualMachine {
                     while (state == RUNNING) {
                         executeInstruction();
                     }
-                } catch (Error e) {
+                } catch (Exception e) {
                     stdout.print(AnsiEscapeCodes.FG_RED);
                     stdout.println("Oooops, something went wrong...");
                     e.printStackTrace(stdout);
