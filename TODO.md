@@ -20,27 +20,30 @@ TODO
     [ ] Virtual Machine Events
         [X] Execution started
         [X] Execution stopped
-        [ ] New Line Reached
-        [ ] New Event Reached
+        [X] New Line Reached
+        [X] New Event Reached
 
 [ ] IDE/Code Editor
     [ ] Show error messages in code
     [X] Show error messages in console
     [ ] Rename tabs
     [X] Show "start executing program", "Program terminated" messages
-    [ ] Single step
-    [ ] Support pausing program
+    [X] Single step
+    [X] Support pausing program
     [ ] Export code to file
     [X] add "well know" style to stylesheets
     [X] smaller size of console when starting
     [ ] code completion
+
+[ ] Sync
+    [X] Connect to Dropbox
 
 [ ] Runtime
     [X] implement "input"
     [X] only show cursor when input is pending
     [X] implement \n special codes
     [X] implement "len" function
-    [ ] implement math functions
+    [X] implement math functions
 
 [ ] Turtle
     [X] Slow mode that moves the Turtle pixel by pixel
@@ -55,7 +58,8 @@ TODO
     [ ] explain turtle
     [ ] explain syntax
     [ ] explain input/output
+
 [ ] Language
     [ ] Default parameters
-    [ ] range operator "..":  a..b == range(a,b)
+    [X] range operator "..":  a..b == range(a,b)
     
