@@ -1,11 +1,14 @@
 // Copyright 2016 Andreas Signer. All rights reserved.
 
-package com.asigner.kidpython.ide;
+package com.asigner.kidpython.ide.sync;
 
+import com.asigner.kidpython.ide.sync.PersistenceStrategy;
 import com.dropbox.core.DbxDownloader;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.UploadUploader;
+import com.dropbox.core.v2.files.WriteMode;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -36,7 +39,11 @@ public class DropboxPersistenceStrategy implements PersistenceStrategy {
     @Override
     public void save(byte[] data) throws IOException {
         try {
-            UploadUploader uploader = client.files().upload(FILEPATH);
+            UploadUploader uploader = client.files()
+                    .uploadBuilder(FILEPATH)
+                    .withAutorename(false)
+                    .withMode(WriteMode.OVERWRITE)
+                    .start();
             OutputStream os = uploader.getOutputStream();
             os.write(data);
             uploader.finish();

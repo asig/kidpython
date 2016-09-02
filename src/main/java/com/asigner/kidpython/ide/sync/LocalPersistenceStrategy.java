@@ -1,6 +1,8 @@
 // Copyright 2016 Andreas Signer. All rights reserved.
 
-package com.asigner.kidpython.ide;
+package com.asigner.kidpython.ide.sync;
+
+import com.asigner.kidpython.ide.sync.PersistenceStrategy;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -33,7 +35,7 @@ public class LocalPersistenceStrategy implements PersistenceStrategy {
     }
 
     private String getFileName() {
-        return System.getProperty("user.home") + File.separator + ".kidpython";
+        return System.getProperty("user.home") + File.separator + ".programmablefun-coderepo.json";
     }
 
 }

@@ -1,7 +1,5 @@
 package com.asigner.kidpython.ide.sync;
 
-import com.asigner.kidpython.ide.DropboxPersistenceStrategy;
-import com.asigner.kidpython.ide.PersistenceStrategy;
 import com.asigner.kidpython.ide.Settings;
 import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxAuthFinish;
