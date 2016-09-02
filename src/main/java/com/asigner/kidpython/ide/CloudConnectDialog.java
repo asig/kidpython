@@ -1,5 +1,6 @@
 package com.asigner.kidpython.ide;
 
+import com.asigner.kidpython.ide.sync.LocalPersistenceStrategy;
 import com.asigner.kidpython.ide.sync.SyncService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
