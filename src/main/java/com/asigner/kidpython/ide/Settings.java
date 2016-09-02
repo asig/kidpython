@@ -119,8 +119,23 @@ public class Settings {
         return this;
     }
 
+    public Settings set(String key, int newVal) {
+        this.set(key, Integer.toString(newVal) );
+        return this;
+    }
+
     public String get(String key) {
         return properties.getProperty(key);
+    }
+
+    public int getInt(String key, int dflt) {
+        String res = properties.getProperty(key);
+        return res == null ? dflt : Integer.parseInt(res);
+    }
+
+    public boolean getBoolean(String key, boolean dflt) {
+        String res = properties.getProperty(key);
+        return res == null ? dflt : Boolean.parseBoolean(res);
     }
 
     public String get(String key, String dflt) {

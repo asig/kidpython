@@ -1,7 +1,9 @@
 package com.asigner.kidpython.ide;
 
 
+import com.asigner.kidpython.ide.sync.PersistenceStrategy;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -10,15 +12,13 @@ import com.google.common.collect.Lists;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class CodeRepository {
 
-    private static final String KEY_PERSISTENCE_STRATEGY = "CodeRepository.PersistenceStrategy";
+//    private static final String KEY_PERSISTENCE_STRATEGY = "CodeRepository.PersistenceStrategy";
 
 //    private final Settings settings;
 
@@ -26,13 +26,8 @@ public class CodeRepository {
         void strategyChanged(PersistenceStrategy newStrategy);
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private static class Content {
-        @JsonProperty("selected_stylesheet")
-        private int selectedStylesheet = 0;
-
-        @JsonProperty("selected_source")
-        private int selectedSource = 0;
-
         @JsonProperty("sources")
         private List<Source> sources;
 
@@ -125,23 +120,6 @@ public class CodeRepository {
 
     public Source getSource(int idx) {
         return content.sources.get(idx);
-    }
-
-    public int getSelectedSource() {
-        return content.selectedSource;
-    }
-
-    public void setSelectedSource(int selectedSource) {
-        content.selectedSource = selectedSource;
-    }
-
-    public int getSelectedStylesheet() {
-        return content.selectedStylesheet;
-    }
-
-    public void setSelectedStylesheet(int selectedStylesheet) {
-        content.selectedStylesheet = selectedStylesheet;
-        save();
     }
 
     public void addListener(Listener listener) {

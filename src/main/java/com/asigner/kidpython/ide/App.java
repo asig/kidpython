@@ -8,6 +8,8 @@ import com.asigner.kidpython.compiler.ast.Stmt;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
 import com.asigner.kidpython.ide.editor.Stylesheet;
 import com.asigner.kidpython.ide.platform.CocoaUiEnhancer;
+import com.asigner.kidpython.ide.sync.LocalPersistenceStrategy;
+import com.asigner.kidpython.ide.sync.PersistenceStrategy;
 import com.asigner.kidpython.ide.sync.SyncService;
 import com.asigner.kidpython.ide.turtle.TurtleCanvas;
 import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
@@ -53,6 +55,8 @@ public class App {
 
     private static final String APP_NAME = "Programmable Fun";
 
+    private static final String KEY_SELECTEDSTYLESHEET = "App.selectedStylesheet";
+
     protected Shell shell;
 
     private CodeRepository codeRepository;
@@ -76,6 +80,8 @@ public class App {
 
     private CoolBarManager coolBarManager;
 
+    private Settings settings;
+
     private boolean highlightLines = false;
 
     /**
@@ -92,6 +98,7 @@ public class App {
     }
 
     public App() {
+        settings = Settings.getInstance();
         PersistenceStrategy persistenceStrategy = new LocalPersistenceStrategy();
         for (SyncService syncService : SyncService.ALL) {
             if (syncService.isConnected()) {
@@ -169,7 +176,7 @@ public class App {
         SashForm sashForm2 = new SashForm(sashForm, SWT.HORIZONTAL);
         sashForm2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         sourceCodeComposite = new SourceCodeComposite(sashForm2, SWT.NONE, codeRepository);
-        sourceCodeComposite.setStylesheet(Stylesheet.ALL[codeRepository.getSelectedStylesheet()]);
+        sourceCodeComposite.setStylesheet(Stylesheet.ALL[settings.getInt(KEY_SELECTEDSTYLESHEET,0)]);
         turtleCanvas = new TurtleCanvas(sashForm2, SWT.NONE);
 
         // Lower part of toplevel sash
@@ -339,10 +346,11 @@ public class App {
                     public void widgetSelected(SelectionEvent selectionEvent) {
                         int selected = combo.getSelectionIndex();
                         sourceCodeComposite.setStylesheet(Stylesheet.ALL[selected]);
-                        codeRepository.setSelectedStylesheet(selected);
+                        settings.set(KEY_SELECTEDSTYLESHEET, selected);
+                        settings.save();
                     }
                 });
-                combo.select(codeRepository.getSelectedStylesheet());
+                combo.select(settings.getInt(KEY_SELECTEDSTYLESHEET, 0));
 
                 return composite;
             }

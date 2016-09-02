@@ -14,7 +14,10 @@ import java.util.List;
 
 public class SourceCodeComposite extends Composite {
 
+    private static final String KEY_SELECTEDSOURCE = "SourceCodeComposite.selectedSource";
+
     private CodeRepository codeRepository;
+    private Settings settings;
 
     private CodeEditor.State[] editorStates;
     private Button[] buttons;
@@ -33,6 +36,7 @@ public class SourceCodeComposite extends Composite {
         setLayout(new GridLayout(1, false));
 
         this.codeRepository = codeRepository;
+        this.settings = Settings.getInstance();
         codeRepository.addListener(newStrategy -> init());
 
         this.addDisposeListener(disposeEvent -> {
@@ -69,13 +73,18 @@ public class SourceCodeComposite extends Composite {
             codeRepository.save();
         });
 
-        selectSource(codeRepository.getSelectedSource());
+        selectSource(settings.getInt(KEY_SELECTEDSOURCE, 0));
     }
 
     private void init() {
         for (int i = 0; i < buttons.length; i++) {
             editorStates[i] = new CodeEditor.State(codeRepository.getSource(i).getCode());
             buttons[i].setText(codeRepository.getSource(i).getName());
+        }
+        if (selectedSource != -1) {
+            editor.restoreState(editorStates[selectedSource]);
+        } else {
+            selectSource(0);
         }
     }
 
@@ -104,8 +113,8 @@ public class SourceCodeComposite extends Composite {
             codeRepository.save();
         }
         selectedSource = idx;
-        codeRepository.setSelectedSource(selectedSource);
-        codeRepository.save();
+        settings.set(KEY_SELECTEDSOURCE, selectedSource);
+        settings.save();
         if (selectedSource > -1) {
             buttons[selectedSource].setSelection(true);
             editor.restoreState(editorStates[selectedSource]);
@@ -116,11 +125,11 @@ public class SourceCodeComposite extends Composite {
     }
 
     public void setErrors(List< com.asigner.kidpython.compiler.Error> errors) {
-
+        // TODO(asigner): Implement this!
     }
 
     public void clearErrors() {
-
+        // TODO(asigner): Implement this!
     }
 
     @Override
