@@ -308,9 +308,12 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         penDown = use;
     }
 
-    public void setPen(RGB color, int width) {
-        penColor = color;
+    public void setPenWidth(int width) {
         penWidth = width;
+    }
+
+    public void setPenColor(RGB color) {
+        penColor = color;
     }
 
     private void draw(PaintEvent e) {
