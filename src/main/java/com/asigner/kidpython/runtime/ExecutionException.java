@@ -2,7 +2,7 @@ package com.asigner.kidpython.runtime;
 
 import com.asigner.kidpython.compiler.Position;
 
-public class ExecutionException extends Error {
+public class ExecutionException extends RuntimeException {
     private final Position pos;
     private final String message;
 
