@@ -2,6 +2,7 @@ package com.asigner.kidpython.ide;
 
 import com.asigner.kidpython.ide.editor.CodeEditor;
 import com.asigner.kidpython.ide.editor.Stylesheet;
+import com.google.common.collect.Lists;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -124,12 +125,12 @@ public class SourceCodeComposite extends Composite {
         selectingSource = false;
     }
 
-    public void setErrors(List< com.asigner.kidpython.compiler.Error> errors) {
-        // TODO(asigner): Implement this!
+    public void setErrors(List<com.asigner.kidpython.compiler.Error> errors) {
+        editor.setErrors(errors);
     }
 
     public void clearErrors() {
-        // TODO(asigner): Implement this!
+        setErrors(Lists.newArrayList());
     }
 
     @Override

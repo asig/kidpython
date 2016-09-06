@@ -2,20 +2,23 @@
 
 package com.asigner.kidpython.ide.editor;
 
+import com.asigner.kidpython.compiler.Error;
 import com.asigner.kidpython.ide.util.SWTResources;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 
+import java.util.List;
 import java.util.Set;
 
 public class CodeEditor extends StyledText {
@@ -24,6 +27,7 @@ public class CodeEditor extends StyledText {
         private int caretOfs = 0;
         private String text = "";
         private Point selection = new Point(0,0);
+        private Multimap<Integer, Error> errors = ArrayListMultimap.create();
 
         public State(String text) {
             this.text = text;
@@ -33,7 +37,7 @@ public class CodeEditor extends StyledText {
     private final CodeLineStyler lineStyler;
     private Font font;
     private int lastLineCount = 0; // Used to trigger redraws for line numbering
-    private int activeLine =  -1;
+    private int activeLine = -1;
 
     public CodeEditor(Composite parent, int style) {
         super(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
@@ -93,6 +97,7 @@ public class CodeEditor extends StyledText {
         State s = new State(getText());
         s.caretOfs = getCaretOffset();
         s.selection = getSelection();
+        s.errors = lineStyler.getErrors();
         return s;
     }
 
@@ -102,9 +107,18 @@ public class CodeEditor extends StyledText {
         }
         setText(s.text);
         lineStyler.parseMultiLineComments(s.text);
+        lineStyler.setErrors(s.errors);
         setSelection(s.selection);
         setCaretOffset(s.caretOfs);
         redraw();
+    }
+
+    public void setErrors(List<Error> errors) {
+        Multimap<Integer, Error> map = ArrayListMultimap.create();
+        for (Error e : errors) {
+            map.put(e.getPos().getLine(), e);
+        }
+        lineStyler.setErrors(map);
     }
 
     @Override

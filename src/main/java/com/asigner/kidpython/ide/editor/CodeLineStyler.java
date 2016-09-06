@@ -1,7 +1,11 @@
 package com.asigner.kidpython.ide.editor;
 
+import com.asigner.kidpython.compiler.Error;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.Bullet;
@@ -40,6 +44,7 @@ public class CodeLineStyler implements LineStyleListener {
     private List<Range> multiLineComments;
     private Font lineNumberFont;
     private Set<String> wellKnown = Sets.newHashSet();
+    private Multimap<Integer, Error> errors = ArrayListMultimap.create();
 
     private static class Range {
         int start;
@@ -80,7 +85,6 @@ public class CodeLineStyler implements LineStyleListener {
         WHITESPACE,
         EOF
     }
-
 
     public CodeLineStyler(StyledText styledText, Stylesheet stylesheet) {
         this.styledText = styledText;
@@ -220,6 +224,14 @@ public class CodeLineStyler implements LineStyleListener {
         return changed;
     }
 
+    void setErrors(Multimap<Integer, Error> errors) {
+        this.errors = errors;
+    }
+
+    Multimap<Integer, Error> getErrors() {
+        return errors;
+    }
+
     /**
      * A simple fuzzy scanner for Python
      */
@@ -357,10 +369,6 @@ public class CodeLineStyler implements LineStyleListener {
             return NUMBER;
         }
 
-        private boolean isSeparator(int c) {
-            return !Character.isUnicodeIdentifierPart(c);
-        }
-
         /**
          * Returns next character.
          */
@@ -379,8 +387,9 @@ public class CodeLineStyler implements LineStyleListener {
         }
 
         protected void unread(int c) {
-            if (c != -1)
+            if (c != -1) {
                 pos--;
+            }
         }
     }
 }

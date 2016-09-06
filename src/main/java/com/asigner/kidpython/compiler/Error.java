@@ -39,4 +39,8 @@ public class Error {
         return String.format("Line %d, column %d: (%s) %s", pos.getLine(), pos.getCol(), code, message);
 
     }
+
+    public Position getPos() {
+        return pos;
+    }
 }
