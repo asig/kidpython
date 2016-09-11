@@ -176,7 +176,7 @@ public class App {
         SashForm sashForm2 = new SashForm(sashForm, SWT.HORIZONTAL);
         sashForm2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         sourceCodeComposite = new SourceCodeComposite(sashForm2, SWT.NONE, codeRepository);
-        sourceCodeComposite.setStylesheet(Stylesheet.ALL[settings.getInt(KEY_SELECTEDSTYLESHEET,0)]);
+        sourceCodeComposite.setStylesheet(Stylesheet.ALL.get(settings.getInt(KEY_SELECTEDSTYLESHEET,0)));
         turtleCanvas = new TurtleCanvas(sashForm2, SWT.NONE);
 
         // Lower part of toplevel sash
@@ -345,7 +345,7 @@ public class App {
                     @Override
                     public void widgetSelected(SelectionEvent selectionEvent) {
                         int selected = combo.getSelectionIndex();
-                        sourceCodeComposite.setStylesheet(Stylesheet.ALL[selected]);
+                        sourceCodeComposite.setStylesheet(Stylesheet.ALL.get(selected));
                         settings.set(KEY_SELECTEDSTYLESHEET, selected);
                         settings.save();
                     }

@@ -2,6 +2,7 @@ package com.asigner.kidpython.ide.editor;
 
 import com.asigner.kidpython.compiler.Error;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -27,6 +28,7 @@ import org.eclipse.swt.widgets.Display;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -34,7 +36,6 @@ import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.COMMENT;
 import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.EOF;
 import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.IDENT;
 import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.KEYWORD;
-import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.LINE_NUMBER;
 import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.NUMBER;
 import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.OTHER;
 import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.STRING;
@@ -97,9 +98,18 @@ public class CodeLineStyler implements LineStyleListener {
         OTHER,
         WELL_KNOWN,
         WHITESPACE,
-        LINE_NUMBER,
         EOF
     }
+
+    private static final Map<Token, Stylesheet.Entity> tokenToStyle = ImmutableMap.<Token, Stylesheet.Entity>builder()
+            .put(Token.IDENT, Stylesheet.Entity.IDENT)
+            .put(Token.KEYWORD, Stylesheet.Entity.KEYWORD)
+            .put(Token.COMMENT, Stylesheet.Entity.COMMENT)
+            .put(Token.STRING, Stylesheet.Entity.STRING)
+            .put(Token.NUMBER, Stylesheet.Entity.NUMBER)
+            .put(Token.OTHER, Stylesheet.Entity.OTHER)
+            .put(Token.WELL_KNOWN, Stylesheet.Entity.WELL_KNOWN_STRING)
+            .build();
 
     public CodeLineStyler(StyledText styledText, Stylesheet stylesheet) {
         this.styledText = styledText;
@@ -166,7 +176,7 @@ public class CodeLineStyler implements LineStyleListener {
                     }
                 }
             } else {
-                Stylesheet.Style s = stylesheet.getStyle(token);
+                Stylesheet.Style s = stylesheet.getStyle(tokenToStyle.getOrDefault(token, Stylesheet.Entity.OTHER));
                 // Only create a style if the token color is different than the
                 // widget's default foreground color and the token's style is bold or italic
                 if (!s.getFg().equals(defaultFgColor) || s.getFontStyle() != SWT.NONE) {
@@ -206,7 +216,7 @@ public class CodeLineStyler implements LineStyleListener {
 
         // Draw line number
         TextLayout layout = new TextLayout(event.display);
-        event.gc.setForeground(stylesheet.getStyle(LINE_NUMBER).getFg());
+        event.gc.setForeground(stylesheet.getStyle(Stylesheet.Entity.LINE_NUMBER_FG).getFg());
         layout.setAscent(event.ascent);
         layout.setDescent(event.descent);
         layout.setFont(lineNumberFont);

@@ -1,0 +1,64 @@
+{
+  "stylesheets": [
+    {
+      "name": "Borland",
+      "default_bg": "#ffffff",
+      "IDENT":             { "fg": "#313131", "attrs": [ ] },
+      "KEYWORD":           { "fg": "#00007b", "attrs": [ "BOLD" ] },
+      "NUMBER":            { "fg": "#0000f5", "attrs": [ ] },
+      "STRING":            { "fg": "#0000f5", "attrs": [ ] },
+      "COMMENT":           { "fg": "#008300", "attrs": [ "ITALIC"] },
+      "WELL_KNOWN_STRING": { "fg": "#ff0000", "attrs": [ ] },
+      "OTHER":             { "fg": "#313131", "attrs": [ ] },
+      "LINE_NUMBER_FG":    { "fg": "#313131", "attrs": [ ] }
+    },
+    {
+      "name": "Monokai Sublime",
+      "default_bg": "#22231e",
+      "IDENT":             { "fg": "#fcfcfb", "attrs": [ ] },
+      "KEYWORD":           { "fg": "#ef256e", "attrs": [ "BOLD" ] },
+      "NUMBER":            { "fg": "#a77cf5", "attrs": [ ] },
+      "STRING":            { "fg": "#ddd26f", "attrs": [ ] },
+      "COMMENT":           { "fg": "#706d4d", "attrs": [ "ITALIC"] },
+      "WELL_KNOWN_STRING": { "fg": "#a6e22a", "attrs": [ ] },
+      "OTHER":             { "fg": "#fcfcfb", "attrs": [ ] },
+      "LINE_NUMBER_FG":    { "fg": "#fcfcfb", "attrs": [ ] }
+    },
+    {
+      "name": "Rainbow",
+      "default_bg": "#414343",
+      "IDENT":             { "fg": "#c1c8d0", "attrs": [ ] },
+      "KEYWORD":           { "fg": "#bc8dbc", "attrs": [ "BOLD" ] },
+      "NUMBER":            { "fg": "#e68651", "attrs": [ ] },
+      "STRING":            { "fg": "#80b0a9", "attrs": [ ] },
+      "COMMENT":           { "fg": "#8a8c8a", "attrs": [ "ITALIC"] },
+      "WELL_KNOWN_STRING": { "fg": "#b5bd68", "attrs": [ ] },
+      "OTHER":             { "fg": "#c1c8d0", "attrs": [ ] },
+      "LINE_NUMBER_FG":    { "fg": "#c1c8d0", "attrs": [ ] }
+    },
+    {
+      "name": "Dracula",
+      "default_bg": "#252632",
+      "IDENT":             { "fg": "#e5e5e0", "attrs": [ ] },
+      "KEYWORD":           { "fg": "#81d7e9", "attrs": [ "BOLD" ] },
+      "NUMBER":            { "fg": "#dfe782", "attrs": [ ] },
+      "STRING":            { "fg": "#dfe782", "attrs": [ ] },
+      "COMMENT":           { "fg": "#32619e", "attrs": [ "ITALIC"] },
+      "WELL_KNOWN_STRING": { "fg": "#ff79c6", "attrs": [ ] },
+      "OTHER":             { "fg": "#e5e5e0", "attrs": [ ] },
+      "LINE_NUMBER_FG":    { "fg": "#e5e5e0", "attrs": [ ] }
+    },
+    {
+      "name": "Black & White",
+      "default_bg": "#ffffff",
+      "IDENT":             { "fg": "#000000", "attrs": [ ] },
+      "KEYWORD":           { "fg": "#000000", "attrs": [ "BOLD" ] },
+      "NUMBER":            { "fg": "#000000", "attrs": [ ] },
+      "STRING":            { "fg": "#000000", "attrs": [ ] },
+      "COMMENT":           { "fg": "#000000", "attrs": [ "ITALIC"] },
+      "WELL_KNOWN_STRING": { "fg": "#000000", "attrs": [ ] },
+      "OTHER":             { "fg": "#000000", "attrs": [ ] },
+      "LINE_NUMBER_FG":    { "fg": "#000000", "attrs": [ ] }
+    }
+  ]
+}

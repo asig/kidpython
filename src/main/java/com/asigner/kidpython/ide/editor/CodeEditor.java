@@ -42,7 +42,7 @@ public class CodeEditor extends StyledText {
     public CodeEditor(Composite parent, int style) {
         super(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 
-        Stylesheet stylesheet = Stylesheet.ALL[0];
+        Stylesheet stylesheet = Stylesheet.ALL.get(0);
         lineStyler = new CodeLineStyler(this, stylesheet);
 
         this.setBackground(stylesheet.getDefaultBackground());
