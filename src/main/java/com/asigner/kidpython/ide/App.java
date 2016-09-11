@@ -379,7 +379,7 @@ public class App {
         sourceCodeComposite.getEditor().setActiveLine(line);
     }
 
-    private void loadCode() {
+    private boolean loadCode() {
         sourceCodeComposite.clearErrors();
         Parser p = new Parser(sourceCodeComposite.getText());
         Stmt stmt = p.parse();
@@ -393,7 +393,7 @@ public class App {
                 consoleOut.println(e);
             }
             sourceCodeComposite.setErrors(p.getErrors());
-            return;
+            return false;
         }
 
         CodeGenerator codeGen = new CodeGenerator(stmt);
@@ -405,16 +405,20 @@ public class App {
         System.out.flush();
 
         virtualMachine.setProgram(program);
+        return true;
     }
 
     private void runCode() {
-        loadCode();
-        virtualMachine.start();
+        if (loadCode()) {
+            virtualMachine.start();
+        }
     }
 
     private void stepInto() {
         if (virtualMachine.getState() != VirtualMachine.State.PAUSED) {
-            loadCode();
+            if (!loadCode()) {
+                return;
+            }
         }
 
         int thisLine = virtualMachine.getCurrentInstruction().getSourceNode().getPos().getLine();
@@ -460,7 +464,9 @@ public class App {
 
     private void stepOver() {
         if (virtualMachine.getState() != VirtualMachine.State.PAUSED) {
-            loadCode();
+            if (!loadCode()) {
+                return;
+            }
         }
 
         int thisLine = virtualMachine.getCurrentInstruction().getSourceNode().getPos().getLine();

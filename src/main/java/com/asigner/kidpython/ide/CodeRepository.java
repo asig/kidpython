@@ -18,10 +18,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class CodeRepository {
 
-//    private static final String KEY_PERSISTENCE_STRATEGY = "CodeRepository.PersistenceStrategy";
-
-//    private final Settings settings;
-
     interface Listener {
         void strategyChanged(PersistenceStrategy newStrategy);
     }
@@ -49,15 +45,6 @@ public class CodeRepository {
     private volatile PersistenceStrategy persistenceStrategy;
 
     public CodeRepository(PersistenceStrategy persistenceStrategy) {
-//        settings = Settings.getInstance();
-//        try {
-//            String className = settings.get(KEY_PERSISTENCE_STRATEGY, LocalPersistenceStrategy.class.getName());
-//            Class<?> clazz = Class.forName(className);
-//            Constructor<?> ctor = clazz.getConstructor();
-//            this.persistenceStrategy = (PersistenceStrategy) ctor.newInstance();
-//        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-//            this.persistenceStrategy = new LocalPersistenceStrategy();
-//        }
         this.persistenceStrategy = persistenceStrategy;
         syncerThread = new Thread(() -> {
             for (;;) {
@@ -109,8 +96,6 @@ public class CodeRepository {
         loadFrom(strategy);
         persistenceStrategy = strategy;
         listeners.forEach(l -> l.strategyChanged(strategy));
-//        settings.set(KEY_PERSISTENCE_STRATEGY, strategy.getClass().getName());
-//        settings.save();
     }
 
     @JsonIgnore

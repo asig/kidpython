@@ -5,6 +5,8 @@ import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxAuthFinish;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
+import com.dropbox.core.DbxStandardSessionStore;
+import com.dropbox.core.DbxWebAuth;
 import com.dropbox.core.DbxWebAuthNoRedirect;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.ListFolderResult;
@@ -41,6 +43,7 @@ public class DropboxSyncService implements SyncService {
         DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
         DropboxConnectDialog dlg = new DropboxConnectDialog(Display.getDefault().getActiveShell(), SWT.APPLICATION_MODAL | SWT.DIALOG_TRIM);
         DbxRequestConfig config = DbxRequestConfig.newBuilder("ProgrammableFun/1.0").build();
+//        DbxWebAuth.newRequestBuilder().withRedirectUri("http://localhost:9876/", new DbxStandardSessionStore())
         DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(config, appInfo);
         String authorizeUrl = webAuth.start();
         dlg.setAuthorizeUrl(authorizeUrl);

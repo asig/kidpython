@@ -37,6 +37,7 @@ TODO
 
 [ ] Sync
     [X] Connect to Dropbox
+    [ ] Bring up server on localhost when syncing with Dropbox
 
 [ ] Runtime
     [X] implement "input"

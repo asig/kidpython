@@ -16,12 +16,16 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.GlyphMetrics;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.TextLayout;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -30,6 +34,7 @@ import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.COMMENT;
 import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.EOF;
 import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.IDENT;
 import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.KEYWORD;
+import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.LINE_NUMBER;
 import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.NUMBER;
 import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.OTHER;
 import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.STRING;
@@ -37,6 +42,10 @@ import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.WELL_KNOWN;
 import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.WHITESPACE;
 
 public class CodeLineStyler implements LineStyleListener {
+
+    private static final String LINE_NUMBER_FORMAT_STRING = "%3d";
+    private static final int BULLET_MARGIN = 4;
+    private static final int BULLET_IN_BETWEEN = 6;
 
     private final StyledText styledText;
 
@@ -46,6 +55,10 @@ public class CodeLineStyler implements LineStyleListener {
     private Font lineNumberFont;
     private Set<String> wellKnown = Sets.newHashSet();
     private Multimap<Integer, Error> errors = ArrayListMultimap.create();
+
+    private Image errorIcon;
+    private int bulletWidth;
+
 
     private static class Range {
         int start;
@@ -84,6 +97,7 @@ public class CodeLineStyler implements LineStyleListener {
         OTHER,
         WELL_KNOWN,
         WHITESPACE,
+        LINE_NUMBER,
         EOF
     }
 
@@ -92,9 +106,16 @@ public class CodeLineStyler implements LineStyleListener {
         this.stylesheet = stylesheet;
         scanner = new CodeScanner();
         multiLineComments = new ArrayList<>();
-        lineNumberFont = new Font(Display.getDefault(), "Mono", 8, SWT.NONE);
+        lineNumberFont = new Font(Display.getDefault(), "Roboto Mono", 8, SWT.NONE);
+        errorIcon = new Image(Display.getDefault(), CodeLineStyler.class.getResourceAsStream("error.png"));
 
-        styledText.addPaintObjectListener(event -> drawBullet(event));
+        // Figure out bullet width
+        GC gc = new GC(styledText);
+        gc.setFont(lineNumberFont);
+        bulletWidth = 2 * BULLET_MARGIN + gc.textExtent(String.format(LINE_NUMBER_FORMAT_STRING, 0)).x + 2*BULLET_IN_BETWEEN + 1 + errorIcon.getBounds().width;
+        gc.dispose();
+
+        styledText.addPaintObjectListener(this::drawBullet);
     }
 
     public void setStylesheet(Stylesheet stylesheet) {
@@ -115,6 +136,7 @@ public class CodeLineStyler implements LineStyleListener {
     }
 
     void dispose() {
+        this.errorIcon.dispose();
         this.stylesheet.dispose();
     }
 
@@ -172,31 +194,36 @@ public class CodeLineStyler implements LineStyleListener {
 
     private void addLineBullets(LineStyleEvent e) {
         // See http://stackoverflow.com/questions/11057442/java-swt-show-line-numbers-for-styledtext for general idea.
-
         StyleRange styleRange = new StyleRange();
-        styleRange.foreground = stylesheet.getStyle(OTHER).getFg();
-        styleRange.font = lineNumberFont;
-
-        // Width of number character is half the height in monospaced font, add 1 character width for right padding.
-        styleRange.metrics = new GlyphMetrics(0, 0, 40); // (bulletLength + 1) * styledText.getLineHeight() / 2);
-
-        Bullet bullet = new Bullet(ST.BULLET_CUSTOM, styleRange);
-        int bulletLine = styledText.getLineAtOffset(e.lineOffset) + 1;
-
-        e.bullet = bullet;
-        e.bulletIndex = bulletLine;
+        styleRange.metrics = new GlyphMetrics(0, 0, bulletWidth); // (bulletLength + 1) * styledText.getLineHeight() / 2);
+        e.bullet = new Bullet(ST.BULLET_CUSTOM, styleRange);
+        e.bulletIndex = styledText.getLineAtOffset(e.lineOffset) + 1;
     }
 
     private void drawBullet(PaintObjectEvent event) {
-        int bulletLength = Math.max(3, Integer.toString(styledText.getLineCount()).length());
+        Rectangle b = errorIcon.getBounds();
+        int lineHeight = styledText.getLineHeight(event.bulletIndex - 1);
 
+        // Draw line number
         TextLayout layout = new TextLayout(event.display);
+        event.gc.setForeground(stylesheet.getStyle(LINE_NUMBER).getFg());
         layout.setAscent(event.ascent);
         layout.setDescent(event.descent);
         layout.setFont(lineNumberFont);
-        layout.setText(String.format("%" + bulletLength + "s", event.bulletIndex));
-        layout.draw(event.gc, event.x, event.y);
+        layout.setText(String.format(LINE_NUMBER_FORMAT_STRING, event.bulletIndex));
+        layout.draw(event.gc, event.x + BULLET_MARGIN + b.width + BULLET_IN_BETWEEN, event.y);
         layout.dispose();
+
+        // Draw separator
+        int xOfs = bulletWidth - BULLET_MARGIN - 1;
+        event.gc.drawLine(event.x + xOfs, event.y, event.x + xOfs, event.y + lineHeight);
+
+        // Draw errors, if there are any
+        Collection<Error> errors = this.errors.get(event.bulletIndex);
+        if (errors != null && errors.size() > 0) {
+            event.gc.drawImage(errorIcon, event.x + BULLET_MARGIN, event.y + (lineHeight - b.height) / 2);
+        }
+
     }
 
     public boolean parseMultiLineComments(String text) {

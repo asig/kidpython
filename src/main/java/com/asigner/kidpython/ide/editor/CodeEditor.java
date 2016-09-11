@@ -119,6 +119,7 @@ public class CodeEditor extends StyledText {
             map.put(e.getPos().getLine(), e);
         }
         lineStyler.setErrors(map);
+        redraw();
     }
 
     @Override
