@@ -20,6 +20,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.GlyphMetrics;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.TextLayout;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -57,6 +58,7 @@ public class CodeLineStyler implements LineStyleListener {
     private Multimap<Integer, Error> errors = ArrayListMultimap.create();
 
     private Image errorIcon;
+    private int bulletWidth;
 
     private static class Range {
         int start;
@@ -113,7 +115,7 @@ public class CodeLineStyler implements LineStyleListener {
         this.stylesheet = stylesheet;
         scanner = new CodeScanner();
         multiLineComments = new ArrayList<>();
-        lineNumberFont = new Font(Display.getDefault(), "Mono", 8, SWT.NONE);
+        lineNumberFont = new Font(Display.getDefault(), "Roboto Mono", 8, SWT.NONE);
         errorIcon = new Image(Display.getDefault(), CodeLineStyler.class.getResourceAsStream("error.png"));
 
         // Figure out bullet width
@@ -220,7 +222,17 @@ public class CodeLineStyler implements LineStyleListener {
         layout.setText(String.format(LINE_NUMBER_FORMAT_STRING, event.bulletIndex));
         layout.draw(event.gc, event.x + BULLET_MARGIN + b.width + BULLET_IN_BETWEEN, event.y);
         layout.dispose();
-        event.gc.drawImage(errorIcon, event.x, event.y);
+
+        // Draw separator
+        int xOfs = bulletWidth - BULLET_MARGIN - 1;
+        event.gc.drawLine(event.x + xOfs, event.y, event.x + xOfs, event.y + lineHeight);
+
+        // Draw errors, if there are any
+        Collection<Error> errors = this.errors.get(event.bulletIndex);
+        if (errors != null && errors.size() > 0) {
+            event.gc.drawImage(errorIcon, event.x + BULLET_MARGIN, event.y + (lineHeight - b.height) / 2);
+        }
+
     }
 
     public boolean parseMultiLineComments(String text) {
