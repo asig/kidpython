@@ -5,9 +5,8 @@ import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxAuthFinish;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
-import com.dropbox.core.DbxStandardSessionStore;
+import com.dropbox.core.DbxSessionStore;
 import com.dropbox.core.DbxWebAuth;
-import com.dropbox.core.DbxWebAuthNoRedirect;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
@@ -19,11 +18,11 @@ import org.eclipse.swt.widgets.Display;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class DropboxSyncService implements SyncService {
-
-    private static final String APP_KEY = "wgcfdvmpgau5h5m";
-    private static final String APP_SECRET = "qn9g8ytz4f4ko47";
 
     private static final String KEY_CONNECTED = "DropboxSyncService.connected";
     private static final String KEY_ACCESS_TOKEN = "DropboxSyncService.token";
@@ -40,29 +39,14 @@ public class DropboxSyncService implements SyncService {
         settings.set(KEY_ACCESS_TOKEN, "");
         settings.set(KEY_CONNECTED, Boolean.toString(true));
 
-        DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
-        DropboxConnectDialog dlg = new DropboxConnectDialog(Display.getDefault().getActiveShell(), SWT.APPLICATION_MODAL | SWT.DIALOG_TRIM);
-        DbxRequestConfig config = DbxRequestConfig.newBuilder("ProgrammableFun/1.0").build();
-//        DbxWebAuth.newRequestBuilder().withRedirectUri("http://localhost:9876/", new DbxStandardSessionStore())
-        DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(config, appInfo);
-        String authorizeUrl = webAuth.start();
-        dlg.setAuthorizeUrl(authorizeUrl);
-        Program.launch(authorizeUrl);
-
-        if (dlg.open()) {
-            String authCode = dlg.getCode();
-            DbxAuthFinish finish = null;
-            try {
-                finish = webAuth.finish(authCode);
-                String token = finish.getAccessToken();
-                settings.set(KEY_ACCESS_TOKEN, token);
-                settings.set(KEY_CONNECTED, true);
-            } catch (DbxException e) {
-                // TODO(asigner): Show error message
-                e.printStackTrace();
-            }
+        DropboxAutomatedAuthFlow flow = new DropboxAutomatedAuthFlow();
+        Optional<String> token = flow.execute();
+        if (token.isPresent()) {
+            settings.set(KEY_ACCESS_TOKEN, token.get());
+            settings.set(KEY_CONNECTED, true);
+        } else {
+            settings.set(KEY_CONNECTED, false);
         }
-
         settings.save();
     }
 
