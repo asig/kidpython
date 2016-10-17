@@ -98,6 +98,11 @@ public class UtilsWrapper extends NativeCodeWrapper {
 
     @Override
     public List<String> getExposedNames() {
-        return Lists.newArrayList("print", "println", "input", "len");
+        return Lists.newArrayList(
+                "print",
+                "println",
+                "input",
+                "len"
+        );
     }
 }
