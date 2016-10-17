@@ -1,5 +1,6 @@
 package com.asigner.kidpython.ide.console;
 
+import com.asigner.kidpython.ide.util.SWTUtils;
 import com.asigner.kidpython.util.ByteBuffer;
 import com.google.common.collect.Lists;
 import org.eclipse.jface.resource.FontDescriptor;
@@ -130,7 +131,7 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
 
         this.setMenu(createContextMenu());
 
-        font = new Font(parent.getDisplay(), "Roboto Mono", 10, SWT.NONE);
+        font = new Font(parent.getDisplay(), "Roboto Mono", SWTUtils.scaleFont(10), SWT.NONE);
         fontBold = FontDescriptor.createFrom(font).setStyle(SWT.BOLD).createFont(disp);
         fontItalic = FontDescriptor.createFrom(font).setStyle(SWT.BOLD).createFont(disp);
         fontBoldItalic = FontDescriptor.createFrom(font).setStyle(SWT.BOLD | SWT.ITALIC).createFont(disp);
