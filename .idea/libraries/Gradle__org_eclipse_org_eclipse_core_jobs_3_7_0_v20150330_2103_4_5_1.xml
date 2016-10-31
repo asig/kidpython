@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: org.eclipse:org.eclipse.core.jobs_3.7.0.v20150330-2103:4.5.1">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/org.eclipse/platform-minimal/4.5.1/jars/org.eclipse.core.jobs_3.7.0.v20150330-2103.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

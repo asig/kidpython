@@ -1,6 +1,8 @@
 package com.asigner.kidpython.ide.editor;
 
 import com.asigner.kidpython.compiler.Error;
+import com.asigner.kidpython.ide.util.SWTResources;
+import com.asigner.kidpython.ide.util.SWTUtils;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -45,8 +47,8 @@ import static com.asigner.kidpython.ide.editor.CodeLineStyler.Token.WHITESPACE;
 public class CodeLineStyler implements LineStyleListener {
 
     private static final String LINE_NUMBER_FORMAT_STRING = "%3d";
-    private static final int BULLET_MARGIN = 4;
-    private static final int BULLET_IN_BETWEEN = 6;
+    private static final int BULLET_MARGIN_PX = 4;
+    private static final int BULLET_IN_BETWEEN_PX = 6;
 
     private final StyledText styledText;
 
@@ -78,8 +80,7 @@ public class CodeLineStyler implements LineStyleListener {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             Range range = (Range) o;
-            return start == range.start &&
-                    end == range.end;
+            return start == range.start && end == range.end;
         }
 
         @Override
@@ -115,13 +116,13 @@ public class CodeLineStyler implements LineStyleListener {
         this.stylesheet = stylesheet;
         scanner = new CodeScanner();
         multiLineComments = new ArrayList<>();
-        lineNumberFont = new Font(Display.getDefault(), "Roboto Mono", 8, SWT.NONE);
-        errorIcon = new Image(Display.getDefault(), CodeLineStyler.class.getResourceAsStream("error.png"));
+        lineNumberFont = new Font(Display.getDefault(), "Roboto Mono", SWTUtils.scaleFont(8), SWT.NONE);
+        errorIcon = SWTResources.getImage("/com/asigner/kidpython/ide/editor/error.png");
 
         // Figure out bullet width
         GC gc = new GC(styledText);
         gc.setFont(lineNumberFont);
-        bulletWidth = 2 * BULLET_MARGIN + gc.textExtent(String.format(LINE_NUMBER_FORMAT_STRING, 0)).x + 2*BULLET_IN_BETWEEN + 1 + errorIcon.getBounds().width;
+        bulletWidth = 2 * BULLET_MARGIN_PX + gc.textExtent(String.format(LINE_NUMBER_FORMAT_STRING, 0)).x + 2* BULLET_IN_BETWEEN_PX + 1 + errorIcon.getBounds().width;
         gc.dispose();
 
         styledText.addPaintObjectListener(this::drawBullet);
@@ -220,17 +221,17 @@ public class CodeLineStyler implements LineStyleListener {
         layout.setDescent(event.descent);
         layout.setFont(lineNumberFont);
         layout.setText(String.format(LINE_NUMBER_FORMAT_STRING, event.bulletIndex));
-        layout.draw(event.gc, event.x + BULLET_MARGIN + b.width + BULLET_IN_BETWEEN, event.y);
+        layout.draw(event.gc, event.x + BULLET_MARGIN_PX + b.width + BULLET_IN_BETWEEN_PX, event.y);
         layout.dispose();
 
         // Draw separator
-        int xOfs = bulletWidth - BULLET_MARGIN - 1;
+        int xOfs = bulletWidth - BULLET_MARGIN_PX - 1;
         event.gc.drawLine(event.x + xOfs, event.y, event.x + xOfs, event.y + lineHeight);
 
         // Draw errors, if there are any
         Collection<Error> errors = this.errors.get(event.bulletIndex);
         if (errors != null && errors.size() > 0) {
-            event.gc.drawImage(errorIcon, event.x + BULLET_MARGIN, event.y + (lineHeight - b.height) / 2);
+            event.gc.drawImage(errorIcon, event.x + BULLET_MARGIN_PX, event.y + (lineHeight - b.height) / 2);
         }
 
     }

@@ -45,6 +45,13 @@ public class UtilsWrapper extends NativeCodeWrapper {
         return UndefinedValue.INSTANCE;
     }
 
+    public Value println(List<Value> values) {
+        print(values);
+        stdout.println();
+        stdout.flush();
+        return UndefinedValue.INSTANCE;
+    }
+
     public Value input(List<Value> values) {
         print(values);
         Display.getDefault().syncExec(consoleComposite::forceFocus);
@@ -84,12 +91,18 @@ public class UtilsWrapper extends NativeCodeWrapper {
     @Override
     public void registerWith(VirtualMachine.Frame frame) {
         frame.setVar("print", new NativeFuncValue(this::print));
+        frame.setVar("println", new NativeFuncValue(this::println));
         frame.setVar("input", new NativeFuncValue(this::input));
         frame.setVar("len", new NativeFuncValue(this::utilsLen));
     }
 
     @Override
     public List<String> getExposedNames() {
-        return Lists.newArrayList("print", "input", "len");
+        return Lists.newArrayList(
+                "print",
+                "println",
+                "input",
+                "len"
+        );
     }
 }

@@ -4,9 +4,9 @@ package com.asigner.kidpython.ide.editor;
 
 import com.asigner.kidpython.compiler.Error;
 import com.asigner.kidpython.ide.util.SWTResources;
+import com.asigner.kidpython.ide.util.SWTUtils;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
@@ -47,7 +47,7 @@ public class CodeEditor extends StyledText {
 
         this.setBackground(stylesheet.getDefaultBackground());
 
-        font = new Font(parent.getDisplay(), "Roboto Mono", 10, SWT.NONE);
+        font = new Font(parent.getDisplay(), "Roboto Mono", SWTUtils.scaleFont(10), SWT.NONE);
         this.addDisposeListener(new DisposeListener() {
             @Override
             public void widgetDisposed(DisposeEvent disposeEvent) {

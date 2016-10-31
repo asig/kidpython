@@ -8,6 +8,7 @@ TODO
           print(i + "\n")
           print(2*i + "\n")
         end
+    [ ] Single step: "Step over" springt aus funktionen raus
 
     
 [ ] Console

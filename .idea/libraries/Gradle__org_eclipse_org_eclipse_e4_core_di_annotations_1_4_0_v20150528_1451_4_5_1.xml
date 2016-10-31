@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: org.eclipse:org.eclipse.e4.core.di.annotations_1.4.0.v20150528-1451:4.5.1">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/org.eclipse/platform-minimal/4.5.1/jars/org.eclipse.e4.core.di.annotations_1.4.0.v20150528-1451.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

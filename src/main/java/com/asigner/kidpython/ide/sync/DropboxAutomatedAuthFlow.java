@@ -69,7 +69,7 @@ public class DropboxAutomatedAuthFlow {
                 String[] paramStrs = uri.substring(uri.indexOf("?")+1).split("&");
                 for (String paramStr : paramStrs) {
                     String[] parts = paramStr.split("=");
-                    params.put(parts[0].trim(), new String[] { URLDecoder.decode(parts[1].trim()) });
+                    params.put(parts[0].trim(), new String[] { URLDecoder.decode(parts[1].trim(), "utf-8") });
                 }
                 String response = "You can close this tab now.";
                 httpExchange.sendResponseHeaders(200, response.length());
