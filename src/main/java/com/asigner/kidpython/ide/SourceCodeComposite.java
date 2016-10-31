@@ -4,12 +4,23 @@ import com.asigner.kidpython.ide.editor.CodeEditor;
 import com.asigner.kidpython.ide.editor.Stylesheet;
 import com.google.common.collect.Lists;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Text;
 
 import java.util.List;
 
@@ -65,6 +76,13 @@ public class SourceCodeComposite extends Composite {
                     selectSource(sourceIdx);
                 }
             });
+            final int finalI = i;
+            buttons[i].addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseDoubleClick(MouseEvent mouseEvent) {
+                    changeName(finalI);
+                }
+            });
         }
 
         editor = new CodeEditor(this, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
@@ -75,6 +93,49 @@ public class SourceCodeComposite extends Composite {
         });
 
         selectSource(settings.getInt(KEY_SELECTEDSOURCE, 0));
+    }
+
+    private void changeName(int idx) {
+        Button b = buttons[idx];
+        Text text = new Text(b.getParent(), SWT.SINGLE);
+        Rectangle r = b.getBounds();
+        r.x += 5;
+        r.y += 5;
+        r.width -= 10;
+        r.height -= 10;
+        text.setBounds(r);
+        text.setText(b.getText());
+        text.setVisible(true);
+        text.moveAbove(b);
+        text.setSelection(0, b.getText().length());
+        text.setFocus();
+        Runnable acceptName = () -> {
+            String newName = text.getText();
+            codeRepository.getSource(idx).setName(newName);
+            buttons[idx].setText(newName);
+        };
+        text.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                acceptName.run();
+                text.dispose();
+            }
+        });
+        text.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                switch (e.character) {
+                    case '\r':
+                        acceptName.run();
+                        // intentional fall-through
+                    case 0x1b:
+                        text.dispose();
+                        break;
+                    default:
+                        super.keyPressed(e);
+                }
+            }
+        });
     }
 
     private void init() {

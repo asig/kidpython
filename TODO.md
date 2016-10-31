@@ -26,7 +26,7 @@ TODO
 [ ] IDE/Code Editor
     [ ] Show error messages in code
     [X] Show error messages in console
-    [ ] Rename tabs
+    [X] Rename tabs
     [X] Show "start executing program", "Program terminated" messages
     [X] Single step
     [X] Support pausing program
@@ -37,7 +37,7 @@ TODO
 
 [ ] Sync
     [X] Connect to Dropbox
-    [ ] Bring up server on localhost when syncing with Dropbox
+    [X] Bring up server on localhost when syncing with Dropbox
 
 [ ] Runtime
     [X] implement "input"
