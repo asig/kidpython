@@ -7,10 +7,17 @@ buildscript {
     }
 }
 
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+}
+
+mainClassName = "com.asigner.kidpython.ide.App"
+
 apply from: "repositories.gradle"
 
-apply plugin: 'java'
-apply plugin: 'application'
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 configurations {
     providedCompile
@@ -21,29 +28,6 @@ configurations {
     runtimeLinux
     runtimeMac
     runtimeWin
-}
-
-distributions {
-    win {
-        contents {
-            with distributions.main.getContents()
-            from configurations.runtimeWin
-        }
-    }
-
-    mac {
-        contents {
-            with distributions.main.getContents()
-            from configurations.runtimeMac
-        }
-    }
-
-    linux {
-        contents {
-            with distributions.main.getContents()
-            from configurations.runtimeLinux
-        }
-    }
 }
 
 dependencies {
@@ -97,6 +81,59 @@ run {
     }
 }
 
+task shadowJarWin(type: ShadowJar) {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+    from sourceSets.main.output //tells the task to include the project code
+    baseName = project.archivesBaseName
+    classifier = "win"
+    configurations = [ project.configurations.runtime, project.configurations.runtimeWin ] //tells the task to shadow in the jars files in the 'runtime' scope
+
+    // Don't include signatures
+    exclude "META-INF/*.SF"
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
+
+    mergeServiceFiles()
+}
+
+task shadowJarLinux(type: ShadowJar) {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+
+    from sourceSets.main.output //tells the task to include the project code
+    baseName = project.archivesBaseName
+    classifier = "linux"
+    from sourceSets.test.output
+    configurations = [ project.configurations.runtime, project.configurations.runtimeLinux ] //tells the task to shadow in the jars files in the 'runtime' scope
+
+    // Don't include signatures
+    exclude "META-INF/*.SF"
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
+
+    mergeServiceFiles()
+}
+
+task shadowJarMac(type: ShadowJar) {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+    from sourceSets.main.output //tells the task to include the project code
+    baseName = project.archivesBaseName
+    classifier = "mac"
+    configurations = [ project.configurations.runtime, project.configurations.runtimeMac ] //tells the task to shadow in the jars files in the 'runtime' scope
+
+    // Don't include signatures
+    exclude "META-INF/*.SF"
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
+
+    mergeServiceFiles()
+}
+
 // Use this task if you need all runtime deps in one place. Helpful for me when playing with Eclipse (to get a
 // decent SWT UI designer...)
 task copyToLib(type: Copy) {
@@ -105,10 +142,8 @@ task copyToLib(type: Copy) {
     from osDependentRuntime
 }
 
-distTar {
-    dependsOn winDistTar
-    dependsOn linuxDistTar
-    dependsOn macDistTar
+shadowJar {
+    dependsOn shadowJarLinux
+    dependsOn shadowJarWin
+    dependsOn shadowJarMac
 }
-
-mainClassName = "com.asigner.kidpython.ide.App"
