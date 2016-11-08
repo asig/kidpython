@@ -215,7 +215,7 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
     public void turnTo(double angle) {
         this.angle = angle;
         if (turtleVisible) {
-            this.getDisplay().syncExec(this::redraw);
+            this.getDisplay().asyncExec(this::redraw);
         }
     }
 
@@ -223,7 +223,7 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         this.posX = x;
         this.posY = y;
         if (turtleVisible) {
-            this.getDisplay().syncExec(this::redraw);
+            this.getDisplay().asyncExec(this::redraw);
         }
     }
 
@@ -257,7 +257,7 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
             posX = newPosX;
             posY = newPosY;
             if (penDown || turtleVisible) {
-                this.getDisplay().syncExec(this::redraw);
+                this.getDisplay().asyncExec(this::redraw);
             }
 
             try {

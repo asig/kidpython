@@ -77,19 +77,19 @@ public class CodeEditor extends StyledText {
 
     public void setWellKnownWords(Set<String> wellKnown) {
         lineStyler.setWellKnownWords(wellKnown);
-        this.getDisplay().syncExec(this::redraw);
+        this.getDisplay().asyncExec(this::redraw);
     }
 
     public void setStylesheet(Stylesheet stylesheet) {
         lineStyler.setStylesheet(stylesheet);
         this.setBackground(stylesheet.getDefaultBackground());
-        this.getDisplay().syncExec(this::redraw);
+        this.getDisplay().asyncExec(this::redraw);
     }
 
     public void setActiveLine(int line) {
         if (line != activeLine) {
             activeLine = line;
-            this.getDisplay().syncExec(this::redraw);
+            this.getDisplay().asyncExec(this::redraw);
         }
     }
 

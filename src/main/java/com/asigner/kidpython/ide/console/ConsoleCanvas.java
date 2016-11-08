@@ -192,19 +192,23 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
 
     private void flipCursor() {
         cursorOn = !cursorOn;
-        if(!isDisposed()) {
-            Display display = this.getDisplay();
-            if (display != null) {
-                // Just repaint the cursor area
-                int x = cursorX * fontMetrics.getAverageCharWidth();
-                int y = cursorY * fontMetrics.getHeight();
-                display.asyncExec(() -> { if (!isDisposed()) redraw(x, y, fontMetrics.getAverageCharWidth() + 1, fontMetrics.getHeight(), false); });
-            }
-        }
+        repaintCursorRect();
     }
 
     public void showCursor(boolean showCursor) {
         this.showCursor = showCursor;
+        repaintCursorRect();
+    }
+
+    private void repaintCursorRect() {
+        Display display = this.getDisplay();
+        if (display != null) {
+            int x = cursorX * fontMetrics.getAverageCharWidth();
+            int y = cursorY * fontMetrics.getHeight();
+            display.asyncExec(() -> {
+                if (!isDisposed()) redraw(x, y, fontMetrics.getAverageCharWidth() + 1, fontMetrics.getHeight(), false);
+            });
+        }
     }
 
     public void write(String s) {
@@ -319,7 +323,7 @@ public class ConsoleCanvas extends Canvas implements PaintListener, KeyListener 
         int finalY = y;
         int finalH = h;
         Rectangle r = getClientArea();
-        getDisplay().syncExec(() -> redraw(r.x, r.y + finalY, r.width, finalH, false));
+        getDisplay().asyncExec(() -> redraw(r.x, r.y + finalY, r.width, finalH, false));
     }
 
     @Override

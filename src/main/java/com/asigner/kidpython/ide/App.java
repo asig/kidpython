@@ -250,7 +250,7 @@ public class App {
     }
 
     private void updateVmButtons() {
-        shell.getDisplay().syncExec(() -> {
+        shell.getDisplay().asyncExec(() -> {
             VirtualMachine.State state = virtualMachine.getState();
             switch (state) {
                 case RUNNING:
