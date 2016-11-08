@@ -43,9 +43,9 @@ dependencies {
     compile 'com.dropbox.core:dropbox-core-sdk:2.1.1'
 
     // OS-dependent runtimes
-    runtimeLinux group: 'org.eclipse', name: 'platform-minimal', version: '4.5.1', configuration: 'linux-gtk-x86_64'
-    runtimeMac group: 'org.eclipse', name: 'platform-minimal', version: '4.5.1', configuration: 'macosx-cocoa-x86_64'
-    runtimeWin group: 'org.eclipse', name: 'platform-minimal', version: '4.5.1', configuration: 'win32-x86'
+    runtimeLinux group: 'org.eclipse', name: 'platform-minimal', version: '4.6.1', configuration: 'linux-gtk-x86_64'
+    runtimeMac group: 'org.eclipse', name: 'platform-minimal', version: '4.6.1', configuration: 'macosx-cocoa-x86_64'
+    runtimeWin group: 'org.eclipse', name: 'platform-minimal', version: '4.6.1', configuration: 'win32-x86'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.9.5'
