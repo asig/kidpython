@@ -237,24 +237,7 @@ public class Parser {
             Position rangePos = lookahead.getPos();
             ExprNode range = expr();
             match(DO);
-
-//            // iter = range.begin()
-//            ExprNode iterVar = new VarNode(rangePos, makeTempVarName());
-//            stmts.add(new AssignmentStmt(rangePos, iterVar, new MakeIterNode(rangePos, range)));
-//
-//            // if !iter.hasnext goto end
-//            ExprNode condition = new NotNode(rangePos, new IterHasNextNode(rangePos, iterVar));
-//            Stmt ifNode = new IfStmt(varPos, condition, end);
-//            stmts.add(ifNode);
-//
-//            // i = iter.next()
-//            stmts.add(new AssignmentStmt(rangePos, ctrlVar, new IterNextNode(rangePos, iterVar)));
-//
             Stmt body = stmtBlock().getFirst();
-
-//            stmts.add(stmtBlock());
-//            stmts.getLast().setNext(ifNode);
-
             match(END);
 
             return new ForEachStmt(pos, ctrlVar, range, body);
@@ -270,25 +253,8 @@ public class Parser {
                 match(STEP);
                 stepExpr = expr();
             }
-
-//            // i := start
-//            stmts.add(new AssignmentStmt(varPos, ctrlVar, fromExpr));
-//
-//            // if i == stop goto end
-//            ExprNode comparison = new RelOpNode(eqPos, RelOpNode.Op.EQ, ctrlVar, toExpr);
-//            Stmt ifNode = new IfStmt(varPos, comparison, end);
-//            stmts.add(ifNode);
-
             match(DO);
-
             Stmt body = stmtBlock().getFirst();
-
-//            // i = i + steop
-//            ExprNode addStep = new ArithOpNode(eqPos, ArithOpNode.Op.ADD, ctrlVar, stepExpr);
-//            stmts.add(new AssignmentStmt(eqPos, ctrlVar, addStep));
-//            // Goto comparisong
-//            stmts.getLast().setNext(ifNode);
-
             match(END);
 
             return new ForStmt(pos, ctrlVar, fromExpr, toExpr, stepExpr, body);
