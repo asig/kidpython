@@ -375,6 +375,15 @@ public class App {
         coolBarManager.createControl(shell);
     }
 
+    private void highlightCurrentInstructionLine() {
+        Instruction instr = virtualMachine.getCurrentInstruction();
+        int line = instr != null ? instr.getSourceNode().getPos().getLine() : -1;
+        if (instr != null) {
+            System.err.println(line);
+        }
+        highlightLine(line);
+    }
+
     private void highlightLine(int line) {
         sourceCodeComposite.getEditor().setActiveLine(line);
     }
@@ -422,6 +431,7 @@ public class App {
         }
 
         int thisLine = virtualMachine.getCurrentInstruction().getSourceNode().getPos().getLine();
+        System.err.println("thisLine is " + thisLine);
 
         virtualMachine.addListener(new VirtualMachine.EventListener() {
             @Override
@@ -434,10 +444,11 @@ public class App {
             @Override
             public void newStatementReached(Node stmt) {
                 int line = stmt.getPos().getLine();
+                System.err.println(String.format("New Statement reached: line = %04d", line));
                 if (line != thisLine) {
-                    highlightLine(line);
                     virtualMachine.removeListener(this);
                     virtualMachine.pause();
+                    highlightCurrentInstructionLine();
                 }
             }
 
@@ -452,12 +463,10 @@ public class App {
             }
 
             @Override
-            public void enteringFunction(FuncValue func) {
-            }
+            public void enteringFunction(FuncValue func) { }
 
             @Override
-            public void leavingFunction() {
-            }
+            public void leavingFunction() { }
         });
         virtualMachine.start();
     }
@@ -470,7 +479,6 @@ public class App {
         }
 
         int thisLine = virtualMachine.getCurrentInstruction().getSourceNode().getPos().getLine();
-
         virtualMachine.addListener(new VirtualMachine.EventListener() {
 
             int callDepth = 0;
@@ -485,10 +493,10 @@ public class App {
             @Override
             public void newStatementReached(Node stmt) {
                 int line = stmt.getPos().getLine();
-                if (line != thisLine && callDepth == 0) {
-                    highlightLine(line);
+                if (line != thisLine && callDepth <= 0) { // We might be in a function and "step over" leaves the function
                     virtualMachine.removeListener(this);
                     virtualMachine.pause();
+                    highlightCurrentInstructionLine();
                 }
             }
 
