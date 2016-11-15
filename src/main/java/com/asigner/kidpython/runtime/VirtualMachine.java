@@ -97,9 +97,9 @@ public class VirtualMachine {
     private final InputStream stdin;
     private final List<NativeCodeWrapper> nativeWrappers;
 
-    class ExecutorThread extends Thread {
+    private class ExecutorThread extends Thread {
 
-        public ExecutorThread() {
+        ExecutorThread() {
             setDaemon(true);
             setName("VM Executor");
         }
@@ -134,9 +134,9 @@ public class VirtualMachine {
             Node stmt = instr.getSourceNode();
             if (stmt != lastStmt) {
                 lastStmt = stmt;
-                cloneListeners().stream().forEach(l -> l.newStatementReached(stmt));
+                cloneListeners().forEach(l -> l.newStatementReached(stmt));
             }
-            System.err.println(String.format("Executing: %04d %s", pc - 1, instr));
+            System.err.println(String.format("Executing: %04d (Line %02d) %s", pc - 1, instr.getSourceNode().getPos().getLine(), instr));
             switch (instr.getOpCode()) {
                 case PUSH:
                     valueStack.push(instr.getVal());
@@ -387,7 +387,7 @@ public class VirtualMachine {
     public void setProgram(List<Instruction> instrs) {
         reset();
         this.program = instrs.toArray(new Instruction[instrs.size()]);
-        cloneListeners().stream().forEach(EventListener::programSet);
+        cloneListeners().forEach(EventListener::programSet);
     }
 
     public State getState() {
@@ -400,7 +400,7 @@ public class VirtualMachine {
             if (newState != state) {
                 state = newState;
                 stateChanged.signalAll();
-                cloneListeners().stream().forEach(EventListener::vmStateChanged);
+                cloneListeners().forEach(EventListener::vmStateChanged);
             }
         } finally {
             stateLock.unlock();
@@ -419,9 +419,9 @@ public class VirtualMachine {
         this.pc = 0;
         this.lastStmt = null;
 
-        nativeWrappers.stream().forEach(w -> w.registerWith(globalFrame));
+        nativeWrappers.forEach(w -> w.registerWith(globalFrame));
 
-        cloneListeners().stream().forEach(EventListener::reset);
+        cloneListeners().forEach(EventListener::reset);
     }
 
     public void stop() {
@@ -442,11 +442,11 @@ public class VirtualMachine {
     }
 
     public Instruction getCurrentInstruction() {
-        return program[pc];
+        return pc < program.length ? program[pc] : null;
     }
 
     private void enterFunction(FuncValue func, List<Value> paramValues) {
-        cloneListeners().stream().forEach(l -> l.enteringFunction(func));
+        cloneListeners().forEach(l -> l.enteringFunction(func));
         Frame frame = new Frame(funcFrame, pc);
         funcFrame = frame;
         List<String> params = func.getParams();
@@ -457,7 +457,7 @@ public class VirtualMachine {
     }
 
     private void leaveFunction() {
-        cloneListeners().stream().forEach(EventListener::leavingFunction);
+        cloneListeners().forEach(EventListener::leavingFunction);
         pc = funcFrame.getReturnAddress();
         funcFrame = funcFrame.getParent();
     }
