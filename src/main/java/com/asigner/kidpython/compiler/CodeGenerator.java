@@ -80,8 +80,16 @@ public class CodeGenerator implements NodeVisitor {
 
     public List<Instruction> generate() {
         generateStmtBlock(stmt);
-        emit(new Instruction(stmt, STOP));
+        emit(new Instruction(tail(stmt), STOP));
         return instrs;
+    }
+
+    private Stmt tail(Stmt stmt) {
+        Stmt tail = stmt;
+        while (tail.getNext() != null) {
+            tail = tail.getNext();
+        }
+        return tail;
     }
 
     private String makeTempVarName() {
