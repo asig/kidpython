@@ -1,8 +1,8 @@
 package com.asigner.kidpython.runtime;
 
 import com.asigner.kidpython.compiler.ast.Node;
-import com.asigner.kidpython.runtime.nativecode.NativeCodeWrapper;
 import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
+import com.asigner.kidpython.runtime.nativecode.NativeCodeWrapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -47,6 +48,12 @@ public class VirtualMachine {
     }
 
     public static class Frame {
+        public enum VarType {
+            REGULAR,
+            TEMPORARY,
+            SYSTEM
+        }
+
         private final Frame parent;
         private int returnAddress;
         private final Map<String, Value> vars;
@@ -75,6 +82,10 @@ public class VirtualMachine {
 
         public void setVar(String name, Value value) {
             vars.put(name, value);
+        }
+
+        public Set<String> getVarNames() {
+            return vars.keySet();
         }
     }
 
@@ -413,8 +424,8 @@ public class VirtualMachine {
 
     public void reset() {
         setState(STOPPED);
-        this.funcFrame = null;
         this.globalFrame = new Frame(null, 0);
+        this.funcFrame = globalFrame;
         this.program = null;
         this.pc = 0;
         this.lastStmt = null;
@@ -445,6 +456,10 @@ public class VirtualMachine {
         return pc < program.length ? program[pc] : null;
     }
 
+    public Frame getCurrentFrame() {
+        return funcFrame;
+    }
+
     private void enterFunction(FuncValue func, List<Value> paramValues) {
         cloneListeners().forEach(l -> l.enteringFunction(func));
         Frame frame = new Frame(funcFrame, pc);
@@ -464,11 +479,9 @@ public class VirtualMachine {
 
     public Value getVar(String name) {
         Value v;
-        if (funcFrame != null) {
-            v = funcFrame.getVar(name);
-            if (v != null) {
-                return v;
-            }
+        v = funcFrame.getVar(name);
+        if (v != null) {
+            return v;
         }
         v = globalFrame.getVar(name);
         return v;
@@ -476,16 +489,12 @@ public class VirtualMachine {
 
     public void setVar(String name, Value value) {
         Frame targetFrame;
-        if (funcFrame != null) {
-            if (funcFrame.isDefined(name)) {
-                targetFrame = funcFrame;
-            } else if (globalFrame.isDefined(name)) {
-                targetFrame = globalFrame;
-            } else {
-                targetFrame = funcFrame;
-            }
-        } else {
+        if (funcFrame.isDefined(name)) {
+            targetFrame = funcFrame;
+        } else if (globalFrame.isDefined(name)) {
             targetFrame = globalFrame;
+        } else {
+            targetFrame = funcFrame;
         }
         targetFrame.setVar(name, value);
     }

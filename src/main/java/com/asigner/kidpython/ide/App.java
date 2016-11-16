@@ -46,7 +46,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
 
 import java.io.PrintWriter;
 import java.util.List;
@@ -180,7 +179,6 @@ public class App {
         sourceCodeComposite = new SourceCodeComposite(sashForm2, SWT.NONE, codeRepository);
         sourceCodeComposite.setStylesheet(Stylesheet.ALL.get(settings.getInt(KEY_SELECTEDSTYLESHEET,0)));
         callStackComposite = new CallStackComposite(sashForm2, SWT.NONE);
-        callStackComposite.setVisible(false);
         turtleCanvas = new TurtleCanvas(sashForm2, SWT.NONE);
         sashForm2.setWeights(new int[]{10,2,8});
 
@@ -206,6 +204,8 @@ public class App {
 
         consoleOut = new PrintWriter(consoleComposite.getOutputStream(), true);
         virtualMachine = new VirtualMachine(consoleComposite.getOutputStream(), consoleComposite.getInputStream(), nativeCodeWrappers);
+
+        callStackComposite.setVirtualMachine(virtualMachine);
 
         updateVmButtons();
 
