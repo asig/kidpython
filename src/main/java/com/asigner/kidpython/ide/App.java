@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
 
 import java.io.PrintWriter;
 import java.util.List;
@@ -63,6 +64,7 @@ public class App {
 
     private TurtleCanvas turtleCanvas;
     private SourceCodeComposite sourceCodeComposite;
+    private CallStackComposite callStackComposite;
     private ConsoleComposite consoleComposite;
 
     private PrintWriter consoleOut;
@@ -177,7 +179,10 @@ public class App {
         sashForm2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         sourceCodeComposite = new SourceCodeComposite(sashForm2, SWT.NONE, codeRepository);
         sourceCodeComposite.setStylesheet(Stylesheet.ALL.get(settings.getInt(KEY_SELECTEDSTYLESHEET,0)));
+        callStackComposite = new CallStackComposite(sashForm2, SWT.NONE);
+        callStackComposite.setVisible(false);
         turtleCanvas = new TurtleCanvas(sashForm2, SWT.NONE);
+        sashForm2.setWeights(new int[]{10,2,8});
 
         // Lower part of toplevel sash
         consoleComposite = new ConsoleComposite(sashForm, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -378,9 +383,6 @@ public class App {
     private void highlightCurrentInstructionLine() {
         Instruction instr = virtualMachine.getCurrentInstruction();
         int line = instr != null ? instr.getSourceNode().getPos().getLine() : -1;
-        if (instr != null) {
-            System.err.println(line);
-        }
         highlightLine(line);
     }
 
@@ -431,7 +433,6 @@ public class App {
         }
 
         int thisLine = virtualMachine.getCurrentInstruction().getSourceNode().getPos().getLine();
-        System.err.println("thisLine is " + thisLine);
 
         virtualMachine.addListener(new VirtualMachine.EventListener() {
             @Override
@@ -444,7 +445,6 @@ public class App {
             @Override
             public void newStatementReached(Node stmt) {
                 int line = stmt.getPos().getLine();
-                System.err.println(String.format("New Statement reached: line = %04d", line));
                 if (line != thisLine) {
                     virtualMachine.removeListener(this);
                     virtualMachine.pause();
