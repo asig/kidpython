@@ -10,7 +10,6 @@ TODO
         end
     [ ] Single step: "Step over" springt aus funktionen raus
 
-    
 [ ] Console
     [X] Support ANSI codes for coloring (ECMA-48)
     [X] Support input                                                                                                                                                xx
@@ -24,13 +23,21 @@ TODO
         [X] New Line Reached
         [X] New Event Reached
 
+[ ] Execution/Debugging
+    [X] Single step
+    [X] Support pausing program
+    [ ] Show variables
+        [X] Show Variables
+        [ ] Popup Dialog for Maps/Lists
+        [ ] Allow user to set values     
+        [ ] Distinguish between temporary and "system" variables
+        [X] Show full call stack
+
 [ ] IDE/Code Editor
     [ ] Show error messages in code
     [X] Show error messages in console
     [X] Rename tabs
     [X] Show "start executing program", "Program terminated" messages
-    [X] Single step
-    [X] Support pausing program
     [ ] Export code to file
     [X] add "well know" style to stylesheets
     [X] smaller size of console when starting
