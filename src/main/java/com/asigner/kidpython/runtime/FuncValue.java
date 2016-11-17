@@ -24,6 +24,16 @@ public class FuncValue extends Value {
     }
 
     @Override
+    public String asString() {
+        return "function";
+    }
+
+    @Override
+    public String asLiteral() {
+        return "function";
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

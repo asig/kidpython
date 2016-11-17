@@ -4,7 +4,9 @@ package com.asigner.kidpython.ide;
 
 import com.asigner.kidpython.compiler.ast.Node;
 import com.asigner.kidpython.runtime.FuncValue;
+import com.asigner.kidpython.runtime.VarType;
 import com.asigner.kidpython.runtime.VirtualMachine;
+import com.google.common.collect.Sets;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
@@ -14,12 +16,15 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CallStackComposite extends Composite {
 
+    private static final Object SEPARATOR = new Object();
+    private static final Set<VarType> VAR_TYPES = Sets.newHashSet(VarType.REGULAR, VarType.PARAMETER);
+
     private final Table table;
-    private final Object SEPARATOR = new Object();
 
     private VirtualMachine virtualMachine;
     private VirtualMachine.EventListener listener;
@@ -68,7 +73,7 @@ public class CallStackComposite extends Composite {
         for (String title : new String[] { "Name", "Value"}) {
             TableColumn col = new TableColumn(table, SWT.NONE);
             col.setText(title);
-            col.setWidth(50);
+            col.setWidth(100);
         }
         table.setLinesVisible(true);
         table.setHeaderVisible(true);
@@ -112,9 +117,9 @@ public class CallStackComposite extends Composite {
             table.removeAll();
             VirtualMachine.Frame curFrame = frame;
             while (curFrame != null) {
-                for (String varName : curFrame.getVarNames().stream().sorted().collect(Collectors.toList())) {
+                for (String varName : curFrame.getVarNames(VAR_TYPES).stream().sorted().collect(Collectors.toList())) {
                     new TableItem(table, SWT.NONE)
-                            .setText(new String[]{varName, curFrame.getVar(varName).toString()});
+                            .setText(new String[]{varName, curFrame.getVar(varName).asLiteral()});
                 }
                 curFrame = curFrame.getParent();
                 if (curFrame != null) {

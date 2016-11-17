@@ -7,6 +7,7 @@ import com.asigner.kidpython.runtime.NativeFuncValue;
 import com.asigner.kidpython.runtime.StringValue;
 import com.asigner.kidpython.runtime.UndefinedValue;
 import com.asigner.kidpython.runtime.Value;
+import com.asigner.kidpython.runtime.VarType;
 import com.asigner.kidpython.runtime.VirtualMachine;
 import com.asigner.kidpython.ide.turtle.TurtleCanvas;
 import com.google.common.collect.Lists;
@@ -92,7 +93,7 @@ public class TurtleWrapper extends NativeCodeWrapper {
         turtle.put(new StringValue("penColor"), new NativeFuncValue(this::penColor));
         turtle.put(new StringValue("penWidth"), new NativeFuncValue(this::penWidth));
 
-        frame.setVar("turtle", new MapValue(turtle));
+        frame.setVar("turtle", VarType.SYSTEM, new MapValue(turtle));
     }
 
     @Override

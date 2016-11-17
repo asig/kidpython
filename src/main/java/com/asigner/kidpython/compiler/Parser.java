@@ -24,6 +24,7 @@ import com.asigner.kidpython.compiler.ast.expr.VarNode;
 import com.asigner.kidpython.runtime.NumberValue;
 import com.asigner.kidpython.runtime.StringValue;
 import com.asigner.kidpython.runtime.UndefinedValue;
+import com.asigner.kidpython.runtime.VarType;
 import com.asigner.kidpython.util.Pair;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -231,7 +232,7 @@ public class Parser {
         String varIdent = lookahead.getValue();
         Position varPos = lookahead.getPos();
         match(IDENT);
-        ExprNode ctrlVar = new VarNode(varPos, varIdent);
+        ExprNode ctrlVar = new VarNode(varPos, varIdent, VarType.REGULAR);
         if (lookahead.getType() == IN) {
             match(IN);
             Position rangePos = lookahead.getPos();
@@ -304,7 +305,7 @@ public class Parser {
         Position pos = lookahead.getPos();
         String ident = lookahead.getValue();
         match(IDENT);
-        ExprNode varExpr = new VarNode(pos, ident);
+        ExprNode varExpr = new VarNode(pos, ident, VarType.REGULAR);
         while (SELECTOR_OR_CALL_START_SET.contains(lookahead.getType())) {
             varExpr = selectorOrCall(varExpr);
         }
@@ -365,7 +366,7 @@ public class Parser {
         match(RPAREN);
         Stmt body = funcBody();
         inFunction--;
-        return new AssignmentStmt(pos, new VarNode(pos, funcName), new MakeFuncNode(pos, body, params));
+        return new AssignmentStmt(pos, new VarNode(pos, funcName, VarType.REGULAR), new MakeFuncNode(pos, body, params));
     }
 
     private ExprNode expr() {
@@ -511,7 +512,7 @@ public class Parser {
         Position pos = lookahead.getPos();
         String varName = lookahead.getValue();
         match(IDENT);
-        ExprNode node = new VarNode(pos, varName);
+        ExprNode node = new VarNode(pos, varName, VarType.REGULAR);
         while (SELECTOR_OR_CALL_START_SET.contains(lookahead.getType())) {
             node = selectorOrCall(node);
         }

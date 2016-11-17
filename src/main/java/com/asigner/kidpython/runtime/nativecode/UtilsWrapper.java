@@ -8,6 +8,7 @@ import com.asigner.kidpython.runtime.NumberValue;
 import com.asigner.kidpython.runtime.StringValue;
 import com.asigner.kidpython.runtime.UndefinedValue;
 import com.asigner.kidpython.runtime.Value;
+import com.asigner.kidpython.runtime.VarType;
 import com.asigner.kidpython.runtime.VirtualMachine;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
 import com.google.common.collect.Lists;
@@ -90,10 +91,10 @@ public class UtilsWrapper extends NativeCodeWrapper {
 
     @Override
     public void registerWith(VirtualMachine.Frame frame) {
-        frame.setVar("print", new NativeFuncValue(this::print));
-        frame.setVar("println", new NativeFuncValue(this::println));
-        frame.setVar("input", new NativeFuncValue(this::input));
-        frame.setVar("len", new NativeFuncValue(this::utilsLen));
+        frame.setVar("print", VarType.SYSTEM, new NativeFuncValue(this::print));
+        frame.setVar("println", VarType.SYSTEM, new NativeFuncValue(this::println));
+        frame.setVar("input", VarType.SYSTEM, new NativeFuncValue(this::input));
+        frame.setVar("len", VarType.SYSTEM, new NativeFuncValue(this::utilsLen));
     }
 
     @Override

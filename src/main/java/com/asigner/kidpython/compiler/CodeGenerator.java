@@ -30,6 +30,7 @@ import com.asigner.kidpython.runtime.FuncValue;
 import com.asigner.kidpython.runtime.Instruction;
 import com.asigner.kidpython.runtime.NumberValue;
 import com.asigner.kidpython.runtime.VarRefValue;
+import com.asigner.kidpython.runtime.VarType;
 import com.asigner.kidpython.util.Pair;
 import com.google.common.collect.Lists;
 
@@ -93,7 +94,7 @@ public class CodeGenerator implements NodeVisitor {
     }
 
     private String makeTempVarName() {
-        return String.format("_tmp%04d", tmpVarCnt++);
+        return String.format("$tmp%04d", tmpVarCnt++);
     }
 
     private void generateStmtBlock(Stmt stmt) {
@@ -124,20 +125,20 @@ public class CodeGenerator implements NodeVisitor {
     public void visit(ForEachStmt stmt) {
 
         // iter = range.begin();
-        VarNode iterVar = new VarNode(stmt.getPos(), makeTempVarName());
+        VarNode iterVar = new VarNode(stmt.getPos(), makeTempVarName(), VarType.TEMPORARY);
         iterVar.accept(this);
         stmt.getRange().accept(this);
         emit(new Instruction(stmt, MKITER));
         emit(new Instruction(stmt, ASSIGN));
 
         // if !iter.hasnext goto end
-        int loopPc = emit(new Instruction(stmt, PUSH, new VarRefValue(iterVar.getVar())));
+        int loopPc = emit(new Instruction(stmt, PUSH, new VarRefValue(iterVar.getVarName(), iterVar.getVarType())));
         emit(new Instruction(stmt, ITER_HAS_NEXT));
         int branchFalsePc = emit(new Instruction(stmt, BF, 0));
 
         // ctrlVar = iter.next()
         stmt.getCtrlVar().accept(this);
-        emit(new Instruction(stmt, PUSH, new VarRefValue(iterVar.getVar())));
+        emit(new Instruction(stmt, PUSH, new VarRefValue(iterVar.getVarName(), iterVar.getVarType())));
         emit(new Instruction(stmt, ITER_NEXT));
         emit(new Instruction(stmt, ASSIGN));
 
@@ -377,7 +378,7 @@ public class CodeGenerator implements NodeVisitor {
 
     @Override
     public void visit(VarNode node) {
-        emit(new Instruction(node, PUSH, new VarRefValue(node.getVar())));
+        emit(new Instruction(node, PUSH, new VarRefValue(node.getVarName(), node.getVarType())));
     }
 
     @Override

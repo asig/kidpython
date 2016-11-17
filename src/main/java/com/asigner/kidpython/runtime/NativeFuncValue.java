@@ -23,6 +23,16 @@ public class NativeFuncValue extends Value {
     }
 
     @Override
+    public String asString() {
+        return "native function";
+    }
+
+    @Override
+    public String asLiteral() {
+        return "native function";
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

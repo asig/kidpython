@@ -26,6 +26,11 @@ public class IterValue extends Value {
         return "iter";
     }
 
+    @Override
+    public String asLiteral() {
+        return "iter";
+    }
+
     public BigDecimal asNumber() {
         throw new IllegalStateException();
     }

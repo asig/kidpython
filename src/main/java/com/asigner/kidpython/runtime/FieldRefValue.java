@@ -23,6 +23,16 @@ public class FieldRefValue extends Value {
     }
 
     @Override
+    public String asString() {
+        return "field " + key.asString();
+    }
+
+    @Override
+    public String asLiteral() {
+        return "." + key.asLiteral();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

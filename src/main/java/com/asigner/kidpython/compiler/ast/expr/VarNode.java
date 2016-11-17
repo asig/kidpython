@@ -4,18 +4,25 @@ package com.asigner.kidpython.compiler.ast.expr;
 
 import com.asigner.kidpython.compiler.Position;
 import com.asigner.kidpython.compiler.ast.NodeVisitor;
+import com.asigner.kidpython.runtime.VarType;
 
 public class VarNode extends ExprNode {
 
-    private final String var;
+    private final String varName;
+    private final VarType varType;
 
-    public VarNode(Position pos, String var) {
+    public VarNode(Position pos, String varName, VarType varType) {
         super(pos);
-        this.var = var;
+        this.varName = varName;
+        this.varType = varType;
     }
 
-    public String getVar() {
-        return var;
+    public String getVarName() {
+        return varName;
+    }
+
+    public VarType getVarType() {
+        return varType;
     }
 
     @Override

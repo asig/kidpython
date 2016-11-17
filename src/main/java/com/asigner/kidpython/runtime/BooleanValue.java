@@ -24,6 +24,11 @@ public class BooleanValue extends Value {
     }
 
     @Override
+    public String asLiteral() {
+        return String.valueOf(boolVal);
+    }
+
+    @Override
     public BigDecimal asNumber() {
         return boolVal ? BigDecimal.ONE : BigDecimal.ZERO;
     }

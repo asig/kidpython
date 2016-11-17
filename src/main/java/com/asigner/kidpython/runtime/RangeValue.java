@@ -57,6 +57,16 @@ public class RangeValue extends Value {
     }
 
     @Override
+    public String asString() {
+        return start.asString() + " .. " + end.asString();
+    }
+
+    @Override
+    public String asLiteral() {
+        return start.asLiteral() + " .. " + end.asLiteral();
+    }
+
+    @Override
     public String toString() {
         return "RangeValue{" + getType().toString() + ": start=" + start + "; end=" + end + "}";
     }

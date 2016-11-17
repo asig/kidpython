@@ -28,6 +28,11 @@ public class StringValue extends Value {
     }
 
     @Override
+    public String asLiteral() {
+        return "\"" + strVal + "\"";
+    }
+
+    @Override
     public BigDecimal asNumber() {
         return new BigDecimal(strVal);
     }

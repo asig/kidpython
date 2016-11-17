@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.asigner.kidpython.runtime.Value.Type.LIST;
+import static java.util.stream.Collectors.joining;
 
 public class ListValue extends Value {
     private final List<Value> listVal;
@@ -23,6 +24,16 @@ public class ListValue extends Value {
 
     public List<Value> asList() {
         return listVal;
+    }
+
+    @Override
+    public String asString() {
+        return "[" + listVal.stream().map(Value::asString).collect(joining(", ")) + "]";
+    }
+
+    @Override
+    public String asLiteral() {
+        return "[" + listVal.stream().map(Value::asLiteral).collect(joining(", ")) + "]";
     }
 
     @Override

@@ -33,9 +33,8 @@ public abstract class Value {
         throw new ExecutionException("Can't coerce to boolean");
     }
 
-    public String asString() {
-        throw new ExecutionException("Can't coerce to string");
-    }
+    abstract public String asString();
+    abstract public String asLiteral();
 
     public BigDecimal asNumber() {
         throw new ExecutionException("Can't coerce to number");

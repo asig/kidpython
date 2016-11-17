@@ -19,6 +19,7 @@ import java.util.Stack;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import static com.asigner.kidpython.runtime.Value.Type.BOOLEAN;
 import static com.asigner.kidpython.runtime.Value.Type.ITERATOR;
@@ -48,20 +49,16 @@ public class VirtualMachine {
     }
 
     public static class Frame {
-        public enum VarType {
-            REGULAR,
-            TEMPORARY,
-            SYSTEM
-        }
-
         private final Frame parent;
         private int returnAddress;
         private final Map<String, Value> vars;
+        private final Map<String, VarType> types;
 
         public Frame(Frame parent, int returnAddress) {
             this.parent = parent;
             this.returnAddress = returnAddress;
             this.vars = Maps.newHashMap();
+            this.types = Maps.newHashMap();
         }
 
         public Frame getParent() {
@@ -80,12 +77,16 @@ public class VirtualMachine {
             return vars.get(name);
         }
 
-        public void setVar(String name, Value value) {
+        public void setVar(String name, VarType type, Value value) {
             vars.put(name, value);
+            types.put(name, type);
         }
 
-        public Set<String> getVarNames() {
-            return vars.keySet();
+        public Set<String> getVarNames(Set<VarType> types) {
+            return this.types.entrySet().stream()
+                    .filter(e -> types.contains(e.getValue()))
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet());
         }
     }
 
@@ -164,7 +165,8 @@ public class VirtualMachine {
                         throw new ExecutionException(instr.getSourceNode().getPos(), "Can't assign to non-reference!");
                     }
                     if (lhs instanceof VarRefValue) {
-                        setVar(((VarRefValue) lhs).getVar(), rhs);
+                        VarRefValue vrv = (VarRefValue)lhs;
+                        setVar(vrv.getVarName(), vrv.getVarType(), rhs);
                     } else if (lhs instanceof FieldRefValue) {
                         FieldRefValue frv = (FieldRefValue) lhs;
                         frv.getMap().asMap().put(frv.getKey(), rhs);
@@ -184,7 +186,7 @@ public class VirtualMachine {
                     if (mapValue == null && mapRef instanceof VarRefValue) {
                         // Variable does not exist yet. Create it.
                         VarRefValue varRef = (VarRefValue) mapRef;
-                        setVar(varRef.getVar(), new MapValue(Maps.newHashMap()));
+                        setVar(varRef.getVarName(), varRef.getVarType(), new MapValue(Maps.newHashMap()));
                         mapValue = load(mapRef);
                     }
                     if (mapValue.getType() != MAP) {
@@ -466,7 +468,7 @@ public class VirtualMachine {
         funcFrame = frame;
         List<String> params = func.getParams();
         for (int i = 0; i < params.size(); i++) {
-            frame.setVar(params.get(i), paramValues.get(i));
+            frame.setVar(params.get(i), VarType.PARAMETER, paramValues.get(i));
         }
         pc = func.getStartPc();
     }
@@ -487,7 +489,7 @@ public class VirtualMachine {
         return v;
     }
 
-    public void setVar(String name, Value value) {
+    public void setVar(String name, VarType type, Value value) {
         Frame targetFrame;
         if (funcFrame.isDefined(name)) {
             targetFrame = funcFrame;
@@ -496,13 +498,13 @@ public class VirtualMachine {
         } else {
             targetFrame = funcFrame;
         }
-        targetFrame.setVar(name, value);
+        targetFrame.setVar(name, type, value);
     }
 
     private Value load(Value value) {
         if (value.getType() == REFERENCE) {
             if (value instanceof VarRefValue) {
-                value = getVar(((VarRefValue) value).getVar());
+                value = getVar(((VarRefValue) value).getVarName());
                 if (value == null) {
                     value = UndefinedValue.INSTANCE;
                 }

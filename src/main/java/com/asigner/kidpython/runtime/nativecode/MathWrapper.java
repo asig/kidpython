@@ -5,6 +5,7 @@ package com.asigner.kidpython.runtime.nativecode;
 import com.asigner.kidpython.runtime.NativeFuncValue;
 import com.asigner.kidpython.runtime.NumberValue;
 import com.asigner.kidpython.runtime.Value;
+import com.asigner.kidpython.runtime.VarType;
 import com.asigner.kidpython.runtime.VirtualMachine;
 import com.google.common.collect.Lists;
 
@@ -30,9 +31,9 @@ public class MathWrapper extends NativeCodeWrapper {
 
     @Override
     public void registerWith(VirtualMachine.Frame frame) {
-        frame.setVar("sin", new NativeFuncValue(this::sin));
-        frame.setVar("cos", new NativeFuncValue(this::cos));
-        frame.setVar("sqrt", new NativeFuncValue(this::sqrt));
+        frame.setVar("sin", VarType.SYSTEM, new NativeFuncValue(this::sin));
+        frame.setVar("cos", VarType.SYSTEM, new NativeFuncValue(this::cos));
+        frame.setVar("sqrt", VarType.SYSTEM, new NativeFuncValue(this::sqrt));
     }
 
     @Override

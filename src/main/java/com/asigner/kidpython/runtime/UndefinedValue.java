@@ -23,6 +23,11 @@ public class UndefinedValue extends Value {
     }
 
     @Override
+    public String asLiteral() {
+        return "<null>";
+    }
+
+    @Override
     public BigDecimal asNumber() {
         throw new RuntimeException("Can't coerce undefined to a number");
     }

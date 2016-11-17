@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.asigner.kidpython.runtime.Value.Type.MAP;
+import static java.util.stream.Collectors.joining;
 
 public class MapValue extends Value {
     private final Map<Value, Value> mapVal;
@@ -29,6 +30,16 @@ public class MapValue extends Value {
 
     public Map<Value, Value> asMap() {
         return mapVal;
+    }
+
+    @Override
+    public String asString() {
+        return "{" + mapVal.entrySet().stream().map(e -> e.getKey().asString() + ": " + e.getValue().asString()).collect(joining(", ")) + "}";
+    }
+
+    @Override
+    public String asLiteral() {
+        return "{" + mapVal.entrySet().stream().map(e -> e.getKey().asLiteral() + ": " + e.getValue().asLiteral()).collect(joining(", ")) + "}";
     }
 
     @Override
