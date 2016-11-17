@@ -214,6 +214,7 @@ public class App {
             public void vmStateChanged() {
                 showVmStateMessage();
                 updateVmButtons();
+                updateSourceCodeSelectionButtons();
                 switch (virtualMachine.getState()) {
                     case STOPPED:
                         highlightLine(-1);
@@ -252,6 +253,11 @@ public class App {
             public void leavingFunction() {
             }
         });
+    }
+
+    private void updateSourceCodeSelectionButtons() {
+        boolean enabled = virtualMachine.getState() == VirtualMachine.State.STOPPED;
+        shell.getDisplay().asyncExec(() -> sourceCodeComposite.setSourceCodeSelectionEnabled(enabled));
     }
 
     private void updateVmButtons() {

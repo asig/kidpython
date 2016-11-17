@@ -26,7 +26,13 @@ import java.util.List;
 
 public class SourceCodeComposite extends Composite {
 
+    public interface SourceSelectionChangedListener {
+        void newSourceSelected(int idx);
+    }
+
     private static final String KEY_SELECTEDSOURCE = "SourceCodeComposite.selectedSource";
+
+    private final List<SourceSelectionChangedListener> listeners = Lists.newArrayList();
 
     private CodeRepository codeRepository;
     private Settings settings;
@@ -93,6 +99,20 @@ public class SourceCodeComposite extends Composite {
         });
 
         selectSource(settings.getInt(KEY_SELECTEDSOURCE, 0));
+    }
+
+    public void addListener(SourceSelectionChangedListener listener) {
+        this.listeners.add(listener);
+    }
+
+    public void removeListener(SourceSelectionChangedListener listener) {
+        this.listeners.remove(listener);
+    }
+
+    public void setSourceCodeSelectionEnabled(boolean enabled) {
+        for (Button b : buttons) {
+            b.setEnabled(enabled);
+        }
     }
 
     private void changeName(int idx) {
@@ -180,6 +200,7 @@ public class SourceCodeComposite extends Composite {
         if (selectedSource > -1) {
             buttons[selectedSource].setSelection(true);
             editor.restoreState(editorStates[selectedSource]);
+            listeners.forEach(l -> l.newSourceSelected(idx));
         }
         editor.setFocus();
 
