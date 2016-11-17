@@ -6,6 +6,8 @@ import com.asigner.kidpython.compiler.ast.Node;
 import com.asigner.kidpython.runtime.FuncValue;
 import com.asigner.kidpython.runtime.VirtualMachine;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
@@ -16,10 +18,11 @@ import java.util.stream.Collectors;
 
 public class CallStackComposite extends Composite {
 
+    private final Table table;
+    private final Object SEPARATOR = new Object();
+
     private VirtualMachine virtualMachine;
     private VirtualMachine.EventListener listener;
-
-    private final Table table;
 
     /**
      * Create the composite.
@@ -69,6 +72,23 @@ public class CallStackComposite extends Composite {
         }
         table.setLinesVisible(true);
         table.setHeaderVisible(true);
+
+        // Set up necessary listeners for custom paint items
+        table.addListener(SWT.EraseItem, event -> {
+            if (event.item.getData() == SEPARATOR) {
+                // Don't do the default foreground painting for separators
+                event.detail &= ~SWT.FOREGROUND;
+            }
+        });
+        table.addListener(SWT.PaintItem, event -> {
+            if (event.item.getData() == SEPARATOR) {
+                Rectangle clientRect = table.getClientArea();
+                GC gc = event.gc;
+                int y = event.y + event.height/2;
+                gc.drawLine(clientRect.x, y, clientRect.x + clientRect.width, y);
+            }
+        });
+
     }
 
     public void setVirtualMachine(VirtualMachine virtualMachine) {
@@ -98,8 +118,7 @@ public class CallStackComposite extends Composite {
                 }
                 curFrame = curFrame.getParent();
                 if (curFrame != null) {
-                    new TableItem(table, SWT.NONE)
-                            .setText(new String[]{"------------------"});
+                    new TableItem(table, SWT.NONE).setData(SEPARATOR);
                 }
             }
         });
