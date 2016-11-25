@@ -80,6 +80,11 @@ public class TurtleWrapper extends NativeCodeWrapper {
         return UndefinedValue.INSTANCE;
     }
 
+    public Value clear(List<Value> values) {
+        turtleCanvas.clear();
+        return UndefinedValue.INSTANCE;
+    }
+
     @Override
     public void registerWith(VirtualMachine.Frame frame) {
         Map<Value, Value> turtle = Maps.newHashMap();
@@ -88,6 +93,7 @@ public class TurtleWrapper extends NativeCodeWrapper {
         turtle.put(new StringValue("penUp"), new NativeFuncValue(this::penUp));
         turtle.put(new StringValue("move"), new NativeFuncValue(this::move));
         turtle.put(new StringValue("home"), new NativeFuncValue(this::home));
+        turtle.put(new StringValue("clear"), new NativeFuncValue(this::clear));
         turtle.put(new StringValue("show"), new NativeFuncValue(this::show));
         turtle.put(new StringValue("hide"), new NativeFuncValue(this::hide));
         turtle.put(new StringValue("penColor"), new NativeFuncValue(this::penColor));
@@ -98,7 +104,7 @@ public class TurtleWrapper extends NativeCodeWrapper {
 
     @Override
     public List<String> getExposedNames() {
-        return Lists.newArrayList("turtle", "turn", "penDown", "penUp", "move", "home", "show", "hide", "penColor", "penWidth");
+        return Lists.newArrayList("turtle", "turn", "penDown", "penUp", "move", "home", "clear", "show", "hide", "penColor", "penWidth");
     }
 
 }

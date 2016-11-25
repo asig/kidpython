@@ -174,7 +174,14 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         getDisplay().asyncExec(this::redraw);
     }
 
-    public void download() {
+    public void clear() {
+        try {
+            linesLock.lock();
+            lines.clear();
+        } finally {
+            linesLock.unlock();
+        }
+        getDisplay().asyncExec(this::redraw);
     }
 
     public void setOffset(int ofsX, int ofsY) {
@@ -369,7 +376,13 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         AffineTransform t = new AffineTransform();
         t.translate(posX, posY);
         t.scale(.25,.25);
-        t.rotate(Math.toRadians(angle));
+        // HACK: SWT under Linux seems to have issues drawing paths if the rotation is a multiple of 45 degrees...
+        // Therefore, let's adjust it a little.
+        double a = angle;
+        if (a % 45.0 < 0.01) {
+            a += .01;
+        }
+        t.rotate(Math.toRadians(a));
         g2d.transform(t);
         Turtle.paint(g2d);
         g2d.setTransform(orig);
