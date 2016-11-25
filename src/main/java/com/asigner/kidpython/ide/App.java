@@ -17,10 +17,11 @@ import com.asigner.kidpython.ide.util.SWTResources;
 import com.asigner.kidpython.runtime.FuncValue;
 import com.asigner.kidpython.runtime.Instruction;
 import com.asigner.kidpython.runtime.VirtualMachine;
+import com.asigner.kidpython.runtime.nativecode.Export;
 import com.asigner.kidpython.runtime.nativecode.MathWrapper;
-import com.asigner.kidpython.runtime.nativecode.NativeCodeWrapper;
 import com.asigner.kidpython.runtime.nativecode.TurtleWrapper;
 import com.asigner.kidpython.runtime.nativecode.UtilsWrapper;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.eclipse.jface.action.ControlContribution;
@@ -48,6 +49,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
@@ -185,12 +187,29 @@ public class App {
         // Lower part of toplevel sash
         consoleComposite = new ConsoleComposite(sashForm, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 
-        List<NativeCodeWrapper> nativeCodeWrappers = Lists.newArrayList(
+        List<Object> nativeCodeWrappers = Lists.newArrayList(
                 new TurtleWrapper(turtleCanvas), new MathWrapper(), new UtilsWrapper(consoleComposite)
         );
         Set<String> wellKnownWords = Sets.newHashSet();
-        for (NativeCodeWrapper wrapper : nativeCodeWrappers) {
-            wellKnownWords.addAll(wrapper.getExposedNames());
+        for (Object wrapper : nativeCodeWrappers) {
+            Export export = wrapper.getClass().getAnnotation(Export.class);
+            if (export != null) {
+                String name = export.name();
+                if (Strings.isNullOrEmpty(name)) {
+                    name = wrapper.getClass().getName();
+                }
+                wellKnownWords.add(name);
+            }
+            for (Method m : wrapper.getClass().getMethods()) {
+                export = m.getAnnotation(Export.class);
+                if (export != null) {
+                    String name = export.name();
+                    if (Strings.isNullOrEmpty(name)) {
+                        name = m.getName();
+                    }
+                    wellKnownWords.add(name);
+                }
+            }
         }
         sourceCodeComposite.getEditor().setWellKnownWords(wellKnownWords);
 

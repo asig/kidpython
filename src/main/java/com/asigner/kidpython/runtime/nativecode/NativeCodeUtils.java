@@ -8,14 +8,10 @@ import com.asigner.kidpython.runtime.VirtualMachine;
 
 import java.util.List;
 
-public abstract class NativeCodeWrapper {
-
-    protected void checkArgs(List<Value> values, int count) {
+class NativeCodeUtils {
+    static void checkArgs(List<Value> values, int count) {
         if (values.size() != count) {
             throw new ExecutionException("Must pass exactly " + count + " values");
         }
     }
-
-    public abstract void registerWith(VirtualMachine.Frame frame);
-    public abstract List<String> getExposedNames();
 }

@@ -2,7 +2,9 @@ package com.asigner.kidpython.runtime;
 
 import com.asigner.kidpython.compiler.ast.Node;
 import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
-import com.asigner.kidpython.runtime.nativecode.NativeCodeWrapper;
+import com.asigner.kidpython.runtime.nativecode.Export;
+import com.asigner.kidpython.util.Pair;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -10,6 +12,7 @@ import com.google.common.collect.Maps;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -107,7 +110,7 @@ public class VirtualMachine {
 
     private final PrintStream stdout;
     private final InputStream stdin;
-    private final List<NativeCodeWrapper> nativeWrappers;
+    private final List<Object> nativeWrappers;
 
     private class ExecutorThread extends Thread {
 
@@ -380,7 +383,7 @@ public class VirtualMachine {
         }
     }
 
-    public VirtualMachine(OutputStream stdout, InputStream stdin, List<NativeCodeWrapper> nativeWrappers) {
+    public VirtualMachine(OutputStream stdout, InputStream stdin, List<Object> nativeWrappers) {
         this.nativeWrappers = ImmutableList.copyOf(nativeWrappers);
         this.stdout = new PrintStream(stdout);
         this.stdin = stdin;
@@ -432,9 +435,53 @@ public class VirtualMachine {
         this.pc = 0;
         this.lastStmt = null;
 
-        nativeWrappers.forEach(w -> w.registerWith(globalFrame));
+        nativeWrappers.forEach(this::registerNativeWrapper);
 
         cloneListeners().forEach(EventListener::reset);
+    }
+
+    private void registerNativeWrapper(Object w) {
+        List<Pair<String, NativeFuncValue>> methods = findExportedMethods(w);
+        Export export = w.getClass().getAnnotation(Export.class);
+        if (export != null) {
+            Map<Value, Value> map = Maps.newHashMap();
+            for (Pair<String, NativeFuncValue> p : methods) {
+                map.put(new StringValue(p.getFirst()), p.getSecond());
+            }
+
+            String name = export.name();
+            if (Strings.isNullOrEmpty(name)) {
+                name = w.getClass().getName();
+            }
+            globalFrame.setVar(name, VarType.SYSTEM, new MapValue(map));
+        } else {
+            for (Pair<String, NativeFuncValue> p : methods) {
+                globalFrame.setVar(p.getFirst(), VarType.SYSTEM, p.getSecond());
+            }
+        }
+    }
+
+    private List<Pair<String, NativeFuncValue>> findExportedMethods(Object w) {
+        List<Pair<String, NativeFuncValue>> methods = Lists.newArrayList();
+        for (Method m : w.getClass().getMethods()) {
+            Export methodExport = m.getAnnotation(Export.class);
+            if (methodExport != null) {
+                String name = methodExport.name();
+                if (Strings.isNullOrEmpty(name)) {
+                    name = m.getName();
+                }
+                final String finalName = name;
+                NativeFuncValue.Iface caller = vals -> {
+                    try {
+                        return (Value) m.invoke(w, vals);
+                    } catch (Exception e) {
+                        throw new ExecutionException("Can't call native function " + finalName + ", e = " + e.getMessage());
+                    }
+                };
+                methods.add(Pair.of(name, new NativeFuncValue(caller)));
+            }
+        }
+        return methods;
     }
 
     public void stop() {
