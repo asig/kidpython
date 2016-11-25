@@ -39,7 +39,10 @@ public class StringValue extends Value {
 
     @Override
     public Iterator<? extends Value> asIterator() {
-        return Stream.of(strVal.toCharArray()).map(c -> new StringValue(String.valueOf(c))).collect(toList()).iterator();
+        return strVal.chars()
+                .mapToObj(i -> new StringValue(String.valueOf((char)i)))
+                .collect(toList())
+                .iterator();
     }
 
     @Override
