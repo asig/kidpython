@@ -89,12 +89,23 @@ public class UtilsWrapper extends NativeCodeWrapper {
         }
     }
 
+    public Value utilsWait(List<Value> values) {
+        checkArgs(values, 1);
+        int delay = values.get(0).asNumber().multiply(new BigDecimal(1000)).intValue();
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException ignored) {
+        }
+        return UndefinedValue.INSTANCE;
+    }
+
     @Override
     public void registerWith(VirtualMachine.Frame frame) {
         frame.setVar("print", VarType.SYSTEM, new NativeFuncValue(this::print));
         frame.setVar("println", VarType.SYSTEM, new NativeFuncValue(this::println));
         frame.setVar("input", VarType.SYSTEM, new NativeFuncValue(this::input));
         frame.setVar("len", VarType.SYSTEM, new NativeFuncValue(this::utilsLen));
+        frame.setVar("wait", VarType.SYSTEM, new NativeFuncValue(this::utilsWait));
     }
 
     @Override
@@ -103,7 +114,8 @@ public class UtilsWrapper extends NativeCodeWrapper {
                 "print",
                 "println",
                 "input",
-                "len"
+                "len",
+                "wait"
         );
     }
 }
