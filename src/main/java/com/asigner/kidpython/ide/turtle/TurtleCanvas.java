@@ -376,8 +376,8 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         AffineTransform t = new AffineTransform();
         t.translate(posX, posY);
         t.scale(.25,.25);
-        // HACK: SWT under Linux seems to have issues drawing paths if the rotation is a multiple of 45 degrees...
-        // Therefore, let's adjust it a little.
+        // HACK: SWT (at least under Linux and macOs) seems to have issues drawing paths if the rotation is a multiple
+        // of 45 degrees... Therefore, let's adjust it a little.
         double a = angle;
         if (a % 45.0 < 0.01) {
             a += .01;
