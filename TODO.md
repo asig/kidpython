@@ -9,6 +9,8 @@ TODO
           print(2*i + "\n")
         end
     [ ] Single step: "Step over" springt aus funktionen raus
+    [ ] Stepping is sort of broken
+    [X] Turtle canvas: Turtle not drawn for 45 degrees???        
 
 [ ] Console
     [X] Support ANSI codes for coloring (ECMA-48)
@@ -30,7 +32,7 @@ TODO
         [X] Show Variables
         [ ] Popup Dialog for Maps/Lists
         [ ] Allow user to set values     
-        [ ] Distinguish between temporary and "system" variables
+        [X] Distinguish between temporary and "system" variables
         [X] Show full call stack
 
 [ ] IDE/Code Editor
@@ -61,6 +63,7 @@ TODO
     [X] Reset buttons
     [X] Make canvas draggable
     [X] implement "clear"
+    [X] implement "home"
     [X] Implement "Double Buffering"
 
 [ ] Manual
@@ -71,4 +74,5 @@ TODO
 [ ] Language
     [ ] Default parameters
     [X] range operator "..":  a..b == range(a,b)
+    [ ] implement case statement (analog to Oberon)
     
