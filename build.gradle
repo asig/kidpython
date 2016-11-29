@@ -1,9 +1,13 @@
 buildscript {
     repositories {
         jcenter()
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+        classpath 'gradle.plugin.edu.sc.seis.gradle:launch4j:1.6.2'
     }
 }
 
@@ -11,6 +15,7 @@ plugins {
     id 'java'
     id 'application'
     id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id 'edu.sc.seis.launch4j' version '1.6.2'
 }
 
 mainClassName = "com.asigner.kidpython.ide.App"
@@ -146,4 +151,14 @@ shadowJar {
     dependsOn shadowJarLinux
     dependsOn shadowJarWin
     dependsOn shadowJarMac
+}
+
+launch4j {
+    // Stupid launch4j gradle plugin ignores copyConfigurable when building the XML file,
+    // so we need to fall back to fat jar.
+    outfile = 'ProgrammableFun.exe'
+    mainClassName = project.mainClassName
+    copyConfigurable = project.tasks.shadowJarWin.outputs.files
+    jar = "lib/${project.tasks.shadowJarWin.archiveName}"
+    icon = '../../resources/turtle.ico' // Icon is relative to build/launch4j
 }
