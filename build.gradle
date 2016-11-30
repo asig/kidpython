@@ -24,6 +24,16 @@ apply from: "repositories.gradle"
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
+//
+// Load custom properties
+//
+def props = new Properties()
+props.load(new FileInputStream("build.properties"))
+props.each { key, val ->
+    project.ext.set(key, val)
+}
+
+
 configurations {
     providedCompile
 
@@ -54,6 +64,14 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.9.5'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs += [ "build/src" ]
+        }
+    }
 }
 
 // Setup OS dependent runtime path
@@ -139,12 +157,18 @@ task shadowJarMac(type: ShadowJar) {
     mergeServiceFiles()
 }
 
+task generateBuildInfo(type:com.programmablefun.GenerateBuildInfoTask)
+
 // Use this task if you need all runtime deps in one place. Helpful for me when playing with Eclipse (to get a
 // decent SWT UI designer...)
 task copyToLib(type: Copy) {
     into "$buildDir/output/lib"
     from configurations.runtime
     from osDependentRuntime
+}
+
+compileJava {
+    dependsOn generateBuildInfo
 }
 
 shadowJar {
