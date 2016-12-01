@@ -110,6 +110,7 @@ task shadowJarWin(type: ShadowJar) {
     }
     from sourceSets.main.output //tells the task to include the project code
     baseName = project.archivesBaseName
+    destinationDir = file("$rootDir/build/dist/win")
     classifier = "win"
     configurations = [ project.configurations.runtime, project.configurations.runtimeWin ] //tells the task to shadow in the jars files in the 'runtime' scope
 
@@ -128,8 +129,8 @@ task shadowJarLinux(type: ShadowJar) {
 
     from sourceSets.main.output //tells the task to include the project code
     baseName = project.archivesBaseName
+    destinationDir = file("$rootDir/build/dist/linux")
     classifier = "linux"
-    from sourceSets.test.output
     configurations = [ project.configurations.runtime, project.configurations.runtimeLinux ] //tells the task to shadow in the jars files in the 'runtime' scope
 
     // Don't include signatures
@@ -146,6 +147,7 @@ task shadowJarMac(type: ShadowJar) {
     }
     from sourceSets.main.output //tells the task to include the project code
     baseName = project.archivesBaseName
+    destinationDir = file("$rootDir/build/dist/mac")
     classifier = "mac"
     configurations = [ project.configurations.runtime, project.configurations.runtimeMac ] //tells the task to shadow in the jars files in the 'runtime' scope
 
