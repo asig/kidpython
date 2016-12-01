@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Name=Programmable Fun
+Comment=A simple IDE to teach kids how to program
+Keywords=Educatiom;Developmen
+Exec=/usr/bin/programmable-fun
+Terminal=false
+Type=Application
+Icon=/usr/share/programmable-fun/icon.png
+Categories=GNOME;GTK;Network;IDE;
+StartupNotify=true
+

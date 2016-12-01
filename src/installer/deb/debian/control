@@ -1,0 +1,17 @@
+Source: programmable-fun
+Section: unknown
+Priority: optional
+Maintainer: Andreas Signer <asigner@gmail.com>
+Build-Depends: debhelper (>=9)
+Standards-Version: 3.9.6
+Homepage: www.programmablefun.com
+
+Package: programmable-fun
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: A simple IDE to teach kids how to code.
+ Programmable Fun is an easy-to-use, no-overhead IDE that 
+ lets kids jump right into coding. Sources are optionally
+ stored in the cloud, and it comes with a powerful 
+ programming language, syntax highlighting, 
+ debugging facilities, and most importantly TURTLE GRAPHICS!
