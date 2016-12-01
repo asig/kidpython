@@ -104,6 +104,24 @@ run {
     }
 }
 
+task generateBuildInfo(type:com.programmablefun.GenerateBuildInfoTask)
+
+compileJava {
+    dependsOn generateBuildInfo
+}
+
+// Use this task if you need all runtime deps in one place. Helpful for me when playing with Eclipse (to get a
+// decent SWT UI designer...)
+task copyToLib(type: Copy) {
+    into "$buildDir/output/lib"
+    from configurations.runtime
+    from osDependentRuntime
+}
+
+//
+// Shadow jar targets
+//
+
 task shadowJarWin(type: ShadowJar) {
     manifest {
         attributes 'Main-Class': mainClassName
@@ -159,25 +177,15 @@ task shadowJarMac(type: ShadowJar) {
     mergeServiceFiles()
 }
 
-task generateBuildInfo(type:com.programmablefun.GenerateBuildInfoTask)
-
-// Use this task if you need all runtime deps in one place. Helpful for me when playing with Eclipse (to get a
-// decent SWT UI designer...)
-task copyToLib(type: Copy) {
-    into "$buildDir/output/lib"
-    from configurations.runtime
-    from osDependentRuntime
-}
-
-compileJava {
-    dependsOn generateBuildInfo
-}
-
 shadowJar {
     dependsOn shadowJarLinux
     dependsOn shadowJarWin
     dependsOn shadowJarMac
 }
+
+//
+// launch4j
+//
 
 launch4j {
     // Stupid launch4j gradle plugin ignores copyConfigurable when building the XML file,
@@ -187,4 +195,29 @@ launch4j {
     copyConfigurable = project.tasks.shadowJarWin.outputs.files
     jar = "lib/${project.tasks.shadowJarWin.archiveName}"
     icon = '../../resources/turtle.ico' // Icon is relative to build/launch4j
+}
+
+createExe {
+    dependsOn shadowJarWin
+}
+
+//
+// Packages
+//
+
+task makePackageWin(type: Exec) {
+    dependsOn createExe // This this for whatever reason not work...
+    workingDir 'src/installer/win'
+    commandLine 'makensis', 'ProgrammableFun.nsi'
+}
+
+task makePackageDeb(type: Exec) {
+    dependsOn shadowJarLinux
+    workingDir 'src/installer/deb'
+    commandLine 'dpkg-buildpackage', '-b', '-uc'
+}
+
+task makePackages {
+    dependsOn makePackageWin
+    dependsOn makePackageDeb
 }
