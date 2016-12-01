@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Andreas Signer <asigner@gmail.com>
 Build-Depends: debhelper (>=9)
 Standards-Version: 3.9.6
-Homepage: www.programmablefun.com
+Homepage: http://www.programmablefun.com
 
 Package: programmable-fun
 Architecture: amd64
