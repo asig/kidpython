@@ -12,6 +12,10 @@ TODO
     [ ] Stepping is sort of broken
     [X] Turtle canvas: Turtle not drawn for 45 degrees???        
 
+[ ] Updates
+    [ ] Update checker
+    [ ] Release script pushing to github
+    
 [ ] Console
     [X] Support ANSI codes for coloring (ECMA-48)
     [X] Support input                                                                                                                                                xx
