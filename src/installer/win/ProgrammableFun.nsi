@@ -47,7 +47,7 @@
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "../../../build/${PRODUCT_NAME}-${PRODUCT_VERSION}-Setup.exe"
+OutFile "../../../build/installers/${PRODUCT_NAME}-${PRODUCT_VERSION}-Setup.exe"
 InstallDir "$PROGRAMFILES\${PRODUCT_DIR}"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
@@ -92,7 +92,7 @@ FunctionEnd
 
 Function un.onInit
 !insertmacro MUI_UNGETLANGUAGE
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "M�chten Sie $(^Name) und alle seinen Komponenten deinstallieren?" IDYES +2
+  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Möchten Sie $(^Name) und alle seinen Komponenten deinstallieren?" IDYES +2
   Abort
 FunctionEnd
 
