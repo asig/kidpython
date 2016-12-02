@@ -211,8 +211,17 @@ task makePackageWin(type: Exec) {
     commandLine 'makensis', 'ProgrammableFun.nsi'
 }
 
+task stagePackageDeb(type: Copy) {
+    dependsOn jar
+
+    into "$buildDir/stage/linux/jars"
+    from configurations.runtime
+    from osDependentRuntime
+    from jar.outputs
+}
+
 task makePackageDeb(type: Exec) {
-    dependsOn shadowJarLinux
+    dependsOn stagePackageDeb
     workingDir 'src/installer/deb'
     commandLine 'dpkg-buildpackage', '-b', '-uc'
 }

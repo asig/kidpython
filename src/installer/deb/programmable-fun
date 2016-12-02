@@ -1,2 +1,2 @@
 #!/bin/sh
-USE_GTK3=0 java -jar /usr/share/programmable-fun/jars/kidpython-linux.jar
+USE_GTK3=0 java -cp "/usr/share/programmable-fun/jars/*" com.asigner.kidpython.ide.App
