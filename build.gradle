@@ -220,10 +220,18 @@ task stagePackageDeb(type: Copy) {
     from jar.outputs
 }
 
-task makePackageDeb(type: Exec) {
+task makePackageDeb {
     dependsOn stagePackageDeb
-    workingDir 'src/installer/deb'
-    commandLine 'dpkg-buildpackage', '-b', '-uc'
+    doLast {
+        exec {
+            workingDir 'src/installer/deb'
+            commandLine 'dpkg-buildpackage', '-b', '-uc'
+        }
+        exec {
+            workingDir 'src/installer/'
+            commandLine 'ls', '*.deb', '../../build/installers/'
+        }
+    }
 }
 
 task makePackages {
