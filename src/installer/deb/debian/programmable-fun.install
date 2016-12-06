@@ -1,4 +1,4 @@
-icon.png                    /usr/share/programmable-fun/
-programmable-fun.desktop    /usr/share/applications/
-programmable-fun            /usr/bin/
-../../../build/dist/linux/* /usr/share/programmable-fun/jars/
+icon.png                          /usr/share/programmable-fun/
+programmable-fun.desktop          /usr/share/applications/
+programmable-fun                  /usr/bin/
+../../../build/stage/linux/jars/* /usr/share/programmable-fun/jars/

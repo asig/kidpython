@@ -5,7 +5,7 @@
 
 ## How to build installer
 1. Install NSIS and snapcraft
-   `sudo apt install nsis snapcraft`
+   `sudo apt install nsis`
 2. `./gradlew createExe makePackages`
 3. `(cd src/installer/win; makensis ProgrammableFun.nsi`)
 4. `(cd src/installer/deb; dpkg-buildpackage -b)`)

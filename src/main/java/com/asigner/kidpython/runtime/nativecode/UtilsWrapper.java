@@ -28,6 +28,7 @@ public class UtilsWrapper {
         this.stdout = new PrintStream(consoleComposite.getOutputStream());
     }
 
+    @Export
     public Value print(List<Value> values) {
         for (Value v : values) {
             String s = v.asString()
