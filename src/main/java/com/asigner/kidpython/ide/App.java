@@ -21,6 +21,7 @@ import com.asigner.kidpython.runtime.nativecode.Export;
 import com.asigner.kidpython.runtime.nativecode.MathWrapper;
 import com.asigner.kidpython.runtime.nativecode.TurtleWrapper;
 import com.asigner.kidpython.runtime.nativecode.UtilsWrapper;
+import com.asigner.kidpython.util.Messages;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -53,6 +54,17 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
+import static com.asigner.kidpython.util.Messages.Key.Action_About;
+import static com.asigner.kidpython.util.Messages.Key.Action_Help;
+import static com.asigner.kidpython.util.Messages.Key.Action_Pause;
+import static com.asigner.kidpython.util.Messages.Key.Action_Preferences;
+import static com.asigner.kidpython.util.Messages.Key.Action_Resume;
+import static com.asigner.kidpython.util.Messages.Key.Action_Run;
+import static com.asigner.kidpython.util.Messages.Key.Action_Step_Into;
+import static com.asigner.kidpython.util.Messages.Key.Action_Step_Over;
+import static com.asigner.kidpython.util.Messages.Key.Action_Stop;
+import static com.asigner.kidpython.util.Messages.Key.VM_Error_While_Compiling;
+
 public class App {
 
     private static final String APP_NAME = "Programmable Fun";
@@ -62,6 +74,8 @@ public class App {
     protected Shell shell;
 
     private CodeRepository codeRepository;
+
+    private final Messages messages;
 
     private TurtleCanvas turtleCanvas;
     private SourceCodeComposite sourceCodeComposite;
@@ -102,6 +116,7 @@ public class App {
 
     public App() {
         settings = Settings.getInstance();
+        messages = new Messages();
         PersistenceStrategy persistenceStrategy = new LocalPersistenceStrategy();
         for (SyncService syncService : SyncService.ALL) {
             if (syncService.isConnected()) {
@@ -315,13 +330,13 @@ public class App {
         VirtualMachine.State state = virtualMachine.getState();
         switch (state) {
             case RUNNING:
-                status("Programmausführung gestartet.");
+                status(messages.get(Messages.Key.VM_Execution_Started));
                 break;
             case STOPPED:
-                status("Programmausführung gestoppt.");
+                status(messages.get(Messages.Key.VM_Execution_Stopped));
                 break;
             case PAUSED:
-                status("Programmausführung pausiert.");
+                status(messages.get(Messages.Key.VM_Execution_Paused));
                 break;
         }
     }
@@ -331,15 +346,15 @@ public class App {
     }
 
     private void createActions() {
-        vmStartAction = new BaseAction("Run", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/nav_go@2x.png"), this::runCode);
-        vmPauseAction = new BaseAction("Pause", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/suspend_co@2x.png"), () -> virtualMachine.pause() );
-        vmResumeAction = new BaseAction("Resume", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/resume_co@2x.png"), () -> virtualMachine.start() );
-        vmStopAction = new BaseAction("Stop", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stop@2x.png"), () -> virtualMachine.stop());
-        vmStepIntoAction = new BaseAction("Step Into", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepinto_co@2x.png"), this::stepInto);
-        vmStepOverAction = new BaseAction("Step Over", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepover_co@2x.png"), this::stepOver);
-        aboutAction = new BaseAction("About", this::showAbout);
-        preferencesAction = new BaseAction("Preferences", this::showPreferences);
-        helpAction = new BaseAction("Help", SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/help@2x.png"), this::showHelp);
+        vmStartAction = new BaseAction(messages.get(Action_Run), SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/nav_go@2x.png"), this::runCode);
+        vmPauseAction = new BaseAction(messages.get(Action_Pause), SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/suspend_co@2x.png"), () -> virtualMachine.pause() );
+        vmResumeAction = new BaseAction(messages.get(Action_Resume), SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/resume_co@2x.png"), () -> virtualMachine.start() );
+        vmStopAction = new BaseAction(messages.get(Action_Stop), SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stop@2x.png"), () -> virtualMachine.stop());
+        vmStepIntoAction = new BaseAction(messages.get(Action_Step_Into), SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepinto_co@2x.png"), this::stepInto);
+        vmStepOverAction = new BaseAction(messages.get(Action_Step_Over), SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepover_co@2x.png"), this::stepOver);
+        aboutAction = new BaseAction(messages.get(Action_About), this::showAbout);
+        preferencesAction = new BaseAction(messages.get(Action_Preferences), this::showPreferences);
+        helpAction = new BaseAction(messages.get(Action_Help), SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/help@2x.png"), this::showHelp);
     }
 
     private void createToolbar() {
@@ -423,7 +438,7 @@ public class App {
             consoleOut.print(AnsiEscapeCodes.BOLD);
             consoleOut.print(AnsiEscapeCodes.FG_YELLOW);
             consoleOut.print(AnsiEscapeCodes.BG_RED);
-            consoleOut.print("Fehler beim Compilieren:");
+            consoleOut.print(messages.get(VM_Error_While_Compiling));
             consoleOut.println(AnsiEscapeCodes.RESET);
             for (Error e : p.getErrors()) {
                 consoleOut.println(e);
