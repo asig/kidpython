@@ -207,6 +207,7 @@ createExe {
 
 task makePackageWin(type: Exec) {
     dependsOn createExe // This this for whatever reason not work...
+    file("$rootDir/build/installers").mkdirs()
     workingDir 'src/installer/win'
     commandLine 'makensis', 'ProgrammableFun.nsi'
 }
@@ -227,9 +228,11 @@ task makePackageDeb {
             workingDir 'src/installer/deb'
             commandLine 'dpkg-buildpackage', '-b', '-uc'
         }
-        exec {
-            workingDir 'src/installer/'
-            commandLine 'ls', '*.deb', '../../build/installers/'
+        file("$rootDir/build/installers").mkdirs()
+        file("$rootDir/src/installer").eachFile {
+            if (it.name.endsWith(".deb")) {
+                it.renameTo("$rootDir/build/installers/" + it.name)
+            }
         }
     }
 }
