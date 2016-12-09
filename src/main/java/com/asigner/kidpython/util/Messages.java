@@ -20,15 +20,61 @@ public class Messages {
         VM_Execution_Stopped,
         VM_Execution_Paused,
         VM_Error_While_Compiling,
+
+        Compiler_Token_FUNC,
+        Compiler_Token_END,
+        Compiler_Token_IF,
+        Compiler_Token_THEN,
+        Compiler_Token_ELSE,
+        Compiler_Token_FOR,
+        Compiler_Token_STEP,
+        Compiler_Token_IN,
+        Compiler_Token_TO,
+        Compiler_Token_DO,
+        Compiler_Token_WHILE,
+        Compiler_Token_REPEAT,
+        Compiler_Token_UNTIL,
+        Compiler_Token_RETURN,
+        Compiler_Token_AND,
+        Compiler_Token_OR,
+        Compiler_Token_PLUS,
+        Compiler_Token_MINUS,
+        Compiler_Token_ASTERISK,
+        Compiler_Token_SLASH,
+        Compiler_Token_LPAREN,
+        Compiler_Token_RPAREN,
+        Compiler_Token_LBRACK,
+        Compiler_Token_RBRACK,
+        Compiler_Token_LBRACE,
+        Compiler_Token_RBRACE,
+        Compiler_Token_COMMA,
+        Compiler_Token_DOT,
+        Compiler_Token_DOTDOT,
+        Compiler_Token_COLON,
+        Compiler_Token_EQ,
+        Compiler_Token_NE,
+        Compiler_Token_LE,
+        Compiler_Token_LT,
+        Compiler_Token_GE,
+        Compiler_Token_GT,
+        Compiler_Token_IDENT,
+        Compiler_Token_STRING_LIT,
+        Compiler_Token_NUM_LIT,
+        Compiler_Token_EOT,
+        Compiler_Token_UNKNOWN,
+
+        Compiler_Error_Position,
+        Compiler_Error_UNEXPECTED_TOKEN,
+        Compiler_Error_RETURN_NOT_ALLOWED_OUTSIDE_FUNCTION,
     }
 
-    private ResourceBundle bundle;
+    private static ResourceBundle bundle;
 
-    public Messages() {
-        this.bundle = ResourceBundle.getBundle("com.asigner.kidpython.Messages", Locale.GERMAN);
+    static {
+        bundle = ResourceBundle.getBundle("com.asigner.kidpython.Messages", Locale.GERMAN);
     }
 
-    public String get(Key key) {
+    public static String get(Key key) {
         return bundle.getString(key.toString());
     }
 }

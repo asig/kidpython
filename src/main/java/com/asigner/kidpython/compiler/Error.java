@@ -1,5 +1,7 @@
 package com.asigner.kidpython.compiler;
 
+import com.asigner.kidpython.util.Messages;
+
 import java.util.Set;
 
 import static java.util.stream.Collectors.joining;
@@ -15,17 +17,24 @@ public class Error {
     private final Code code;
     private final String message;
 
+    private static String getTokenMsg(Token.Type type) {
+        return Messages.get(Messages.Key.valueOf("Compiler_Token_" + type.toString()));
+    }
+
     public static Error unexpectedToken(Token token, Set<Token.Type> expected) {
+        String unexpectedTokenMsg = getTokenMsg(token.getType());
+        String expectedMsg = expected.stream().map(Error::getTokenMsg).collect(joining(", "));
         return new Error(
                 Code.UNEXPECTED_TOKEN,
-                "Unexpected token " + token.getType() + ". Expected instead one of " + expected.stream().map(Enum::toString).collect(joining(",")),
+                String.format(Messages.get(Messages.Key.Compiler_Error_UNEXPECTED_TOKEN), unexpectedTokenMsg, expectedMsg),
                 token.getPos());
     }
 
     public static Error returnNotAllowedOutsideFunction(Position pos) {
+        String message = Messages.get(Messages.Key.Compiler_Error_RETURN_NOT_ALLOWED_OUTSIDE_FUNCTION);
         return new Error(
                 Code.RETURN_NOT_ALLOWED_OUTSIDE_FUNCTION,
-                "return statement not allowed outside a function",
+                message,
                 pos);
     }
 
@@ -36,8 +45,8 @@ public class Error {
     }
 
     public String toString() {
-        return String.format("Line %d, column %d: (%s) %s", pos.getLine(), pos.getCol(), code, message);
-
+        String posStr = String.format(Messages.get(Messages.Key.Compiler_Error_Position), pos.getLine(), pos.getCol());
+        return String.format("%s: (%s) %s", posStr, code, message);
     }
 
     public Position getPos() {
