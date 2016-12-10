@@ -66,6 +66,8 @@ public class Messages {
         Compiler_Error_Position,
         Compiler_Error_UNEXPECTED_TOKEN,
         Compiler_Error_RETURN_NOT_ALLOWED_OUTSIDE_FUNCTION,
+
+        StatusLine_Position
     }
 
     private static ResourceBundle bundle;

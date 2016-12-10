@@ -1,6 +1,7 @@
 package com.asigner.kidpython.ide;
 
 import com.asigner.kidpython.ide.editor.CodeEditor;
+import com.asigner.kidpython.ide.editor.CodeEditorStyledText;
 import com.asigner.kidpython.ide.editor.Stylesheet;
 import com.google.common.collect.Lists;
 import org.eclipse.swt.SWT;
@@ -88,7 +89,7 @@ public class SourceCodeComposite extends Composite {
             });
         }
 
-        editor = new CodeEditor(this, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+        editor = new CodeEditor(this, SWT.NONE);
         editor.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         editor.addModifyListener(event -> {
             codeRepository.getSource(selectedSource).setCode(editor.getText());
