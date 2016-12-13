@@ -1,27 +1,22 @@
-// Copyright 2016 Andreas Signer. All rights reserved.
-
 package com.asigner.kidpython.ide.editor;
 
 import com.asigner.kidpython.compiler.Error;
-import com.asigner.kidpython.ide.util.SWTResources;
-import com.asigner.kidpython.ide.util.SWTUtils;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.LineBackgroundEvent;
-import org.eclipse.swt.custom.LineBackgroundListener;
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 
 import java.util.List;
 import java.util.Set;
 
-public class CodeEditor extends StyledText {
+public class CodeEditor extends Composite {
+
+    private final CodeEditorStyledText editor;
+    private final StatusLine statusLine;
 
     public static class State {
         private int caretOfs = 0;
@@ -34,70 +29,28 @@ public class CodeEditor extends StyledText {
         }
     }
 
-    private final CodeLineStyler lineStyler;
-    private Font font;
-    private int lastLineCount = 0; // Used to trigger redraws for line numbering
-    private int activeLine = -1;
-
     public CodeEditor(Composite parent, int style) {
-        super(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+        super(parent, SWT.NONE);
+        GridLayout gridLayout = new GridLayout(1, false);
+        gridLayout.verticalSpacing = 0;
+        gridLayout.marginWidth = 0;
+        gridLayout.marginHeight = 0;
+        gridLayout.horizontalSpacing = 0;
+        setLayout(gridLayout);
 
-        Stylesheet stylesheet = Stylesheet.ALL.get(0);
-        lineStyler = new CodeLineStyler(this, stylesheet);
+        editor = new CodeEditorStyledText(this, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+        editor.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+        editor.addCaretListener(caretEvent -> updateStatusLine());
 
-        this.setBackground(stylesheet.getDefaultBackground());
-
-        font = new Font(parent.getDisplay(), "Roboto Mono", SWTUtils.scaleFont(10), SWT.NONE);
-        this.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(DisposeEvent disposeEvent) {
-                font.dispose();
-            }
-        });
-        this.addLineBackgroundListener(new LineBackgroundListener() {
-            @Override
-            public void lineGetBackground(LineBackgroundEvent lineBackgroundEvent) {
-                int line = getLineAtOffset(lineBackgroundEvent.lineOffset) + 1; // activeLine is 1-based
-                if (line == activeLine) {
-                    lineBackgroundEvent.lineBackground = SWTResources.getColor(new RGB(255,0,0));
-                }
-            }
-        });
-
-        addLineStyleListener(lineStyler);
-        setFont(font);
-        addModifyListener(modifyEvent -> {
-            int lineCount = getLineCount();
-            if (lastLineCount != lineCount || lineStyler.parseMultiLineComments(getText())) {
-                redraw();
-            }
-            lastLineCount = lineCount;
-        });
-    }
-
-    public void setWellKnownWords(Set<String> wellKnown) {
-        lineStyler.setWellKnownWords(wellKnown);
-        this.getDisplay().asyncExec(this::redraw);
-    }
-
-    public void setStylesheet(Stylesheet stylesheet) {
-        lineStyler.setStylesheet(stylesheet);
-        this.setBackground(stylesheet.getDefaultBackground());
-        this.getDisplay().asyncExec(this::redraw);
-    }
-
-    public void setActiveLine(int line) {
-        if (line != activeLine) {
-            activeLine = line;
-            this.getDisplay().asyncExec(this::redraw);
-        }
+        statusLine = new StatusLine(this, SWT.NONE);
+        statusLine.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
     }
 
     public State saveState() {
-        State s = new State(getText());
-        s.caretOfs = getCaretOffset();
-        s.selection = getSelection();
-        s.errors = lineStyler.getErrors();
+        State s = new State(editor.getText());
+        s.caretOfs = editor.getCaretOffset();
+        s.selection = editor.getSelection();
+        s.errors = editor.getLineStyler().getErrors();
         return s;
     }
 
@@ -105,24 +58,50 @@ public class CodeEditor extends StyledText {
         if (s == null) {
             return;
         }
-        setText(s.text);
-        lineStyler.parseMultiLineComments(s.text);
-        lineStyler.setErrors(s.errors);
-        setSelection(s.selection);
-        setCaretOffset(s.caretOfs);
-        redraw();
+        editor.setText(s.text);
+        editor.getLineStyler().parseMultiLineComments(s.text);
+        editor.getLineStyler().setErrors(s.errors);
+        editor.setSelection(s.selection);
+        editor.setCaretOffset(s.caretOfs);
+        updateStatusLine();
+        editor.redraw();
+    }
+
+    private void updateStatusLine() {
+        int ofs = editor.getCaretOffset();
+        int line = editor.getLineAtOffset(ofs);
+        int col = ofs - editor.getOffsetAtLine(line);
+        statusLine.setPosition(line + 1, col + 1);
+    }
+
+    public void addModifyListener(ModifyListener listener) {
+        editor.addModifyListener(listener);
+    }
+
+    public String getText() {
+        return editor.getText();
+    }
+
+    public void setWellKnownWords(Set<String> wellKnown) {
+        editor.setWellKnownWords(wellKnown);
+    }
+
+    public void setStylesheet(Stylesheet stylesheet) {
+        editor.setStylesheet(stylesheet);
+        statusLine.setStylesheet(stylesheet);
+    }
+
+    public void setActiveLine(int line) {
+        editor.setActiveLine(line);
     }
 
     public void setErrors(List<Error> errors) {
-        Multimap<Integer, Error> map = ArrayListMultimap.create();
-        for (Error e : errors) {
-            map.put(e.getPos().getLine(), e);
-        }
-        lineStyler.setErrors(map);
-        redraw();
+        editor.setErrors(errors);
     }
 
     @Override
     protected void checkSubclass() {
+        // Disable the check that prevents subclassing of SWT components
     }
+
 }

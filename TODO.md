@@ -1,6 +1,9 @@
 TODO
 ====
 
+[ ] Cleanup
+    [ ] Style LINENR_BG really necessary?
+
 [ ] Bugs
     [X] Write to parameters are not done in the func frame, but in global?
     [X] ForEach loop: only first command is executed. e.g.:
@@ -10,7 +13,7 @@ TODO
         end
     [ ] Single step: "Step over" springt aus funktionen raus
     [ ] Stepping is sort of broken
-    [X] Turtle canvas: Turtle not drawn for 45 degrees???        
+    [X] Turtle canvas: Turtle not drawn for 45 degrees???
 
 [ ] Updates
     [ ] Update checker
