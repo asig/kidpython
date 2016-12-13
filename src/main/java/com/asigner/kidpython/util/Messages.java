@@ -16,6 +16,14 @@ public class Messages {
         Action_Preferences,
         Action_Help,
 
+        Menu_File,
+        MenuItem_Exit,
+
+        StatusLine_Position,
+        StatusLine_CAPS,
+        StatusLine_NUM,
+        StatusLine_SCROLL,
+
         VM_Execution_Started,
         VM_Execution_Stopped,
         VM_Execution_Paused,

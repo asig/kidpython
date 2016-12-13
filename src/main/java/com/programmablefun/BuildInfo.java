@@ -6,6 +6,7 @@ public interface BuildInfo {
     Version getVersion();
     java.time.Instant getBuildTime();
     String getCommit();
-    String getPlatform();
+    String getOSName();
+    String getOSArch();
     String toString();
 }

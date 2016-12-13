@@ -46,6 +46,8 @@ class GenerateBuildInfoTask extends DefaultTask {
         def targetFileName = outputDir.path + "/" + packageName.replaceAll('\\.', '/') + "/" + className + ".java"
         def targetFile = new File(targetFileName)
 
+        def osName = System.properties.get("os.name");
+        def osArch = System.properties.get("os.arch");
         def platform = System.properties.get("os.name") + " " + System.properties.get("os.version") + " " + System.properties.get("os.arch")
         targetFile.delete();
         targetFile.getParentFile().mkdirs()
@@ -54,8 +56,9 @@ class GenerateBuildInfoTask extends DefaultTask {
         targetFile << "public Version getVersion() { return new Version(\"${getVersion()}\"); }\n"
         targetFile << "public java.time.Instant getBuildTime() { return java.time.Instant.ofEpochMilli(${now}L); }\n"
         targetFile << "public String getCommit() { return \"${getGitCommit()}\"; }\n"
-        targetFile << "public String getPlatform() { return \"${platform}\"; }\n"
-        targetFile << "public String toString() { return String.format(\"%s/%s/%s\", getBuildTime(), getCommit(), getPlatform()); }\n"
+        targetFile << "public String getOSName() { return \"${osName}\"; }\n"
+        targetFile << "public String getOSArch() { return \"${osArch}\"; }\n"
+        targetFile << "public String toString() { return String.format(\"%s/%s/%s\", getBuildTime(), getCommit(), getOSName() + \" \" + getOSArch()); }\n"
         targetFile << '}\n'
 
         println "Generated build info class in " + targetFileName

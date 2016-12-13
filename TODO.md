@@ -38,7 +38,7 @@ TODO
     [ ] Show variables
         [X] Show Variables
         [ ] Popup Dialog for Maps/Lists
-        [ ] Allow user to set values     
+        [ ] Allow user to set values
         [X] Distinguish between temporary and "system" variables
         [X] Show full call stack
 

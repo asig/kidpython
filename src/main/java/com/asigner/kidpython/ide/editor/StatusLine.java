@@ -13,6 +13,13 @@ import org.eclipse.swt.layout.GridData;
 
 import java.util.List;
 
+import static com.asigner.kidpython.util.Messages.Key.StatusLine_CAPS;
+import static com.asigner.kidpython.util.Messages.Key.StatusLine_NUM;
+import static com.asigner.kidpython.util.Messages.Key.StatusLine_Position;
+import static com.asigner.kidpython.util.Messages.Key.StatusLine_SCROLL;
+import static java.util.stream.Collectors.joining;
+import static javafx.scene.input.ScrollEvent.SCROLL;
+
 public class StatusLine extends Composite {
 
     private final List<Label> labels = Lists.newArrayList();
@@ -42,7 +49,7 @@ public class StatusLine extends Composite {
         label = makeLabel("");
         label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 
-        label = makeLabel("");
+        label = makeLabel("XXX");
         label.setAlignment(SWT.RIGHT);
     }
 
@@ -60,10 +67,34 @@ public class StatusLine extends Composite {
         this.getDisplay().asyncExec(this::redraw);
     }
 
+    public void setLockStates(boolean capsLock, boolean numLock, boolean scrollLock) {
+        List<String> elems = Lists.newArrayList();
+        if (capsLock) {
+            elems.add(Messages.get(StatusLine_CAPS));
+        }
+        if (numLock) {
+            elems.add(Messages.get(StatusLine_NUM));
+        }
+        if (scrollLock) {
+            elems.add(Messages.get(StatusLine_SCROLL));
+        }
+
+
+        Label label = labels.get(labels.size() - 1);
+        String newText = elems.stream().collect(joining(" | "));
+        if (!label.getText().equals(newText)) {
+            label.setText(newText);
+            this.layout();
+        }
+    }
+
     public void setPosition(int line, int col) {
-        String s = String.format(Messages.get(Messages.Key.StatusLine_Position), line, col);
-        labels.get(0).setText(s);
-        this.pack();
+        String s = String.format(Messages.get(StatusLine_Position), line, col);
+        Label label = labels.get(0);
+        if (!label.getText().equals(s)) {
+            label.setText(s);
+            this.layout();
+        }
     }
 
     @Override

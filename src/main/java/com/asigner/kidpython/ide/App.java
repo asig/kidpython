@@ -63,6 +63,8 @@ import static com.asigner.kidpython.util.Messages.Key.Action_Run;
 import static com.asigner.kidpython.util.Messages.Key.Action_Step_Into;
 import static com.asigner.kidpython.util.Messages.Key.Action_Step_Over;
 import static com.asigner.kidpython.util.Messages.Key.Action_Stop;
+import static com.asigner.kidpython.util.Messages.Key.MenuItem_Exit;
+import static com.asigner.kidpython.util.Messages.Key.Menu_File;
 import static com.asigner.kidpython.util.Messages.Key.Toolbar_ColorScheme;
 import static com.asigner.kidpython.util.Messages.Key.Toolbar_FollowCodeExecution;
 import static com.asigner.kidpython.util.Messages.Key.VM_Error_While_Compiling;
@@ -153,37 +155,8 @@ public class App {
         Image icon = new Image(display, App.class.getResourceAsStream("icons/icon.png"));
         shell.setImage(icon);
 
-        Listener quitListener = event -> {
-            shell.getDisplay().dispose();
-            System.exit(0);
-        };
-
         createActions();
-
-        boolean isMac = System.getProperty( "os.name" ).equals( "Mac OS X" );
-        if (isMac) {
-            CocoaUiEnhancer enhancer = new CocoaUiEnhancer(APP_NAME);
-            enhancer.hookApplicationMenu( display, quitListener, aboutAction, preferencesAction);
-        }
-
-        Menu menuBar = new Menu(shell, SWT.BAR);
-        MenuItem cascadeFileMenu = new MenuItem(menuBar, SWT.CASCADE);
-        cascadeFileMenu.setText("&File");
-
-        Menu fileMenu = new Menu(shell, SWT.DROP_DOWN);
-        cascadeFileMenu.setMenu(fileMenu);
-
-        MenuItem exitItem = new MenuItem(fileMenu, SWT.PUSH);
-        exitItem.setText("&Exit");
-        shell.setMenuBar(menuBar);
-        exitItem.addListener(SWT.Selection, quitListener);
-
-        if (!isMac) {
-            MenuItem preferencesItem = new MenuItem(fileMenu, SWT.PUSH);
-            preferencesItem.setText(preferencesAction.getText());
-            preferencesItem.addListener(SWT.Selection, event -> preferencesAction.run());
-        }
-
+        createMenu(display);
         createToolbar();
 
         SashForm sashForm = new SashForm(shell, SWT.VERTICAL);
@@ -230,9 +203,8 @@ public class App {
         sashForm.setWeights(new int[]{3, 1});
 
         shell.setText(APP_NAME);
-        shell.setSize(578, 390);
-        shell.layout();
         shell.setMaximized(true);
+        shell.layout();
         shell.open();
 
         consoleOut = new PrintWriter(consoleComposite.getOutputStream(), true);
@@ -354,6 +326,37 @@ public class App {
         aboutAction = new BaseAction(Messages.get(Action_About), this::showAbout);
         preferencesAction = new BaseAction(Messages.get(Action_Preferences), this::showPreferences);
         helpAction = new BaseAction(Messages.get(Action_Help), SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/help@2x.png"), this::showHelp);
+    }
+
+    private void createMenu(Display display) {
+        Listener quitListener = event -> {
+            display.dispose();
+            System.exit(0);
+        };
+
+        boolean isMac = System.getProperty( "os.name" ).equals( "Mac OS X" );
+        if (isMac) {
+            CocoaUiEnhancer enhancer = new CocoaUiEnhancer(APP_NAME);
+            enhancer.hookApplicationMenu( display, quitListener, aboutAction, preferencesAction);
+        }
+
+        Menu menuBar = new Menu(shell, SWT.BAR);
+        MenuItem cascadeFileMenu = new MenuItem(menuBar, SWT.CASCADE);
+        cascadeFileMenu.setText(Messages.get(Menu_File));
+
+        Menu fileMenu = new Menu(shell, SWT.DROP_DOWN);
+        cascadeFileMenu.setMenu(fileMenu);
+
+        MenuItem exitItem = new MenuItem(fileMenu, SWT.PUSH);
+        exitItem.setText(Messages.get(MenuItem_Exit));
+        shell.setMenuBar(menuBar);
+        exitItem.addListener(SWT.Selection, quitListener);
+
+        if (!isMac) {
+            MenuItem preferencesItem = new MenuItem(fileMenu, SWT.PUSH);
+            preferencesItem.setText(preferencesAction.getText());
+            preferencesItem.addListener(SWT.Selection, event -> preferencesAction.run());
+        }
     }
 
     private void createToolbar() {
