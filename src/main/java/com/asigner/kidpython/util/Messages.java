@@ -75,8 +75,6 @@ public class Messages {
         Compiler_Error_UNEXPECTED_TOKEN,
         Compiler_Error_RETURN_NOT_ALLOWED_OUTSIDE_FUNCTION,
 
-        StatusLine_Position,
-
         VarTable_Name,
         VarTable_Value,
 

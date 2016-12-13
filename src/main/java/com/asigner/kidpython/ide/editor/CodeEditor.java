@@ -3,14 +3,13 @@ package com.asigner.kidpython.ide.editor;
 import com.asigner.kidpython.compiler.Error;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
 
-import java.awt.Toolkit;
 import java.util.List;
 import java.util.Set;
 
@@ -74,12 +73,6 @@ public class CodeEditor extends Composite {
         int line = editor.getLineAtOffset(ofs);
         int col = ofs - editor.getOffsetAtLine(line);
         statusLine.setPosition(line + 1, col + 1);
-
-        statusLine.setLockStates(
-                Toolkit.getDefaultToolkit().getLockingKeyState( java.awt.event.KeyEvent.VK_CAPS_LOCK ),
-                Toolkit.getDefaultToolkit().getLockingKeyState( java.awt.event.KeyEvent.VK_NUM_LOCK ),
-                Toolkit.getDefaultToolkit().getLockingKeyState( java.awt.event.KeyEvent.VK_SCROLL_LOCK )
-        );
     }
 
     public void addModifyListener(ModifyListener listener) {

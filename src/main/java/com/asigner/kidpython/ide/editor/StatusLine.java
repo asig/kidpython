@@ -3,13 +3,13 @@ package com.asigner.kidpython.ide.editor;
 import com.asigner.kidpython.ide.util.SWTUtils;
 import com.asigner.kidpython.util.Messages;
 import com.google.common.collect.Lists;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
 
 import java.util.List;
 
@@ -18,7 +18,6 @@ import static com.asigner.kidpython.util.Messages.Key.StatusLine_NUM;
 import static com.asigner.kidpython.util.Messages.Key.StatusLine_Position;
 import static com.asigner.kidpython.util.Messages.Key.StatusLine_SCROLL;
 import static java.util.stream.Collectors.joining;
-import static javafx.scene.input.ScrollEvent.SCROLL;
 
 public class StatusLine extends Composite {
 
@@ -49,7 +48,7 @@ public class StatusLine extends Composite {
         label = makeLabel("");
         label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 
-        label = makeLabel("XXX");
+        label = makeLabel("");
         label.setAlignment(SWT.RIGHT);
     }
 
