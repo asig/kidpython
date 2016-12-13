@@ -63,6 +63,8 @@ import static com.asigner.kidpython.util.Messages.Key.Action_Run;
 import static com.asigner.kidpython.util.Messages.Key.Action_Step_Into;
 import static com.asigner.kidpython.util.Messages.Key.Action_Step_Over;
 import static com.asigner.kidpython.util.Messages.Key.Action_Stop;
+import static com.asigner.kidpython.util.Messages.Key.Toolbar_ColorScheme;
+import static com.asigner.kidpython.util.Messages.Key.Toolbar_FollowCodeExecution;
 import static com.asigner.kidpython.util.Messages.Key.VM_Error_While_Compiling;
 
 public class App {
@@ -375,7 +377,7 @@ public class App {
 
                 //START >>  label1
                 final Label label1 = new Label(composite, SWT.NONE);
-                label1.setText("Stylesheet");
+                label1.setText(Messages.get(Toolbar_ColorScheme));
                 label1.setLayoutData(GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).grab(false, true).create());
                 //END <<  label1
 
@@ -401,7 +403,7 @@ public class App {
             @Override
             protected Control createControl(Composite parent) {
                 Button checkbox = new Button(parent, SWT.CHECK);
-                checkbox.setText("Follow code execution");
+                checkbox.setText(Messages.get(Toolbar_FollowCodeExecution));
                 checkbox.setSelection(highlightLines);
                 checkbox.addSelectionListener(new SelectionAdapter() {
                     @Override

@@ -67,7 +67,13 @@ public class Messages {
         Compiler_Error_UNEXPECTED_TOKEN,
         Compiler_Error_RETURN_NOT_ALLOWED_OUTSIDE_FUNCTION,
 
-        StatusLine_Position
+        StatusLine_Position,
+
+        VarTable_Name,
+        VarTable_Value,
+
+        Toolbar_ColorScheme,
+        Toolbar_FollowCodeExecution,
     }
 
     private static ResourceBundle bundle;

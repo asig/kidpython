@@ -6,6 +6,7 @@ import com.asigner.kidpython.compiler.ast.Node;
 import com.asigner.kidpython.runtime.FuncValue;
 import com.asigner.kidpython.runtime.VarType;
 import com.asigner.kidpython.runtime.VirtualMachine;
+import com.asigner.kidpython.util.Messages;
 import com.google.common.collect.Sets;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
@@ -18,6 +19,9 @@ import org.eclipse.swt.widgets.TableItem;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.asigner.kidpython.util.Messages.Key.VarTable_Name;
+import static com.asigner.kidpython.util.Messages.Key.VarTable_Value;
 
 public class CallStackComposite extends Composite {
 
@@ -70,7 +74,7 @@ public class CallStackComposite extends Composite {
         setLayout(new FillLayout());
 
         table = new Table(this, SWT.NONE);
-        for (String title : new String[] { "Name", "Value"}) {
+        for (String title : new String[] { Messages.get(VarTable_Name), Messages.get(VarTable_Value)}) {
             TableColumn col = new TableColumn(table, SWT.NONE);
             col.setText(title);
             col.setWidth(100);
