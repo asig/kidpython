@@ -21,7 +21,7 @@ public class TurtleWrapper {
     @Export
     public Value turn(List<Value> values) {
         NativeCodeUtils.checkArgs(values, 1);
-        turtleCanvas.turn(values.get(0).asNumber().intValue());
+        turtleCanvas.turn(values.get(0).asNumber().doubleValue());
         return UndefinedValue.INSTANCE;
     }
 
