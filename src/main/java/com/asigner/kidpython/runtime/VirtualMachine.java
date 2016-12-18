@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
-import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -607,7 +607,7 @@ public class VirtualMachine {
     }
 
     private Value divValues(Value left, Value right) {
-        return new NumberValue(left.asNumber().divide(right.asNumber(), BigDecimal.ROUND_HALF_DOWN));
+        return new NumberValue(left.asNumber().divide(right.asNumber(), MathContext.DECIMAL128));
     }
 
     private Optional<Integer> compare(Value v1, Value v2) {
