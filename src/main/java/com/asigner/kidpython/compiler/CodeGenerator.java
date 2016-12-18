@@ -123,7 +123,6 @@ public class CodeGenerator implements NodeVisitor {
 
     @Override
     public void visit(ForEachStmt stmt) {
-
         // iter = range.begin();
         VarNode iterVar = new VarNode(stmt.getPos(), makeTempVarName(), VarType.TEMPORARY);
         iterVar.accept(this);
@@ -132,13 +131,13 @@ public class CodeGenerator implements NodeVisitor {
         emit(new Instruction(stmt, ASSIGN));
 
         // if !iter.hasnext goto end
-        int loopPc = emit(new Instruction(stmt, PUSH, new VarRefValue(iterVar.getVarName(), iterVar.getVarType())));
+        int loopPc = emit(new Instruction(stmt, PUSH, new VarRefValue(iterVar)));
         emit(new Instruction(stmt, ITER_HAS_NEXT));
         int branchFalsePc = emit(new Instruction(stmt, BF, 0));
 
         // ctrlVar = iter.next()
         stmt.getCtrlVar().accept(this);
-        emit(new Instruction(stmt, PUSH, new VarRefValue(iterVar.getVarName(), iterVar.getVarType())));
+        emit(new Instruction(stmt, PUSH, new VarRefValue(iterVar)));
         emit(new Instruction(stmt, ITER_NEXT));
         emit(new Instruction(stmt, ASSIGN));
 
@@ -378,7 +377,7 @@ public class CodeGenerator implements NodeVisitor {
 
     @Override
     public void visit(VarNode node) {
-        emit(new Instruction(node, PUSH, new VarRefValue(node.getVarName(), node.getVarType())));
+        emit(new Instruction(node, PUSH, new VarRefValue(node)));
     }
 
     @Override

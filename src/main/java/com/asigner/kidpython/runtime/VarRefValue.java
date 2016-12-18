@@ -1,15 +1,17 @@
 package com.asigner.kidpython.runtime;
 
+import com.asigner.kidpython.compiler.ast.expr.VarNode;
+
 import java.util.Objects;
 
 public class VarRefValue extends Value {
     private final String varName;
     private final VarType varType;
 
-    public VarRefValue(String varName, VarType varType) {
+    public VarRefValue(VarNode varNode) {
         super(Type.REFERENCE);
-        this.varName = varName;
-        this.varType = varType;
+        this.varName = varNode.getVarName();
+        this.varType = varNode.getVarType();
     }
 
     public String getVarName() {
