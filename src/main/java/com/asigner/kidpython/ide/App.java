@@ -198,7 +198,7 @@ public class App {
                 }
             }
         }
-        sourceCodeComposite.getEditor().setWellKnownWords(wellKnownWords);
+        sourceCodeComposite.setWellKnownWords(wellKnownWords);
 
         sashForm.setWeights(new int[]{3, 1});
 
@@ -429,7 +429,7 @@ public class App {
     }
 
     private void highlightLine(int line) {
-        sourceCodeComposite.getEditor().setActiveLine(line);
+        sourceCodeComposite.setActiveLine(line);
     }
 
     private boolean loadCode() {

@@ -45,6 +45,7 @@ public class CodeEditor extends Composite {
 
         statusLine = new StatusLine(this, SWT.NONE);
         statusLine.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+        updateStatusLine();
     }
 
     public State saveState() {

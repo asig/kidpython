@@ -1,10 +1,11 @@
 package com.asigner.kidpython.ide;
 
 import com.asigner.kidpython.ide.editor.CodeEditor;
-import com.asigner.kidpython.ide.editor.CodeEditorStyledText;
 import com.asigner.kidpython.ide.editor.Stylesheet;
 import com.google.common.collect.Lists;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
@@ -13,14 +14,15 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
 import java.util.List;
+import java.util.Set;
 
 public class SourceCodeComposite extends Composite {
 
@@ -35,12 +37,13 @@ public class SourceCodeComposite extends Composite {
     private CodeRepository codeRepository;
     private Settings settings;
 
-    private CodeEditor.State[] editorStates;
-    private Button[] buttons;
-    private CodeEditor editor;
-
     private boolean selectingSource = false;
     private int selectedSource = -1;
+
+    private CTabFolder tabFolder;
+    private CodeEditor.State[] editorStates;
+    private CodeEditor[] editors;
+    private CTabItem[] tabItems;
 
     /**
      * Create the composite.
@@ -53,47 +56,55 @@ public class SourceCodeComposite extends Composite {
 
         this.codeRepository = codeRepository;
         this.settings = Settings.getInstance();
-        codeRepository.addListener(newStrategy -> init());
+        codeRepository.addListener(newStrategy -> initEditorsFromRepo());
 
         this.addDisposeListener(disposeEvent -> {
-            codeRepository.getSource(selectedSource).setCode(editor.getText());
+            codeRepository.getSource(selectedSource).setCode(editors[selectedSource].getText());
             codeRepository.save();
         });
         int nofSources = codeRepository.getNofSources();
 
-        Composite composite = new Composite(this, SWT.NONE);
-        composite.setLayout(new GridLayout(nofSources, false));
-        composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-
+        setLayout(new FillLayout(SWT.HORIZONTAL));
+        editors = new CodeEditor[nofSources];
         editorStates = new CodeEditor.State[nofSources];
-        buttons = new Button[nofSources];
+        tabFolder = new CTabFolder(this, SWT.BORDER);
+        tabFolder.setSimple(false);
+        tabItems = new CTabItem[nofSources];
         for (int i = 0; i < nofSources; i++) {
-            final int sourceIdx = i;
             editorStates[i] = new CodeEditor.State(codeRepository.getSource(i).getCode());
-            buttons[i] = new Button(composite, SWT.TOGGLE);
-            buttons[i].setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-            buttons[i].setBounds(0, 0, 93, 29);
-            buttons[i].setText(codeRepository.getSource(i).getName());
-            buttons[i].addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    selectSource(sourceIdx);
-                }
+            CodeEditor editor = new CodeEditor(tabFolder, SWT.NONE);
+            editor.restoreState(editorStates[i]);
+            CTabItem ti = new CTabItem(tabFolder, SWT.NONE);
+            ti.setText(codeRepository.getSource(i).getName());
+            ti.setControl(editor);
+            ti.setData("index", i);
+
+            int finalI = i;
+            editor.addModifyListener(event -> {
+                codeRepository.getSource(finalI).setCode(editor.getText());
+                codeRepository.save();
             });
-            final int finalI = i;
-            buttons[i].addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseDoubleClick(MouseEvent mouseEvent) {
-                    changeName(finalI);
-                }
-            });
+
+            tabItems[i] = ti;
+            editors[i] = editor;
         }
 
-        editor = new CodeEditor(this, SWT.NONE);
-        editor.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-        editor.addModifyListener(event -> {
-            codeRepository.getSource(selectedSource).setCode(editor.getText());
-            codeRepository.save();
+        tabFolder.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                selectSource(tabFolder.getSelectionIndex());
+            }
+        });
+        tabFolder.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDoubleClick(MouseEvent arg0) {
+                CTabFolder curFolder = (CTabFolder)arg0.widget;
+                Point eventLocation = new Point(arg0.x, arg0.y);
+                CTabItem item = curFolder.getItem(eventLocation);
+                if (item != null) {
+                    changeName((Integer)item.getData("index"));
+                }
+            }
         });
 
         selectSource(settings.getInt(KEY_SELECTEDSOURCE, 0));
@@ -107,30 +118,28 @@ public class SourceCodeComposite extends Composite {
         this.listeners.remove(listener);
     }
 
+    public void setActiveLine(int line) {
+        editors[selectedSource].setActiveLine(line);
+    }
+
     public void setSourceCodeSelectionEnabled(boolean enabled) {
-        for (Button b : buttons) {
-            b.setEnabled(enabled);
-        }
+        tabFolder.setEnabled(enabled);
     }
 
     private void changeName(int idx) {
-        Button b = buttons[idx];
-        Text text = new Text(b.getParent(), SWT.SINGLE);
-        Rectangle r = b.getBounds();
-        r.x += 5;
-        r.y += 5;
-        r.width -= 10;
-        r.height -= 10;
+        CTabItem tabItem = tabItems[idx];
+        Text text = new Text(tabItem.getParent(), SWT.SINGLE);
+        Rectangle r = tabItem.getBounds();
         text.setBounds(r);
-        text.setText(b.getText());
+        text.setText(tabItem.getText());
         text.setVisible(true);
-        text.moveAbove(b);
-        text.setSelection(0, b.getText().length());
+        text.moveAbove(tabFolder);
+        text.setSelection(0, tabItem.getText().length());
         text.setFocus();
         Runnable acceptName = () -> {
-            String newName = text.getText();
+            String newName = text.getText() ;
             codeRepository.getSource(idx).setName(newName);
-            buttons[idx].setText(newName);
+            tabItem.setText(newName);
         };
         text.addFocusListener(new FocusAdapter() {
             @Override
@@ -156,28 +165,30 @@ public class SourceCodeComposite extends Composite {
         });
     }
 
-    private void init() {
-        for (int i = 0; i < buttons.length; i++) {
-            editorStates[i] = new CodeEditor.State(codeRepository.getSource(i).getCode());
-            buttons[i].setText(codeRepository.getSource(i).getName());
+    private void initEditorsFromRepo() {
+        for (int i = 0; i < editors.length; i++) {
+            tabItems[i].setText(codeRepository.getSource(i).getName());
+            editors[i].restoreState(new CodeEditor.State(codeRepository.getSource(i).getCode()));
         }
-        if (selectedSource != -1) {
-            editor.restoreState(editorStates[selectedSource]);
-        } else {
+        if (selectedSource < 0) {
             selectSource(0);
         }
     }
 
     public String getText() {
-        return editor.getText();
-    }
-
-    public CodeEditor getEditor() {
-        return editor;
+        return editors[selectedSource].getText();
     }
 
     public void setStylesheet(Stylesheet stylesheet) {
-        editor.setStylesheet(stylesheet);
+        for (CodeEditor editor : editors) {
+            editor.setStylesheet(stylesheet);
+        }
+    }
+
+    public void setWellKnownWords(Set<String> words) {
+        for (CodeEditor editor : editors) {
+            editor.setWellKnownWords(words);
+        }
     }
 
     private void selectSource(int idx) {
@@ -185,28 +196,25 @@ public class SourceCodeComposite extends Composite {
             return;
         }
         selectingSource = true;
+        tabFolder.setSelection(idx);
 
         if (selectedSource > -1) {
-            buttons[selectedSource].setSelection(false);
-            editorStates[selectedSource] = editor.saveState();
-            codeRepository.getSource(selectedSource).setCode(editor.getText());
+            codeRepository.getSource(selectedSource).setCode(editors[selectedSource].getText());
             codeRepository.save();
         }
         selectedSource = idx;
         settings.set(KEY_SELECTEDSOURCE, selectedSource);
         settings.save();
         if (selectedSource > -1) {
-            buttons[selectedSource].setSelection(true);
-            editor.restoreState(editorStates[selectedSource]);
             listeners.forEach(l -> l.newSourceSelected(idx));
         }
-        editor.setFocus();
+        editors[selectedSource].setFocus();
 
         selectingSource = false;
     }
 
     public void setErrors(List<com.asigner.kidpython.compiler.Error> errors) {
-        editor.setErrors(errors);
+        editors[selectedSource].setErrors(errors);
     }
 
     public void clearErrors() {
