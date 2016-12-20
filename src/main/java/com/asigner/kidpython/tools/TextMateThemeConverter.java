@@ -15,6 +15,7 @@ import xmlwise.XmlParseException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class TextMateThemeConverter {
     public static void main(String ... args) {
         try {
             List<Stylesheet.JsonStylesheet> stylesheets = Files.list(new File(args[0]).toPath())
-                    .map(path -> new TextMateThemeConverter(path.toFile()).convert())
+                    .map(path -> new TextMateThemeConverter(path).convert())
                     .collect(Collectors.toList());
             ObjectMapper mapper = new ObjectMapper();
             mapper.writerWithDefaultPrettyPrinter().writeValue(System.out, stylesheets);
@@ -40,13 +41,29 @@ public class TextMateThemeConverter {
         }
     }
 
-    public TextMateThemeConverter(File file) {
+    public TextMateThemeConverter(Path path) {
         this.stylesheet = new Stylesheet.JsonStylesheet();
+        String content = "";
         try {
-            this.plist = Plist.load(file);
+            // We need to do some preprocessing to get rid of XML-breaking comments...
+            content = removeXmlComments(new String(Files.readAllBytes(path)));
+            this.plist = Plist.fromXml(content);
         } catch (XmlParseException | IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String removeXmlComments(String s) {
+        String res = "";
+        int lastEnd = 0;
+        int start = s.indexOf("<!--", lastEnd);
+        while (start > -1) {
+            res += s.substring(lastEnd, start);
+            lastEnd = s.indexOf("-->", start) + 3;
+            start = s.indexOf("<!--", lastEnd);
+        }
+        res += s.substring(lastEnd);
+        return res.trim();
     }
 
     private Stylesheet.JsonStylesheet convert() {
@@ -57,6 +74,24 @@ public class TextMateThemeConverter {
             convertEntry(entry);
         }
 
+        if (stylesheet.styleComment == null) {
+            stylesheet.styleComment = stylesheet.styleOther;
+        }
+        if (stylesheet.styleString == null) {
+            stylesheet.styleString = stylesheet.styleOther;
+        }
+        if (stylesheet.styleKeyword == null) {
+            stylesheet.styleKeyword = stylesheet.styleOther;
+        }
+        if (stylesheet.styleIdent == null) {
+            stylesheet.styleIdent = stylesheet.styleOther;
+        }
+        if (stylesheet.styleNumber == null) {
+            stylesheet.styleNumber = stylesheet.styleOther;
+        }
+        if (stylesheet.styleWellKnownString == null) {
+            stylesheet.styleWellKnownString = stylesheet.styleOther;
+        }
         fixup(stylesheet.styleComment);
         fixup(stylesheet.styleString);
         fixup(stylesheet.styleKeyword);
@@ -109,6 +144,9 @@ public class TextMateThemeConverter {
 
     private Stylesheet.JsonStyle convertStyle(Map<String, Object> settings) {
         Stylesheet.JsonStyle style = new Stylesheet.JsonStyle();
+        if (settings == null) {
+            return style;
+        }
         style.fg = (String)settings.get("foreground");
         style.bg = (String)settings.get("background");
         style.attrs = Lists.newArrayList();
