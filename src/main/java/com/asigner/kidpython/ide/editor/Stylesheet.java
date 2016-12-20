@@ -3,6 +3,7 @@
 package com.asigner.kidpython.ide.editor;
 
 import com.asigner.kidpython.ide.util.SWTResources;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,8 +23,6 @@ import java.util.stream.Collectors;
 import static com.asigner.kidpython.ide.editor.Stylesheet.Entity.COMMENT;
 import static com.asigner.kidpython.ide.editor.Stylesheet.Entity.IDENT;
 import static com.asigner.kidpython.ide.editor.Stylesheet.Entity.KEYWORD;
-import static com.asigner.kidpython.ide.editor.Stylesheet.Entity.LINE_NUMBER_BG;
-import static com.asigner.kidpython.ide.editor.Stylesheet.Entity.LINE_NUMBER_FG;
 import static com.asigner.kidpython.ide.editor.Stylesheet.Entity.NUMBER;
 import static com.asigner.kidpython.ide.editor.Stylesheet.Entity.OTHER;
 import static com.asigner.kidpython.ide.editor.Stylesheet.Entity.STRING;
@@ -33,6 +32,8 @@ public class Stylesheet {
     // TO ADD:
     // https://studiostyl.es/schemes/borland-pascal-theme
     // http://enrmarc.github.io/atom-theme-gallery/
+    // http://colorsublime.com/
+    // http://netbeansthemes.com/
 
     enum Entity {
         IDENT,
@@ -41,9 +42,7 @@ public class Stylesheet {
         STRING,
         NUMBER,
         WELL_KNOWN_STRING,
-        OTHER,
-        LINE_NUMBER_FG,
-        LINE_NUMBER_BG
+        OTHER
     }
 
     private static final Map<String, RGB> SVG_COLORS = ImmutableMap.<String, RGB>builder()
@@ -233,15 +232,17 @@ public class Stylesheet {
         }
     }
 
-    static class JsonStyle {
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class JsonStyle {
         private static final Map<String, Integer> nameToValue = ImmutableMap.<String, Integer>builder()
                 .put("BOLD", SWT.BOLD)
                 .put("ITALIC", SWT.ITALIC)
+                .put("UNDERLINE", 0) // Underline is not store in fontstyles!
                 .build();
 
-        @JsonProperty("fg") String fg;
-        @JsonProperty("bg") String bg;
-        @JsonProperty("attrs") List<String> attrs;
+        @JsonProperty("fg") public String fg;
+        @JsonProperty("bg") public String bg;
+        @JsonProperty("attrs") public List<String> attrs;
 
         int parseAttrs() {
             int res = 0;
@@ -256,41 +257,49 @@ public class Stylesheet {
             return res;
         }
 
+        boolean isUnderline() {
+            for (String attr : attrs) {
+                if (attr.equals("UNDERLINE")) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         Style toStyle() {
             return new Style(
                     fg != null ? SWTResources.getColor(parseColor(fg)) : null,
                     bg != null ? SWTResources.getColor(parseColor(bg)) : null,
-                    parseAttrs()
+                    parseAttrs(),
+                    isUnderline()
             );
         }
     }
 
-    static class JsonStylesheet {
-        private static final Style DEFAULT_STYLE = new Style(SWTResources.getColor(new RGB(0,0,0)), SWTResources.getColor(new RGB(255,255,255)), 0);
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class JsonStylesheet {
+        private static final Style DEFAULT_STYLE = new Style(SWTResources.getColor(new RGB(0,0,0)), SWTResources.getColor(new RGB(255,255,255)), 0, false);
 
-        @JsonProperty("name") String name;
-        @JsonProperty("default_bg") String defaultBackground;
-        @JsonProperty("IDENT") JsonStyle styleIdent;
-        @JsonProperty("KEYWORD") JsonStyle styleKeyword;
-        @JsonProperty("COMMENT") JsonStyle styleComment;
-        @JsonProperty("STRING") JsonStyle styleString;
-        @JsonProperty("NUMBER") JsonStyle styleNumber;
-        @JsonProperty("WELL_KNOWN_STRING") JsonStyle styleWellKnownString;
-        @JsonProperty("LINE_NUMBER_FG") JsonStyle styleLineNumberFg;
-        @JsonProperty("LINE_NUMBER_BG") JsonStyle styleLineNumberBg;
-        @JsonProperty("OTHER") JsonStyle styleOther;
-
+        @JsonProperty("name") public String name;
+        @JsonProperty("author") public String author;
+        @JsonProperty("default_bg") public String defaultBackground;
+        @JsonProperty("selection_bg") public String selectionBackground;
+        @JsonProperty("selection_fg") public String selectionForeground;
+        @JsonProperty("gutter_bg") public String gutterBackground;
+        @JsonProperty("gutter_fg") public String gutterForeground;
+        @JsonProperty("IDENT") public JsonStyle styleIdent;
+        @JsonProperty("KEYWORD") public JsonStyle styleKeyword;
+        @JsonProperty("COMMENT") public JsonStyle styleComment;
+        @JsonProperty("STRING") public JsonStyle styleString;
+        @JsonProperty("NUMBER") public JsonStyle styleNumber;
+        @JsonProperty("WELL_KNOWN_STRING") public JsonStyle styleWellKnownString;
+        @JsonProperty("OTHER") public JsonStyle styleOther;
 
         Stylesheet toStylesheet() {
             if (name == null) {
                 name = "Stylesheet " + this.hashCode();
             }
             Stylesheet stylesheet = new Stylesheet(name);
-            if (defaultBackground != null) {
-                stylesheet.setDefaultBackground(parseColor(defaultBackground));
-            } else {
-                stylesheet.setDefaultBackground(new RGB(255,255,255));
-            }
 
             stylesheet.setStyle(IDENT, styleIdent != null ? styleIdent.toStyle() : DEFAULT_STYLE);
             stylesheet.setStyle(KEYWORD, styleKeyword != null ? styleKeyword.toStyle() : DEFAULT_STYLE);
@@ -298,9 +307,27 @@ public class Stylesheet {
             stylesheet.setStyle(STRING, styleString != null ? styleString.toStyle() : DEFAULT_STYLE);
             stylesheet.setStyle(NUMBER, styleNumber != null ? styleNumber.toStyle() : DEFAULT_STYLE);
             stylesheet.setStyle(WELL_KNOWN_STRING, styleWellKnownString!= null ? styleWellKnownString.toStyle() : DEFAULT_STYLE);
-            stylesheet.setStyle(LINE_NUMBER_FG, styleLineNumberFg != null ? styleLineNumberFg.toStyle() : DEFAULT_STYLE);
-            stylesheet.setStyle(LINE_NUMBER_BG, styleLineNumberBg != null ? styleLineNumberBg.toStyle() : DEFAULT_STYLE);
             stylesheet.setStyle(OTHER, styleOther != null ? styleOther.toStyle() : DEFAULT_STYLE);
+
+            if (defaultBackground != null) {
+                stylesheet.setDefaultBackground(parseColor(defaultBackground));
+            }
+            if (selectionBackground != null) {
+                stylesheet.setSelectionBackground(parseColor(selectionBackground));
+            }
+            if (selectionForeground != null) {
+                stylesheet.setSelectionForeground(parseColor(selectionForeground));
+            }
+            if (gutterBackground != null) {
+                stylesheet.setGutterBackground(parseColor(gutterBackground));
+            } else {
+                stylesheet.setGutterBackground(stylesheet.getDefaultBackground().getRGB());
+            }
+            if (gutterForeground != null) {
+                stylesheet.setGutterForeground(parseColor(gutterForeground));
+            } else {
+                stylesheet.setGutterForeground(stylesheet.getStyle(OTHER).getFg().getRGB());
+            }
 
             return stylesheet;
         }
@@ -331,11 +358,13 @@ public class Stylesheet {
         private final Color fg;
         private final Color bg;
         private final int fontStyle;
+        private final boolean underline;
 
-        public Style(Color fg, Color bg, int fontStyle) {
+        public Style(Color fg, Color bg, int fontStyle, boolean underline) {
             this.fg = fg;
             this.bg = bg;
             this.fontStyle = fontStyle;
+            this.underline = underline;
         }
 
         public Color getBg() {
@@ -349,12 +378,20 @@ public class Stylesheet {
         public int getFontStyle() {
             return fontStyle;
         }
+
+        public boolean getUnderline() {
+            return underline;
+        }
     }
 
     private final Map<Entity, Style> tokenStyles = Maps.newHashMap();
     private final String name;
 
     private Color background = Display.getDefault().getSystemColor(SWT.COLOR_WHITE);
+    private Color selectionBackground = Display.getDefault().getSystemColor(SWT.COLOR_LIST_SELECTION);
+    private Color selectionForeground = Display.getDefault().getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT);
+    private Color gutterBackground = Display.getDefault().getSystemColor(SWT.COLOR_WHITE);
+    private Color gutterForeground = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
 
     public Stylesheet(String name) {
         this.name = name;
@@ -368,6 +405,42 @@ public class Stylesheet {
         return background;
     }
 
+    public Color getSelectionBackground() {
+        return selectionBackground;
+    }
+
+    public Color getSelectionForeground() {
+        return selectionForeground;
+    }
+
+    public Color getGutterBackground() {
+        return gutterBackground;
+    }
+
+    public Color getGutterForeground() {
+        return gutterForeground;
+    }
+
+    public Stylesheet setSelectionBackground(RGB rgb) {
+        selectionBackground = SWTResources.getColor(rgb);
+        return this;
+    }
+
+    public Stylesheet setSelectionForeground(RGB rgb) {
+        selectionForeground = SWTResources.getColor(rgb);
+        return this;
+    }
+
+    public Stylesheet setGutterBackground(RGB rgb) {
+        gutterBackground = SWTResources.getColor(rgb);
+        return this;
+    }
+
+    public Stylesheet setGutterForeground(RGB rgb) {
+        gutterForeground = SWTResources.getColor(rgb);
+        return this;
+    }
+
     public Stylesheet setDefaultBackground(RGB rgb) {
         background = SWTResources.getColor(rgb);
         return this;
@@ -376,7 +449,7 @@ public class Stylesheet {
     public Style getStyle(Entity entity) {
         Style style = tokenStyles.get(entity);
         if (style == null) {
-            style = new Style(Display.getDefault().getSystemColor(SWT.COLOR_BLACK), background, SWT.NONE);
+            style = new Style(Display.getDefault().getSystemColor(SWT.COLOR_BLACK), background, SWT.NONE, false);
             tokenStyles.put(entity, style);
         }
         return style;

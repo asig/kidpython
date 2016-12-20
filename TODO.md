@@ -83,3 +83,13 @@ TODO
     [X] range operator "..":  a..b == range(a,b)
     [ ] implement case statement (analog to Oberon)
     
+[ ] Stylesheets:
+    [ ] Load style sheets dynamically from files
+    [ ] Load style sheets dynamicallt from textmate themes
+    [X] Add TextMate converter
+    [ ] Add additional colors:
+        [ ] lineHighlight background
+        [X] gutter foreground
+        [X] gutter background
+        [X] selection foreground
+        [X] selection background

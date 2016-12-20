@@ -61,8 +61,8 @@ public class StatusLine extends Composite {
     }
 
     public void setStylesheet(Stylesheet stylesheet) {
-        this.setBackground(stylesheet.getDefaultBackground());
-        this.labels.forEach(l -> l.setForeground(stylesheet.getStyle(Stylesheet.Entity.LINE_NUMBER_FG).getFg()));
+        this.setBackground(stylesheet.getGutterBackground());
+        this.labels.forEach(l -> l.setForeground(stylesheet.getGutterForeground()) );
         this.getDisplay().asyncExec(this::redraw);
     }
 

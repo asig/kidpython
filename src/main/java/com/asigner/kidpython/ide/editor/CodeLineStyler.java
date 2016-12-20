@@ -166,32 +166,22 @@ public class CodeLineStyler implements LineStyleListener {
         scanner.setRange(event.lineOffset, event.lineText);
         token = scanner.nextToken();
         while (token != EOF) {
-            if (token == WHITESPACE) {
-                // Whitespace take over the previous style to reduce the number of style changes
-                if (styles.size() > 0) {
-                    int start = scanner.getStartOffset() + event.lineOffset;
+            Stylesheet.Style s = stylesheet.getStyle(tokenToStyle.getOrDefault(token, Stylesheet.Entity.OTHER));
+            // Only create a style if the token color is different than the
+            // widget's default foreground color and the token's style is bold or italic or underlined
+            if (!s.getFg().equals(defaultFgColor) || s.getFontStyle() != SWT.NONE || s.getUnderline()) {
+                StyleRange style = new StyleRange(scanner.getStartOffset() + event.lineOffset, scanner.getLength(), s.getFg(), s.getBg());
+                style.fontStyle = s.getFontStyle();
+                style.underline = s.getUnderline();
+                if (styles.isEmpty()) {
+                    styles.add(style);
+                } else {
+                    // Merge similar styles.  Doing so will improve performance.
                     lastStyle = styles.get(styles.size() - 1);
-                    if (lastStyle.start + lastStyle.length == start) {
-                        lastStyle.length += scanner.getLength();
-                    }
-                }
-            } else {
-                Stylesheet.Style s = stylesheet.getStyle(tokenToStyle.getOrDefault(token, Stylesheet.Entity.OTHER));
-                // Only create a style if the token color is different than the
-                // widget's default foreground color and the token's style is bold or italic
-                if (!s.getFg().equals(defaultFgColor) || s.getFontStyle() != SWT.NONE) {
-                    StyleRange style = new StyleRange(scanner.getStartOffset() + event.lineOffset, scanner.getLength(), s.getFg(), s.getBg());
-                    style.fontStyle = s.getFontStyle();
-                    if (styles.isEmpty()) {
-                        styles.add(style);
+                    if (styleMatches(lastStyle, style) && (lastStyle.start + lastStyle.length == style.start)) {
+                        lastStyle.length += style.length;
                     } else {
-                        // Merge similar styles.  Doing so will improve performance.
-                        lastStyle = styles.get(styles.size() - 1);
-                        if (lastStyle.similarTo(style) && (lastStyle.start + lastStyle.length == style.start)) {
-                            lastStyle.length += style.length;
-                        } else {
-                            styles.add(style);
-                        }
+                        styles.add(style);
                     }
                 }
             }
@@ -200,6 +190,10 @@ public class CodeLineStyler implements LineStyleListener {
         event.styles = styles.toArray(new StyleRange[styles.size()]);
 
         addLineBullets(event);
+    }
+
+    private boolean styleMatches(StyleRange r1, StyleRange r2) {
+        return r1.similarTo(r2) && r1.underline == r2.underline;
     }
 
     private void addLineBullets(LineStyleEvent e) {
@@ -216,7 +210,8 @@ public class CodeLineStyler implements LineStyleListener {
 
         // Draw line number
         TextLayout layout = new TextLayout(event.display);
-        event.gc.setForeground(stylesheet.getStyle(Stylesheet.Entity.LINE_NUMBER_FG).getFg());
+        event.gc.setForeground(stylesheet.getGutterForeground());
+        event.gc.setBackground(stylesheet.getGutterBackground());
         layout.setAscent(event.ascent);
         layout.setDescent(event.descent);
         layout.setFont(lineNumberFont);

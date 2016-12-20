@@ -57,6 +57,9 @@ dependencies {
     // Store snippets in dropbox
     compile 'com.dropbox.core:dropbox-core-sdk:2.1.1'
 
+    // Only for TextMate converter
+    compile 'xmlwise:xmlwise:1.2.11'
+
     // OS-dependent runtimes
     runtimeLinux group: 'org.eclipse', name: 'platform-minimal', version: '4.6.1', configuration: 'linux-gtk-x86_64'
     runtimeMac group: 'org.eclipse', name: 'platform-minimal', version: '4.6.1', configuration: 'macosx-cocoa-x86_64'

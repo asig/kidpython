@@ -35,7 +35,7 @@ public class CodeEditorStyledText extends StyledText {
         Stylesheet stylesheet = Stylesheet.ALL.get(0);
         lineStyler = new CodeLineStyler(this, stylesheet);
 
-        this.setBackground(stylesheet.getDefaultBackground());
+        applyStylesheetColors(stylesheet);
 
         font = new Font(parent.getDisplay(), "Roboto Mono", SWTUtils.scaleFont(10), SWT.NONE);
         this.addDisposeListener(new DisposeListener() {
@@ -72,8 +72,14 @@ public class CodeEditorStyledText extends StyledText {
 
     public void setStylesheet(Stylesheet stylesheet) {
         lineStyler.setStylesheet(stylesheet);
-        this.setBackground(stylesheet.getDefaultBackground());
+        applyStylesheetColors(stylesheet);
         this.getDisplay().asyncExec(this::redraw);
+    }
+
+    private void applyStylesheetColors(Stylesheet stylesheet) {
+        this.setBackground(stylesheet.getDefaultBackground());
+        this.setSelectionBackground(stylesheet.getSelectionBackground());
+        this.setSelectionForeground(stylesheet.getSelectionForeground());
     }
 
     public void setActiveLine(int line) {

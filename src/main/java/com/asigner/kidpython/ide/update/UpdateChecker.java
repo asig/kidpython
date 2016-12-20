@@ -91,16 +91,31 @@ public class UpdateChecker {
     Optional<Descriptor> checkForUpdates() {
         String platform = buildPlatform();
         return null;
-
     }
 
     private String buildPlatform() {
+        String platform = "";
         Properties props = System.getProperties();
-        String osName = props.getProperty("os.name");
+        String osName = props.getProperty("os.name").toLowerCase();
+        if (osName.startsWith("windows")) {
+            platform = "windows";
+        } else if (osName.startsWith("linux")) {
+            platform = "linux";
+        } else if (osName.startsWith("mac os x")) {
+            platform = "macosx";
+        } else {
+            platform = "unknown";
+        }
         String osArch = props.getProperty("os.arch");
-
+        if (osArch.contains("64")) {
+            platform += "_x64";
+        } else if (osArch.contains("86")) {
+            platform += "_x86";
+        } else {
+            platform += "_unknown";
+        }
+        return platform;
     }
-
 
     public static void main(String ... args) {
         String json = "     {\n" +
