@@ -57,7 +57,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../lib/org.eclipse/platform-minimal/4.6.1/jars/org.eclipse.core.runtime_3.12.0.v20160606-1342.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/org.eclipse/platform-minimal/4.6.1/jars/org.eclipse.core.databinding_1.6.0.v20160412-0910.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -66,16 +66,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../lib/org.eclipse/platform-minimal/4.6.1/jars/org.eclipse.core.databinding.property_1.6.0.v20160427-0852.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../lib/org.eclipse/platform-minimal/4.6.1/jars/org.eclipse.jface.databinding_1.8.0.v20160420-2231.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/org.eclipse/platform-minimal/4.6.1/jars/org.eclipse.core.databinding.beans_1.3.100.v20160509-1025.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -85,6 +76,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../../lib/org.eclipse/platform-minimal/4.6.1/jars/org.eclipse.core.databinding.observable_1.6.0.v20160511-1747.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../lib/org.eclipse/platform-minimal/4.6.1/jars/org.eclipse.core.databinding.property_1.6.0.v20160427-0852.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -183,7 +183,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../lib/org.eclipse/platform-minimal/4.6.1/jars/org.eclipse.core.externaltools_1.0.400.v20160509-1057.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/org.eclipse/platform-minimal/4.6.1/jars/org.eclipse.jface_3.12.0.v20160518-1929.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -192,7 +192,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../lib/org.eclipse/platform-minimal/4.6.1/jars/org.eclipse.core.net_1.3.0.v20160418-1534.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/org.eclipse/platform-minimal/4.6.1/jars/org.eclipse.jface.databinding_1.8.0.v20160420-2231.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -201,7 +201,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../lib/org.eclipse/platform-minimal/4.6.1/jars/org.eclipse.core.contenttype_3.5.100.v20160418-1621.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/org.eclipse/platform-minimal/4.6.1/jars/org.eclipse.jface.text_3.11.1.v20160819-1517.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -210,7 +210,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../lib/org.eclipse/platform-minimal/4.6.1/jars/org.eclipse.swt.gtk.linux.x86_64_3.105.1.v20160907-0248.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/org.eclipse/platform-minimal/4.6.1/jars/org.eclipse.swt.cocoa.macosx.x86_64_3.105.1.v20160907-0248.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
