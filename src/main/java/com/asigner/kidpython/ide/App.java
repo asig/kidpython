@@ -8,6 +8,7 @@ import com.asigner.kidpython.compiler.ast.Stmt;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
 import com.asigner.kidpython.ide.editor.Stylesheet;
 import com.asigner.kidpython.ide.platform.CocoaUiEnhancer;
+import com.asigner.kidpython.ide.settings.ColorSchemePrefPage;
 import com.asigner.kidpython.ide.settings.RepositoryPrefPage;
 import com.asigner.kidpython.ide.sync.LocalPersistenceStrategy;
 import com.asigner.kidpython.ide.sync.PersistenceStrategy;
@@ -78,11 +79,10 @@ public class App {
 
     private static final String APP_NAME = "Programmable Fun";
 
-    private static final String KEY_SELECTEDSTYLESHEET = "App.selectedStylesheet";
-
     protected Shell shell;
 
     private CodeRepository codeRepository;
+    private Set<String> wellKnownWords;
 
     private TurtleCanvas turtleCanvas;
     private SourceCodeComposite sourceCodeComposite;
@@ -171,7 +171,7 @@ public class App {
         SashForm sashForm2 = new SashForm(sashForm, SWT.HORIZONTAL);
         sashForm2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         sourceCodeComposite = new SourceCodeComposite(sashForm2, SWT.NONE, codeRepository);
-        sourceCodeComposite.setStylesheet(Stylesheet.ALL.get(settings.getInt(KEY_SELECTEDSTYLESHEET,0)));
+        sourceCodeComposite.setStylesheet(Stylesheet.ALL.get(settings.getSelectedStylesheetIndex()));
         callStackComposite = new CallStackComposite(sashForm2, SWT.NONE);
         turtleCanvas = new TurtleCanvas(sashForm2, SWT.NONE);
         sashForm2.setWeights(new int[]{10,2,8});
@@ -182,7 +182,7 @@ public class App {
         List<Object> nativeCodeWrappers = Lists.newArrayList(
                 new TurtleWrapper(turtleCanvas), new MathWrapper(), new UtilsWrapper(consoleComposite)
         );
-        Set<String> wellKnownWords = Sets.newHashSet();
+        wellKnownWords = Sets.newHashSet();
         for (Object wrapper : nativeCodeWrappers) {
             Export export = wrapper.getClass().getAnnotation(Export.class);
             if (export != null) {
@@ -398,11 +398,11 @@ public class App {
                     public void widgetSelected(SelectionEvent selectionEvent) {
                         int selected = combo.getSelectionIndex();
                         sourceCodeComposite.setStylesheet(Stylesheet.ALL.get(selected));
-                        settings.set(KEY_SELECTEDSTYLESHEET, selected);
+                        settings.setKeySelectedstylesheetIndex(selected);
                         settings.save();
                     }
                 });
-                combo.select(settings.getInt(KEY_SELECTEDSTYLESHEET, 0));
+                combo.select(settings.getSelectedStylesheetIndex());
 
                 return composite;
             }
@@ -580,7 +580,8 @@ public class App {
 
     private void showPreferences() {
         PreferencePage pages[] = new PreferencePage[] {
-            new RepositoryPrefPage(codeRepository),
+                new RepositoryPrefPage(codeRepository),
+                new ColorSchemePrefPage(Stylesheet.ALL, wellKnownWords),
         };
         PreferenceManager mgr = new PreferenceManager();
         for(PreferencePage p : pages) {

@@ -85,6 +85,10 @@ public class Messages {
         Preferences_CodeRepository_Connect,
         Preferences_CodeRepository_Disconnect,
         Preferences_CodeRepository_Connected,
+
+        Preferences_ColorScheme,
+        Preferences_ColorScheme_AvailableColorSchemes,
+        Preferences_ColorScheme_Preview
     }
 
     private static ResourceBundle bundle;
