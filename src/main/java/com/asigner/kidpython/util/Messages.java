@@ -80,6 +80,11 @@ public class Messages {
 
         Toolbar_ColorScheme,
         Toolbar_FollowCodeExecution,
+
+        Preferences_CodeRepository,
+        Preferences_CodeRepository_Connect,
+        Preferences_CodeRepository_Disconnect,
+        Preferences_CodeRepository_Connected,
     }
 
     private static ResourceBundle bundle;

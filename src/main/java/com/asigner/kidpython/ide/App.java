@@ -8,6 +8,7 @@ import com.asigner.kidpython.compiler.ast.Stmt;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
 import com.asigner.kidpython.ide.editor.Stylesheet;
 import com.asigner.kidpython.ide.platform.CocoaUiEnhancer;
+import com.asigner.kidpython.ide.settings.RepositoryPrefPage;
 import com.asigner.kidpython.ide.sync.LocalPersistenceStrategy;
 import com.asigner.kidpython.ide.sync.PersistenceStrategy;
 import com.asigner.kidpython.ide.sync.SyncService;
@@ -31,6 +32,10 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.PreferenceDialog;
+import org.eclipse.jface.preference.PreferenceManager;
+import org.eclipse.jface.preference.PreferenceNode;
+import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -574,7 +579,19 @@ public class App {
     }
 
     private void showPreferences() {
-        CloudConnectDialog dlg = new CloudConnectDialog(shell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-        dlg.open(codeRepository);
+        PreferencePage pages[] = new PreferencePage[] {
+            new RepositoryPrefPage(codeRepository),
+        };
+        PreferenceManager mgr = new PreferenceManager();
+        for(PreferencePage p : pages) {
+            mgr.addToRoot(new PreferenceNode(p.getTitle(),p));
+        }
+        PreferenceDialog dlg = new PreferenceDialog(Display.getCurrent().getActiveShell(), mgr);
+        dlg.open();
+//        Settings.getInstance().save();^M
+//
+//
+//        CloudConnectDialog dlg = new CloudConnectDialog(shell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+//        dlg.open(codeRepository);
     }
 }
