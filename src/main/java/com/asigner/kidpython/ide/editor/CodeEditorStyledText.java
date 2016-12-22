@@ -16,7 +16,6 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 
@@ -82,7 +81,7 @@ public class CodeEditorStyledText extends StyledText {
         if (e.x < gutterWidth && gutterWidth < e.x + e.width) {
             // We need to repaint the gutter separator
             e.gc.setForeground(stylesheet.getGutterForeground());
-            e.gc.drawLine(e.x + gutterWidth, e.y, e.x + gutterWidth, e.y + e.height);
+            e.gc.drawLine(gutterWidth, e.y, gutterWidth, e.y + e.height);
         }
     }
 
