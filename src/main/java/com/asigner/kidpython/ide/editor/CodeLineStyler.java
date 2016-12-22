@@ -17,6 +17,7 @@ import org.eclipse.swt.custom.PaintObjectEvent;
 import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
@@ -204,14 +205,17 @@ public class CodeLineStyler implements LineStyleListener {
         e.bulletIndex = styledText.getLineAtOffset(e.lineOffset) + 1;
     }
 
+    public int getGutterWidth() {
+        return bulletWidth - BULLET_MARGIN_PX - 1;
+    }
+
     private void drawBullet(PaintObjectEvent event) {
         Rectangle b = errorIcon.getBounds();
-        int lineHeight = styledText.getLineHeight(event.bulletIndex - 1);
+
+        event.gc.setForeground(stylesheet.getGutterForeground());
 
         // Draw line number
         TextLayout layout = new TextLayout(event.display);
-        event.gc.setForeground(stylesheet.getGutterForeground());
-        event.gc.setBackground(stylesheet.getGutterBackground());
         layout.setAscent(event.ascent);
         layout.setDescent(event.descent);
         layout.setFont(lineNumberFont);
@@ -219,16 +223,12 @@ public class CodeLineStyler implements LineStyleListener {
         layout.draw(event.gc, event.x + BULLET_MARGIN_PX + b.width + BULLET_IN_BETWEEN_PX, event.y);
         layout.dispose();
 
-        // Draw separator
-        int xOfs = bulletWidth - BULLET_MARGIN_PX - 1;
-        event.gc.drawLine(event.x + xOfs, event.y, event.x + xOfs, event.y + lineHeight);
-
         // Draw errors, if there are any
         Collection<Error> errors = this.errors.get(event.bulletIndex);
         if (errors != null && errors.size() > 0) {
+            int lineHeight = styledText.getLineHeight(event.bulletIndex - 1);
             event.gc.drawImage(errorIcon, event.x + BULLET_MARGIN_PX, event.y + (lineHeight - b.height) / 2);
         }
-
     }
 
     public boolean parseMultiLineComments(String text) {

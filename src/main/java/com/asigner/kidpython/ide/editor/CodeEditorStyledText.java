@@ -13,7 +13,9 @@ import org.eclipse.swt.custom.LineBackgroundListener;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
@@ -23,8 +25,9 @@ import java.util.Set;
 
 public class CodeEditorStyledText extends StyledText {
 
-
     private final CodeLineStyler lineStyler;
+
+    private Stylesheet stylesheet;
     private Font font;
     private int lastLineCount = 0; // Used to trigger redraws for line numbering
     private int activeLine = -1;
@@ -35,7 +38,9 @@ public class CodeEditorStyledText extends StyledText {
         Stylesheet stylesheet = Stylesheet.ALL.get(0);
         lineStyler = new CodeLineStyler(this, stylesheet);
 
-        applyStylesheetColors(stylesheet);
+        this.setBackground(stylesheet.getDefaultBackground());
+        this.setSelectionBackground(stylesheet.getSelectionBackground());
+        this.setSelectionForeground(stylesheet.getSelectionForeground());
 
         font = new Font(parent.getDisplay(), "Roboto Mono", SWTUtils.scaleFont(10), SWT.NONE);
         this.addDisposeListener(new DisposeListener() {
@@ -63,6 +68,33 @@ public class CodeEditorStyledText extends StyledText {
             }
             lastLineCount = lineCount;
         });
+
+        // For some reason, the gutter separator is not a complete line if we only draw it in drawBackground().
+        // Therefore, we add an additional paint listener that *only* draws the gutter separator line.
+        // Note that we must not erase the background in the paint listener, because the StyledText is already
+        // painted when it gets called.
+        this.addPaintListener(this::drawGutterSeparator);
+
+    }
+
+    private void drawGutterSeparator(PaintEvent e) {
+        int gutterWidth = lineStyler.getGutterWidth();
+        if (e.x < gutterWidth && gutterWidth < e.x + e.width) {
+            // We need to repaint the gutter separator
+            e.gc.setForeground(stylesheet.getGutterForeground());
+            e.gc.drawLine(e.x + gutterWidth, e.y, e.x + gutterWidth, e.y + e.height);
+        }
+    }
+
+    @Override
+    public void drawBackground(GC gc, int x, int y, int width, int height) {
+        super.drawBackground(gc, x, y, width, height);
+        int gutterWidth = lineStyler.getGutterWidth();
+        if (x < gutterWidth) {
+            // We need to repaint the gutter. the separator is drawn in drawGutterSeparator()
+            gc.setBackground(stylesheet.getGutterBackground());
+            gc.fillRectangle(0, y, gutterWidth, y + height);
+        }
     }
 
     public void setWellKnownWords(Set<String> wellKnown) {
@@ -72,11 +104,12 @@ public class CodeEditorStyledText extends StyledText {
 
     public void setStylesheet(Stylesheet stylesheet) {
         lineStyler.setStylesheet(stylesheet);
-        applyStylesheetColors(stylesheet);
+        applyStylesheet(stylesheet);
         this.getDisplay().asyncExec(this::redraw);
     }
 
-    private void applyStylesheetColors(Stylesheet stylesheet) {
+    private void applyStylesheet(Stylesheet stylesheet) {
+        this.stylesheet = stylesheet;
         this.setBackground(stylesheet.getDefaultBackground());
         this.setSelectionBackground(stylesheet.getSelectionBackground());
         this.setSelectionForeground(stylesheet.getSelectionForeground());
