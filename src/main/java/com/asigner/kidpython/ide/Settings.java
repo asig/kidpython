@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Settings {
+    public static final String KEY_SELECTEDSTYLESHEET = "SelectedStylesheet";
+
     private static Settings instance = null;
 
     private String fileName = null;
@@ -20,6 +22,14 @@ public class Settings {
             instance = new Settings();
         }
         return instance;
+    }
+
+    public int getSelectedStylesheetIndex() {
+        return getInt(KEY_SELECTEDSTYLESHEET, 0);
+    }
+
+    public void setKeySelectedstylesheetIndex(int idx) {
+        set(KEY_SELECTEDSTYLESHEET, idx);
     }
 
     private Settings() {
