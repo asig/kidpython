@@ -8,12 +8,10 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 
@@ -41,17 +39,18 @@ public class ColorSchemePrefPage extends PreferencePage {
     protected Control createContents(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout(2, false));
-        composite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true, 1, 1));
 
-        Label lblTitle = new Label(composite, SWT.NONE);
-        lblTitle.setText(Messages.get(Preferences_ColorScheme_AvailableColorSchemes));
+        Label label = new Label(composite, SWT.NONE);
+        label.setText(Messages.get(Preferences_ColorScheme_AvailableColorSchemes));
 
-        Group grpPreview = new Group(composite, SWT.NONE);
-        grpPreview.setLayout(new FillLayout(SWT.HORIZONTAL));
-        grpPreview.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2));
-        grpPreview.setText(Messages.get(Preferences_ColorScheme_Preview));
+        label = new Label(composite, SWT.NONE);
+        label.setText(Messages.get(Preferences_ColorScheme_Preview));
 
-        CodeEditor codeEditor = new CodeEditor(grpPreview, SWT.NONE);
+        List list = new List(composite, SWT.BORDER);
+        list.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+
+        CodeEditor codeEditor = new CodeEditor(composite, SWT.NONE);
+        codeEditor.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         codeEditor.setWellKnownWords(wellKnownWords);
         codeEditor.restoreState(new CodeEditor.State(
                 "// Draw a bunch of boxes \n" +
@@ -73,9 +72,6 @@ public class ColorSchemePrefPage extends PreferencePage {
                         "end\n" +
                         "println(\"All boxes drawn!\")"
         ));
-
-        List list = new List(composite, SWT.BORDER);
-        list.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
 
         for (Stylesheet s : availableStylesheets) {
             list.add(s.getName());
