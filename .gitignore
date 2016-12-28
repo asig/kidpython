@@ -4,3 +4,4 @@
 build
 kidpython.iws
 bin/
+src/installer/deb/debian
