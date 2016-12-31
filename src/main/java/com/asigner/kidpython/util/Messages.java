@@ -78,7 +78,6 @@ public class Messages {
         VarTable_Name,
         VarTable_Value,
 
-        Toolbar_ColorScheme,
         Toolbar_FollowCodeExecution,
 
         Preferences_CodeRepository,

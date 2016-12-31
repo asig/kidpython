@@ -8,13 +8,14 @@ import com.asigner.kidpython.compiler.ast.Stmt;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
 import com.asigner.kidpython.ide.editor.Stylesheet;
 import com.asigner.kidpython.ide.platform.CocoaUiEnhancer;
-import com.asigner.kidpython.ide.settings.ColorSchemePrefPage;
-import com.asigner.kidpython.ide.settings.RepositoryPrefPage;
+import com.asigner.kidpython.ide.preferences.ColorSchemePrefPage;
+import com.asigner.kidpython.ide.preferences.RepositoryPrefPage;
 import com.asigner.kidpython.ide.sync.LocalPersistenceStrategy;
 import com.asigner.kidpython.ide.sync.PersistenceStrategy;
 import com.asigner.kidpython.ide.sync.SyncService;
 import com.asigner.kidpython.ide.turtle.TurtleCanvas;
 import com.asigner.kidpython.ide.util.AnsiEscapeCodes;
+import com.asigner.kidpython.ide.util.OS;
 import com.asigner.kidpython.ide.util.SWTResources;
 import com.asigner.kidpython.runtime.FuncValue;
 import com.asigner.kidpython.runtime.Instruction;
@@ -31,12 +32,11 @@ import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.CoolBarManager;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -71,7 +71,6 @@ import static com.asigner.kidpython.util.Messages.Key.Action_Step_Over;
 import static com.asigner.kidpython.util.Messages.Key.Action_Stop;
 import static com.asigner.kidpython.util.Messages.Key.MenuItem_Exit;
 import static com.asigner.kidpython.util.Messages.Key.Menu_File;
-import static com.asigner.kidpython.util.Messages.Key.Toolbar_ColorScheme;
 import static com.asigner.kidpython.util.Messages.Key.Toolbar_FollowCodeExecution;
 import static com.asigner.kidpython.util.Messages.Key.VM_Error_While_Compiling;
 
@@ -340,7 +339,7 @@ public class App {
         };
 
         boolean isMac = System.getProperty( "os.name" ).equals( "Mac OS X" );
-        if (isMac) {
+        if (OS.isMac()) {
             CocoaUiEnhancer enhancer = new CocoaUiEnhancer(APP_NAME);
             enhancer.hookApplicationMenu( display, quitListener, aboutAction, preferencesAction);
         }
@@ -352,12 +351,12 @@ public class App {
         Menu fileMenu = new Menu(shell, SWT.DROP_DOWN);
         cascadeFileMenu.setMenu(fileMenu);
 
-        MenuItem exitItem = new MenuItem(fileMenu, SWT.PUSH);
-        exitItem.setText(Messages.get(MenuItem_Exit));
-        shell.setMenuBar(menuBar);
-        exitItem.addListener(SWT.Selection, quitListener);
-
         if (!isMac) {
+            MenuItem exitItem = new MenuItem(fileMenu, SWT.PUSH);
+            exitItem.setText(Messages.get(MenuItem_Exit));
+            shell.setMenuBar(menuBar);
+            exitItem.addListener(SWT.Selection, quitListener);
+
             MenuItem preferencesItem = new MenuItem(fileMenu, SWT.PUSH);
             preferencesItem.setText(preferencesAction.getText());
             preferencesItem.addListener(SWT.Selection, event -> preferencesAction.run());
@@ -377,36 +376,6 @@ public class App {
 
         final ToolBarManager helpToolBarManager = new ToolBarManager(SWT.FLAT | SWT.NO_FOCUS);
         coolBarManager.add(helpToolBarManager);
-        helpToolBarManager.add(new ControlContribution("stylesheet") {
-            @Override
-            protected Control createControl(Composite parent) {
-                final Composite composite = new Composite(parent, SWT.NULL);
-                composite.setLayout(GridLayoutFactory.fillDefaults().margins(0, 0).numColumns(2).create());
-
-                //START >>  label1
-                final Label label1 = new Label(composite, SWT.NONE);
-                label1.setText(Messages.get(Toolbar_ColorScheme));
-                label1.setLayoutData(GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).grab(false, true).create());
-                //END <<  label1
-
-                Combo combo = new Combo(composite, SWT.READ_ONLY);
-                for (Stylesheet sheet : Stylesheet.ALL) {
-                    combo.add(sheet.getName());
-                }
-                combo.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent selectionEvent) {
-                        int selected = combo.getSelectionIndex();
-                        sourceCodeComposite.setStylesheet(Stylesheet.ALL.get(selected));
-                        settings.setKeySelectedstylesheetIndex(selected);
-                        settings.save();
-                    }
-                });
-                combo.select(settings.getSelectedStylesheetIndex());
-
-                return composite;
-            }
-        });
         helpToolBarManager.add(new ControlContribution("trace-code") {
             @Override
             protected Control createControl(Composite parent) {
@@ -588,11 +557,8 @@ public class App {
             mgr.addToRoot(new PreferenceNode(p.getTitle(),p));
         }
         PreferenceDialog dlg = new PreferenceDialog(Display.getCurrent().getActiveShell(), mgr);
-        dlg.open();
-//        Settings.getInstance().save();^M
-//
-//
-//        CloudConnectDialog dlg = new CloudConnectDialog(shell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-//        dlg.open(codeRepository);
+        if (dlg.open() == Window.OK) {
+            sourceCodeComposite.setStylesheet(Stylesheet.ALL.get(settings.getSelectedStylesheetIndex()));
+        }
     }
 }

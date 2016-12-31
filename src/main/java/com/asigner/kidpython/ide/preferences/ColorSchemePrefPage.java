@@ -1,4 +1,4 @@
-package com.asigner.kidpython.ide.settings;
+package com.asigner.kidpython.ide.preferences;
 
 import com.asigner.kidpython.ide.Settings;
 import com.asigner.kidpython.ide.editor.CodeEditor;
@@ -26,6 +26,8 @@ public class ColorSchemePrefPage extends PreferencePage {
     private final Set<String> wellKnownWords;
     private final java.util.List<Stylesheet> availableStylesheets;
 
+    private List list;
+
     private Stylesheet selectedStylesheet;
 
     public ColorSchemePrefPage(java.util.List<Stylesheet> availableStylesheets, Set<String> wellKnownWords) {
@@ -46,7 +48,7 @@ public class ColorSchemePrefPage extends PreferencePage {
         label = new Label(composite, SWT.NONE);
         label.setText(Messages.get(Preferences_ColorScheme_Preview));
 
-        List list = new List(composite, SWT.BORDER);
+        list = new List(composite, SWT.BORDER);
         list.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
 
         CodeEditor codeEditor = new CodeEditor(composite, SWT.NONE);
@@ -94,7 +96,12 @@ public class ColorSchemePrefPage extends PreferencePage {
         return composite;
     }
 
-    public Stylesheet getSelectedStylesheet() {
-        return selectedStylesheet;
+    @Override
+    public boolean performOk() {
+        if (list != null) {
+            int idx = list.getSelectionIndex();
+            Settings.getInstance().setSelectedstylesheetIndex(idx);
+        }
+        return true;
     }
 }

@@ -28,7 +28,7 @@ public class Settings {
         return getInt(KEY_SELECTEDSTYLESHEET, 0);
     }
 
-    public void setKeySelectedstylesheetIndex(int idx) {
+    public void setSelectedstylesheetIndex(int idx) {
         set(KEY_SELECTEDSTYLESHEET, idx);
     }
 

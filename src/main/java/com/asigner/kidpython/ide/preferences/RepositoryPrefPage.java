@@ -1,4 +1,4 @@
-package com.asigner.kidpython.ide.settings;
+package com.asigner.kidpython.ide.preferences;
 
 import com.asigner.kidpython.util.Messages;
 import org.eclipse.jface.preference.PreferencePage;
