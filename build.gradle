@@ -49,6 +49,7 @@ dependencies {
     // For compilation, we use the system's runtime.
     // providedCompile group: 'org.eclipse', name: 'platform-minimal', version: '4.5.1', configuration: 'linux-gtk-x86_64'
 
+    compile 'commons-io:commons-io:2.5'
     compile 'com.google.guava:guava:19.0'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.0'
     compile 'org.apache.xmlgraphics:batik-svggen:1.8'
