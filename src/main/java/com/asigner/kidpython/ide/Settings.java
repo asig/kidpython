@@ -11,7 +11,8 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Settings {
-    public static final String KEY_SELECTEDSTYLESHEET = "SelectedStylesheet";
+    private static final String KEY_SELECTEDSTYLESHEET = "SelectedStylesheet";
+    private static final String KEY_SELECTEDSOURCE = "SelectedSource";
 
     private static Settings instance = null;
 
@@ -32,6 +33,14 @@ public class Settings {
 
     public void setSelectedstylesheetIndex(int idx) {
         set(KEY_SELECTEDSTYLESHEET, idx);
+    }
+
+    public int getSelectedSourceIndex() {
+        return getInt(KEY_SELECTEDSOURCE, 0);
+    }
+
+    public void setSelectedSourceIndex(int idx) {
+        set(KEY_SELECTEDSOURCE, idx);
     }
 
     public static String getSettingsDirectory() {
@@ -132,21 +141,21 @@ public class Settings {
         return this;
     }
 
-    public Settings set(String key, boolean newVal) {
+    private Settings set(String key, boolean newVal) {
         this.set(key, Boolean.toString(newVal) );
         return this;
     }
 
-    public Settings set(String key, int newVal) {
+    private Settings set(String key, int newVal) {
         this.set(key, Integer.toString(newVal) );
         return this;
     }
 
-    public String get(String key) {
+    private String get(String key) {
         return properties.getProperty(key);
     }
 
-    public int getInt(String key, int dflt) {
+    private int getInt(String key, int dflt) {
         String res = properties.getProperty(key);
         return res == null ? dflt : Integer.parseInt(res);
     }

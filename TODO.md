@@ -85,7 +85,7 @@ TODO
     
 [ ] Stylesheets:
     [ ] Load style sheets dynamically from files
-    [ ] Load style sheets dynamicallt from textmate themes
+    [ ] Load style sheets dynamically from textmate themes
     [X] Add TextMate converter
     [ ] Add additional colors:
         [ ] lineHighlight background

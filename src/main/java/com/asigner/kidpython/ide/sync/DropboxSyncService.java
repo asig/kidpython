@@ -43,16 +43,16 @@ public class DropboxSyncService implements SyncService {
         Optional<String> token = flow.execute();
         if (token.isPresent()) {
             settings.set(KEY_ACCESS_TOKEN, token.get());
-            settings.set(KEY_CONNECTED, true);
+            settings.set(KEY_CONNECTED, Boolean.toString(true));
         } else {
-            settings.set(KEY_CONNECTED, false);
+            settings.set(KEY_CONNECTED, Boolean.toString(false));
         }
         settings.save();
     }
 
     @Override
     public boolean isConnected() {
-        return Boolean.parseBoolean(settings.get(KEY_CONNECTED, "false"));
+        return settings.getBoolean(KEY_CONNECTED, false);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class DropboxSyncService implements SyncService {
 
     @Override
     public PersistenceStrategy getPersistenceStrategy() {
-        String token = settings.get(KEY_ACCESS_TOKEN);
+        String token = settings.get(KEY_ACCESS_TOKEN, "");
         DbxRequestConfig config = DbxRequestConfig.newBuilder("ProgrammableFun/1.0").build();
         DbxClientV2 client = new DbxClientV2(config, token);
         return new DropboxPersistenceStrategy(client);

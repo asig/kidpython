@@ -30,8 +30,6 @@ public class SourceCodeComposite extends Composite {
         void newSourceSelected(int idx);
     }
 
-    private static final String KEY_SELECTEDSOURCE = "SourceCodeComposite.selectedSource";
-
     private final List<SourceSelectionChangedListener> listeners = Lists.newArrayList();
 
     private CodeRepository codeRepository;
@@ -107,7 +105,7 @@ public class SourceCodeComposite extends Composite {
             }
         });
 
-        selectSource(settings.getInt(KEY_SELECTEDSOURCE, 0));
+        selectSource(settings.getSelectedSourceIndex());
     }
 
     public void addListener(SourceSelectionChangedListener listener) {
@@ -203,7 +201,7 @@ public class SourceCodeComposite extends Composite {
             codeRepository.save();
         }
         selectedSource = idx;
-        settings.set(KEY_SELECTEDSOURCE, selectedSource);
+        settings.setSelectedSourceIndex(selectedSource);
         settings.save();
         if (selectedSource > -1) {
             listeners.forEach(l -> l.newSourceSelected(idx));
