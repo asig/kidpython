@@ -2,6 +2,7 @@
 
 package com.asigner.kidpython.ide.sync;
 
+import com.asigner.kidpython.ide.Settings;
 import com.asigner.kidpython.ide.sync.PersistenceStrategy;
 
 import java.io.ByteArrayOutputStream;
@@ -35,7 +36,7 @@ public class LocalPersistenceStrategy implements PersistenceStrategy {
     }
 
     private String getFileName() {
-        return System.getProperty("user.home") + File.separator + ".programmablefun-coderepo.json";
+        return Settings.getInstance().getSettingsDirectory() + "/coderepo.json";
     }
 
 }

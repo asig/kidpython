@@ -1,5 +1,7 @@
 package com.asigner.kidpython.ide;
 
+import com.asigner.kidpython.ide.util.OS;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -32,8 +34,14 @@ public class Settings {
         set(KEY_SELECTEDSTYLESHEET, idx);
     }
 
+    public String getSettingsDirectory() {
+        File dir = new File(OS.getAppDataDirectory() + "/ProgrammableFun/");
+        dir.mkdirs();
+        return dir.getAbsolutePath();
+    }
+
     private Settings() {
-        fileName = System.getProperty("user.home") + File.separator + ".programmablefun.properties";
+        fileName = getSettingsDirectory() + "/settings.properties";
         properties = new Properties(getDefaultProperties());
         FileInputStream is = null;
         try {
@@ -153,6 +161,3 @@ public class Settings {
         return res == null ? dflt : res;
     }
 }
-
-
-
