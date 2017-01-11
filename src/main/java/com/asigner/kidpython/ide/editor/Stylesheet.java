@@ -354,6 +354,11 @@ public class Stylesheet {
         return null;
     }
 
+    public static Stylesheet loadTextMateTheme(InputStream tm) throws IOException {
+        TextMateThemeLoader loader = new TextMateThemeLoader(tm);
+        return loader.load();
+    }
+
     static class Style {
         private final Color fg;
         private final Color bg;

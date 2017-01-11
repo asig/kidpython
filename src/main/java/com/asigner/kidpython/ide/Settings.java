@@ -34,7 +34,7 @@ public class Settings {
         set(KEY_SELECTEDSTYLESHEET, idx);
     }
 
-    public String getSettingsDirectory() {
+    public static String getSettingsDirectory() {
         File dir = new File(OS.getAppDataDirectory() + "/ProgrammableFun/");
         dir.mkdirs();
         return dir.getAbsolutePath();

@@ -1,69 +1,45 @@
-// Copyright 2016 Andreas Signer. All rights reserved.
+// Copyright 2017 Andreas Signer. All rights reserved.
 
-package com.asigner.kidpython.tools;
+package com.asigner.kidpython.ide.editor;
 
 
-import com.asigner.kidpython.ide.editor.Stylesheet;
-import com.asigner.kidpython.ide.editor.TextMateThemeLoader;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.apache.commons.io.IOUtils;
 import xmlwise.Plist;
 import xmlwise.XmlParseException;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
 
-public class TextMateThemeConverter {
+public class TextMateThemeLoader {
 
     private Stylesheet.JsonStylesheet stylesheet;
     private Map<String, Object> plist;
 
-    public static void main(String ... args) {
-        try {
-
-            List<Stylesheet.JsonStylesheet> stylesheets = Files.list(new File(args[0]).toPath())
-                    .map(TextMateThemeConverter::load)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.writerWithDefaultPrettyPrinter().writeValue(System.out, stylesheets);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static Stylesheet.JsonStylesheet load(Path path) {
-        try {
-            return new TextMateThemeLoader(new FileInputStream(path.toFile())).loadJson();
-        } catch (IOException e) {
-            System.err.println("Can't convert " + path.toString());
-            return null;
-        }
-    }
-
-    public TextMateThemeConverter(Path path) {
+    public TextMateThemeLoader(InputStream is) throws IOException {
         this.stylesheet = new Stylesheet.JsonStylesheet();
-        String content = "";
+        StringWriter w = new StringWriter();
+        IOUtils.copy(is, w, Charset.defaultCharset());
+        String content = removeXmlComments(w.toString());
         try {
-            // We need to do some preprocessing to get rid of XML-breaking comments...
-            content = removeXmlComments(new String(Files.readAllBytes(path)));
             this.plist = Plist.fromXml(content);
-        } catch (XmlParseException | IOException e) {
-            throw new RuntimeException(e);
+        } catch (XmlParseException e) {
+            throw new IOException(e);
         }
+    }
+
+    public Stylesheet load() {
+        return loadJson().toStylesheet();
     }
 
     private String removeXmlComments(String s) {
@@ -79,7 +55,7 @@ public class TextMateThemeConverter {
         return res.trim();
     }
 
-    private Stylesheet.JsonStylesheet convert() {
+    public Stylesheet.JsonStylesheet loadJson() {
         this.stylesheet.author = (String)plist.get("author");
         this.stylesheet.name = (String)plist.get("name");
         List<Map<String, Object>> entries = (List<Map<String, Object>>)plist.get("settings");
