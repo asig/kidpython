@@ -8,6 +8,10 @@ public class OS {
         return System.getProperty( "os.name" ).equals( "Mac OS X" );
     }
 
+    public static boolean isWin() {
+        return System.getProperty( "os.name" ).toLowerCase().contains("windows");
+    }
+
     public static String getAppDataDirectory() {
         if (OS.isMac()) {
             return System.getProperty("user.home") + "/Library/Application Support";
@@ -28,4 +32,18 @@ public class OS {
             return System.getProperty("user.home") + "/.local/share";
         }
     }
+
+    public static String getConfigDirectory() {
+        if (OS.isMac() || OS.isWin()) {
+            return getAppDataDirectory();
+        }
+
+        // Linux
+        String dir = System.getenv("XDG_CONFIG_HOME");
+        if (dir == null) {
+            dir = System.getProperty("user.home") + "/.config";
+        }
+        return dir;
+    }
+
 }

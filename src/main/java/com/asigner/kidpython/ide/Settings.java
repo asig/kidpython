@@ -34,14 +34,20 @@ public class Settings {
         set(KEY_SELECTEDSTYLESHEET, name);
     }
 
-    public static String getSettingsDirectory() {
+    public static String getDataDirectory() {
         File dir = new File(OS.getAppDataDirectory() + "/ProgrammableFun/");
         dir.mkdirs();
         return dir.getAbsolutePath();
     }
 
+    public static String getConfigDirectory() {
+        File dir = new File(OS.getConfigDirectory() + "/ProgrammableFun/");
+        dir.mkdirs();
+        return dir.getAbsolutePath();
+    }
+
     private Settings() {
-        fileName = getSettingsDirectory() + "/settings.properties";
+        fileName = getConfigDirectory() + "/settings.properties";
         properties = new Properties(getDefaultProperties());
         FileInputStream is = null;
         try {

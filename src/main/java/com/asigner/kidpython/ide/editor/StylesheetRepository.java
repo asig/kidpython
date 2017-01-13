@@ -21,7 +21,9 @@ public class StylesheetRepository {
     }
 
     public static File getThemeDirectory() {
-        return new File(Settings.getSettingsDirectory() + "/themes");
+        File dir = new File(Settings.getDataDirectory() + "/themes");
+        dir.mkdirs();
+        return dir;
     }
 
     public void loadDefaults() {

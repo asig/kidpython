@@ -108,7 +108,13 @@ public class ColorSchemePrefPage extends PreferencePage {
         });
 
         String selected =  Settings.getInstance().getSelectedStylesheet();
+        if (selected == null) {
+            selected = list.getItem(0);
+        }
         list.setSelection(new String[] { selected });
+        // Changing the selection does not result in an event... so let's set it manually
+        selectedStylesheet = workingCopy.get(selected);
+        codeEditor.setStylesheet(selectedStylesheet);
 
         initialized = true;
 
