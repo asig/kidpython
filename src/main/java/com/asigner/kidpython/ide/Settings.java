@@ -26,12 +26,12 @@ public class Settings {
         return instance;
     }
 
-    public int getSelectedStylesheetIndex() {
-        return getInt(KEY_SELECTEDSTYLESHEET, 0);
+    public String getSelectedStylesheet() {
+        return get(KEY_SELECTEDSTYLESHEET, null);
     }
 
-    public void setSelectedstylesheetIndex(int idx) {
-        set(KEY_SELECTEDSTYLESHEET, idx);
+    public void setSelectedstylesheet(String name) {
+        set(KEY_SELECTEDSTYLESHEET, name);
     }
 
     public static String getSettingsDirectory() {

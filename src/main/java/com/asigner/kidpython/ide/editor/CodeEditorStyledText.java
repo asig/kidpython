@@ -34,7 +34,7 @@ public class CodeEditorStyledText extends StyledText {
     public CodeEditorStyledText(Composite parent, int style) {
         super(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 
-        Stylesheet stylesheet = Stylesheet.ALL.get(0);
+        stylesheet = Stylesheet.ALL.get(0);
         lineStyler = new CodeLineStyler(this, stylesheet);
 
         this.setBackground(stylesheet.getDefaultBackground());
@@ -90,7 +90,7 @@ public class CodeEditorStyledText extends StyledText {
         super.drawBackground(gc, x, y, width, height);
         int gutterWidth = lineStyler.getGutterWidth();
         if (x < gutterWidth) {
-            // We need to repaint the gutter. the separator is drawn in drawGutterSeparator()
+            // We need to repaint the gutter. the separator is drawn in drawGutterSeparator()        	
             gc.setBackground(stylesheet.getGutterBackground());
             gc.fillRectangle(0, y, gutterWidth, y + height);
         }
