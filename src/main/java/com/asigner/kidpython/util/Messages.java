@@ -86,6 +86,7 @@ public class Messages {
         Preferences_CodeRepository_Connected,
 
         Preferences_ColorScheme,
+        Preferences_ColorScheme_AddColorSchemes,
         Preferences_ColorScheme_AvailableColorSchemes,
         Preferences_ColorScheme_Preview
     }

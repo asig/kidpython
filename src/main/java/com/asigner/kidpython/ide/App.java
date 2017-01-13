@@ -6,7 +6,7 @@ import com.asigner.kidpython.compiler.Parser;
 import com.asigner.kidpython.compiler.ast.Node;
 import com.asigner.kidpython.compiler.ast.Stmt;
 import com.asigner.kidpython.ide.console.ConsoleComposite;
-import com.asigner.kidpython.ide.editor.Stylesheet;
+import com.asigner.kidpython.ide.editor.StylesheetRepository;
 import com.asigner.kidpython.ide.platform.CocoaUiEnhancer;
 import com.asigner.kidpython.ide.preferences.ColorSchemePrefPage;
 import com.asigner.kidpython.ide.preferences.RepositoryPrefPage;
@@ -45,11 +45,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -80,6 +78,7 @@ public class App {
 
     protected Shell shell;
 
+    private StylesheetRepository stylesheetRepository;
     private CodeRepository codeRepository;
     private Set<String> wellKnownWords;
 
@@ -122,6 +121,8 @@ public class App {
 
     public App() {
         settings = Settings.getInstance();
+        stylesheetRepository = new StylesheetRepository();
+        stylesheetRepository.loadDefaults();
         PersistenceStrategy persistenceStrategy = new LocalPersistenceStrategy();
         for (SyncService syncService : SyncService.ALL) {
             if (syncService.isConnected()) {
@@ -170,7 +171,7 @@ public class App {
         SashForm sashForm2 = new SashForm(sashForm, SWT.HORIZONTAL);
         sashForm2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         sourceCodeComposite = new SourceCodeComposite(sashForm2, SWT.NONE, codeRepository);
-        sourceCodeComposite.setStylesheet(Stylesheet.ALL.get(settings.getSelectedStylesheetIndex()));
+        sourceCodeComposite.setStylesheet(stylesheetRepository.get(settings.getSelectedStylesheet()));
         callStackComposite = new CallStackComposite(sashForm2, SWT.NONE);
         turtleCanvas = new TurtleCanvas(sashForm2, SWT.NONE);
         sashForm2.setWeights(new int[]{10,2,8});
@@ -550,7 +551,7 @@ public class App {
     private void showPreferences() {
         PreferencePage pages[] = new PreferencePage[] {
                 new RepositoryPrefPage(codeRepository),
-                new ColorSchemePrefPage(Stylesheet.ALL, wellKnownWords),
+                new ColorSchemePrefPage(stylesheetRepository, wellKnownWords),
         };
         PreferenceManager mgr = new PreferenceManager();
         for(PreferencePage p : pages) {
@@ -558,7 +559,8 @@ public class App {
         }
         PreferenceDialog dlg = new PreferenceDialog(Display.getCurrent().getActiveShell(), mgr);
         if (dlg.open() == Window.OK) {
-            sourceCodeComposite.setStylesheet(Stylesheet.ALL.get(settings.getSelectedStylesheetIndex()));
+            sourceCodeComposite.setStylesheet(stylesheetRepository.get(settings.getSelectedStylesheet()));
+            settings.save();
         }
     }
 }

@@ -11,8 +11,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Settings {
-    private static final String KEY_SELECTEDSTYLESHEET = "SelectedStylesheet";
-    private static final String KEY_SELECTEDSOURCE = "SelectedSource";
+    public static final String KEY_SELECTEDSTYLESHEET = "SelectedStylesheet";
 
     private static Settings instance = null;
 
@@ -27,30 +26,28 @@ public class Settings {
         return instance;
     }
 
-    public int getSelectedStylesheetIndex() {
-        return getInt(KEY_SELECTEDSTYLESHEET, 0);
+    public String getSelectedStylesheet() {
+        return get(KEY_SELECTEDSTYLESHEET, null);
     }
 
-    public void setSelectedstylesheetIndex(int idx) {
-        set(KEY_SELECTEDSTYLESHEET, idx);
+    public void setSelectedstylesheet(String name) {
+        set(KEY_SELECTEDSTYLESHEET, name);
     }
 
-    public int getSelectedSourceIndex() {
-        return getInt(KEY_SELECTEDSOURCE, 0);
-    }
-
-    public void setSelectedSourceIndex(int idx) {
-        set(KEY_SELECTEDSOURCE, idx);
-    }
-
-    public static String getSettingsDirectory() {
+    public static String getDataDirectory() {
         File dir = new File(OS.getAppDataDirectory() + "/ProgrammableFun/");
         dir.mkdirs();
         return dir.getAbsolutePath();
     }
 
+    public static String getConfigDirectory() {
+        File dir = new File(OS.getConfigDirectory() + "/ProgrammableFun/");
+        dir.mkdirs();
+        return dir.getAbsolutePath();
+    }
+
     private Settings() {
-        fileName = getSettingsDirectory() + "/settings.properties";
+        fileName = getConfigDirectory() + "/settings.properties";
         properties = new Properties(getDefaultProperties());
         FileInputStream is = null;
         try {
@@ -141,21 +138,21 @@ public class Settings {
         return this;
     }
 
-    private Settings set(String key, boolean newVal) {
+    public Settings set(String key, boolean newVal) {
         this.set(key, Boolean.toString(newVal) );
         return this;
     }
 
-    private Settings set(String key, int newVal) {
+    public Settings set(String key, int newVal) {
         this.set(key, Integer.toString(newVal) );
         return this;
     }
 
-    private String get(String key) {
+    public String get(String key) {
         return properties.getProperty(key);
     }
 
-    private int getInt(String key, int dflt) {
+    public int getInt(String key, int dflt) {
         String res = properties.getProperty(key);
         return res == null ? dflt : Integer.parseInt(res);
     }

@@ -6,7 +6,11 @@ import com.google.common.collect.Maps;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
+
+import static java.util.stream.Collectors.toList;
 
 public class StylesheetRepository {
 
@@ -14,14 +18,22 @@ public class StylesheetRepository {
 
     public StylesheetRepository() {
         stylesheets = Maps.newHashMap();
+    }
 
+    public static File getThemeDirectory() {
+        File dir = new File(Settings.getDataDirectory() + "/themes");
+        dir.mkdirs();
+        return dir;
+    }
+
+    public void loadDefaults() {
         // First, add the hard coded ones
         for (Stylesheet s : Stylesheet.ALL) {
             stylesheets.put(s.getName(), s);
         }
 
         // Now, load all TextMate files
-        File dir = new File(Settings.getSettingsDirectory() + "/themes");
+        File dir = getThemeDirectory();
         dir.mkdir();
         File[] themes = dir.listFiles();
         if (themes != null) {
@@ -42,12 +54,24 @@ public class StylesheetRepository {
         }
     }
 
+    public StylesheetRepository replaceWith(StylesheetRepository toClone) {
+        stylesheets.clear();
+        stylesheets.putAll(toClone.stylesheets);
+        return this;
+    }
+
     public Stylesheet get(String name) {
         Stylesheet res = stylesheets.get(name);
         if (res == null) {
             res = getDefault();
         }
         return res;
+    }
+
+    public List<Stylesheet> getAll() {
+        return stylesheets.values().stream()
+                .sorted(Comparator.comparing(Stylesheet::getName))
+                .collect(toList());
     }
 
     public Stylesheet getDefault() {
