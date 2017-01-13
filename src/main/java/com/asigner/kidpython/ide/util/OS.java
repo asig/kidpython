@@ -2,8 +2,6 @@
 
 package com.asigner.kidpython.ide.util;
 
-import java.io.File;
-
 public class OS {
 
     public static boolean isMac() {
@@ -21,12 +19,13 @@ public class OS {
             return appdata;
         }
 
+        // Linux
         appdata = System.getenv("XDG_DATA_HOME");
         if (appdata != null) {
             return appdata;
+        } else {
+            // Fall back to recommendation in https://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
+            return System.getProperty("user.home") + "/.local/share";
         }
-
-        // Neither win nor linux. Fall back to user.home
-        return System.getProperty("user.home");
     }
 }
