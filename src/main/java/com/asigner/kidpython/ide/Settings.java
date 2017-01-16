@@ -11,13 +11,26 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Settings {
-    public static final String KEY_SELECTEDSTYLESHEET = "SelectedStylesheet";
+    private static final String KEY_SELECTEDSTYLESHEET = "SelectedStylesheet";
+    private static final String KEY_SELECTEDSOURCE = "SelectedSource";
 
     private static Settings instance = null;
 
     private String fileName = null;
     private Properties properties = null;
 //    private List<SettingsChangedListener> listeners = new LinkedList<SettingsChangedListener>();
+
+    public static String getDataDirectory() {
+        File dir = new File(OS.getAppDataDirectory() + "/ProgrammableFun/");
+        dir.mkdirs();
+        return dir.getAbsolutePath();
+    }
+
+    public static String getConfigDirectory() {
+        File dir = new File(OS.getConfigDirectory() + "/ProgrammableFun/");
+        dir.mkdirs();
+        return dir.getAbsolutePath();
+    }
 
     public static synchronized Settings getInstance() {
         if (instance == null) {
@@ -34,16 +47,12 @@ public class Settings {
         set(KEY_SELECTEDSTYLESHEET, name);
     }
 
-    public static String getDataDirectory() {
-        File dir = new File(OS.getAppDataDirectory() + "/ProgrammableFun/");
-        dir.mkdirs();
-        return dir.getAbsolutePath();
+    public int getSelectedSourceIndex() {
+        return getInt(KEY_SELECTEDSOURCE, 0);
     }
 
-    public static String getConfigDirectory() {
-        File dir = new File(OS.getConfigDirectory() + "/ProgrammableFun/");
-        dir.mkdirs();
-        return dir.getAbsolutePath();
+    public void setSelectedSourceIndex(int idx) {
+        set(KEY_SELECTEDSOURCE, idx);
     }
 
     private Settings() {
