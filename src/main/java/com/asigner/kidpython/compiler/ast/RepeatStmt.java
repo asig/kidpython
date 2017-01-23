@@ -28,5 +28,4 @@ public class RepeatStmt extends Stmt {
     public void accept(NodeVisitor visitor) {
         visitor.visit(this);
     }
-
 }
