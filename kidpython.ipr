@@ -9,8 +9,11 @@
     <wildcardResourcePatterns>
       <entry name="!?*.java"/>
       <entry name="!?*.groovy"/>
+      <entry name="!?*.class"/>
+      <entry name="!?*.scala"/>
     </wildcardResourcePatterns>
     <annotationProcessing enabled="false" useClasspath="true"/>
+    <bytecodeTargetLevel target="1.8"/>
   </component>
   <component name="CopyrightManager" default="">
     <module2copyright/>
@@ -45,7 +48,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/kidpython.iml" filepath="$PROJECT_DIR$/kidpython.iml"/>
+      <module filepath="$PROJECT_DIR$/kidpython.iml" fileurl="file://$PROJECT_DIR$/kidpython.iml"/>
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" assert-keyword="true" jdk-15="true" project-jdk-type="JavaSDK" assert-jdk-15="true" project-jdk-name="1.8">
