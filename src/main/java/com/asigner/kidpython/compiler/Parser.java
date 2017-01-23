@@ -1,6 +1,7 @@
 package com.asigner.kidpython.compiler;
 
 import com.asigner.kidpython.compiler.ast.AssignmentStmt;
+import com.asigner.kidpython.compiler.ast.CaseStmt;
 import com.asigner.kidpython.compiler.ast.EmptyStmt;
 import com.asigner.kidpython.compiler.ast.EvalStmt;
 import com.asigner.kidpython.compiler.ast.ForEachStmt;
@@ -36,6 +37,8 @@ import java.util.function.BiFunction;
 
 import static com.asigner.kidpython.compiler.Token.Type.AND;
 import static com.asigner.kidpython.compiler.Token.Type.ASTERISK;
+import static com.asigner.kidpython.compiler.Token.Type.BAR;
+import static com.asigner.kidpython.compiler.Token.Type.CASE;
 import static com.asigner.kidpython.compiler.Token.Type.COLON;
 import static com.asigner.kidpython.compiler.Token.Type.COMMA;
 import static com.asigner.kidpython.compiler.Token.Type.DO;
@@ -60,6 +63,7 @@ import static com.asigner.kidpython.compiler.Token.Type.LT;
 import static com.asigner.kidpython.compiler.Token.Type.MINUS;
 import static com.asigner.kidpython.compiler.Token.Type.NE;
 import static com.asigner.kidpython.compiler.Token.Type.NUM_LIT;
+import static com.asigner.kidpython.compiler.Token.Type.OF;
 import static com.asigner.kidpython.compiler.Token.Type.OR;
 import static com.asigner.kidpython.compiler.Token.Type.PLUS;
 import static com.asigner.kidpython.compiler.Token.Type.RBRACE;
@@ -89,6 +93,7 @@ public class Parser {
             WHILE,
             REPEAT,
             RETURN,
+            CASE,
             FUNC,
             IDENT
     );
@@ -114,6 +119,11 @@ public class Parser {
             LBRACK,
             IDENT,
             LPAREN
+    );
+
+    private Set<Token.Type> CASE_LABEL_SET = Sets.newHashSet(
+            NUM_LIT,
+            STRING_LIT
     );
 
     private final Scanner scanner;
@@ -179,6 +189,8 @@ public class Parser {
                 return repeatStmt();
             case RETURN:
                 return returnStmt();
+            case CASE:
+                return caseStmt();
             case IDENT:
                 return assignmentOrCall();
             default:
@@ -299,6 +311,32 @@ public class Parser {
             error(Error.returnNotAllowedOutsideFunction(pos));
         }
         return new ReturnStmt(pos, expr);
+    }
+
+    private Stmt caseStmt() {
+        Position pos = lookahead.getPos();
+        match(CASE);
+        ExprNode expr = expr();
+        match(OF);
+        List<CaseStmt.Case> cases = Lists.newArrayList();
+        cases.add(casePart());
+        while (lookahead.getType() == BAR) {
+            match(BAR);
+            cases.add(casePart());
+        }
+        return new CaseStmt(pos, expr, cases);
+    }
+
+    private CaseStmt.Case casePart() {
+        List<ExprNode> labelRanges = Lists.newLinkedList();
+        labelRanges.add(rangeExpr());
+        while (lookahead.getType() == COMMA) {
+            match(COMMA);
+            labelRanges.add(rangeExpr());
+        }
+        match(COLON);
+        Stmt caseBody = stmtBlock().getFirst();
+        return new CaseStmt.Case(labelRanges, caseBody);
     }
 
     private Stmt assignmentOrCall() {

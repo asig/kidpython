@@ -3,6 +3,7 @@
 package com.asigner.kidpython.compiler;
 
 import com.asigner.kidpython.compiler.ast.AssignmentStmt;
+import com.asigner.kidpython.compiler.ast.CaseStmt;
 import com.asigner.kidpython.compiler.ast.EmptyStmt;
 import com.asigner.kidpython.compiler.ast.EvalStmt;
 import com.asigner.kidpython.compiler.ast.ForEachStmt;
@@ -234,6 +235,11 @@ public class CodeGenerator implements NodeVisitor {
         generateStmtBlock(stmt.getBody());
         emit(new Instruction(stmt, B, startPc)); // will be patched afterwards
         patch(jumpPc, new Instruction(stmt, BF, instrs.size()));
+    }
+
+    @Override
+    public void visit(CaseStmt stmt) {
+        throw new IllegalStateException("Not implemented yet!");
     }
 
     @Override

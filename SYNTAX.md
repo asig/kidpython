@@ -41,11 +41,7 @@ case_stmt := "case" expr "of" case { "|" case } "end".
 
 case := case_label_list ":" stmt_block .
 
-case_label_list := label_range { "," label_range }.
-
-label_range := label [ ".." label ].
-
-label = integer | string | ident.
+case_label_list := range_expr { "," range_expr }.
 
 return_stmt := "return" [ expr ].
 

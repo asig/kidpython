@@ -22,6 +22,7 @@ public interface NodeVisitor {
     void visit(RepeatStmt stmt);
     void visit(ReturnStmt stmt);
     void visit(WhileStmt stmt);
+    void visit(CaseStmt stmt);
 
     void visit(BinOpNode node);
     void visit(UnOpNode node);
