@@ -41,5 +41,7 @@
 	<classpathentry kind="lib" path="/home/asigner/projects/kidpython/build/output/lib/xalan-2.7.0.jar"/>
 	<classpathentry kind="lib" path="/home/asigner/projects/kidpython/build/output/lib/xml-apis-2.0.2.jar"/>
 	<classpathentry kind="lib" path="/home/asigner/projects/kidpython/build/output/lib/xml-apis-ext-1.3.04.jar"/>
+	<classpathentry kind="lib" path="build/output/lib/commons-io-2.5.jar"/>
+	<classpathentry kind="lib" path="build/output/lib/xmlwise-1.2.11.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
