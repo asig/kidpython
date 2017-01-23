@@ -9,6 +9,8 @@ public class Scanner {
 
     private static final Map<String, Token.Type> keywords = ImmutableMap.<String, Token.Type>builder()
             .put("function", Token.Type.FUNC)
+            .put("case", Token.Type.CASE)
+            .put("of", Token.Type.OF)
             .put("for", Token.Type.FOR)
             .put("end", Token.Type.END)
             .put("if", Token.Type.IF)
@@ -110,6 +112,7 @@ public class Scanner {
                     }
                     return new Token(Token.Type.STRING_LIT, pos, b.toString());
                 }
+                case '|': return new Token(Token.Type.BAR, pos);
                 case '(': return new Token(Token.Type.LPAREN, pos);
                 case ')': return new Token(Token.Type.RPAREN, pos);
                 case '[': return new Token(Token.Type.LBRACK, pos);

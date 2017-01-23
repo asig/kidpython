@@ -3,6 +3,8 @@ package com.asigner.kidpython.compiler;
 public class Token {
 
     public enum Type {
+        CASE,
+        OF,
         FUNC,
         END,
         IF,
@@ -34,6 +36,7 @@ public class Token {
         DOT,
         DOTDOT,
         COLON,
+        BAR,
 
         EQ,
         NE,

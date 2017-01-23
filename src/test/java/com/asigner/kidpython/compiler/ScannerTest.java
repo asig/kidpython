@@ -51,8 +51,10 @@ public class ScannerTest {
 
     @Test
     public void testToken() throws Exception {
-        Scanner scanner = new Scanner("function for to end if then else step in do while repeat until return and or ()[]{}+-*/= <> < <= > >= , . .. : 1 12. 12.34 abc a2b \"foo\" 'bar'");
+        Scanner scanner = new Scanner("case of function for to end if then else step in do while repeat until return and or ()[]{}+-*/= <> < <= > >= , . .. | : 1 12. 12.34 abc a2b \"foo\" 'bar'");
         Token t;
+        t = scanner.next(); assertEquals(Token.Type.CASE, t.getType());
+        t = scanner.next(); assertEquals(Token.Type.OF, t.getType());
         t = scanner.next(); assertEquals(Token.Type.FUNC, t.getType());
         t = scanner.next(); assertEquals(Token.Type.FOR, t.getType());
         t = scanner.next(); assertEquals(Token.Type.TO, t.getType());
@@ -88,6 +90,7 @@ public class ScannerTest {
         t = scanner.next(); assertEquals(Token.Type.COMMA, t.getType());
         t = scanner.next(); assertEquals(Token.Type.DOT, t.getType());
         t = scanner.next(); assertEquals(Token.Type.DOTDOT, t.getType());
+        t = scanner.next(); assertEquals(Token.Type.BAR, t.getType());
         t = scanner.next(); assertEquals(Token.Type.COLON, t.getType());
 
         t = scanner.next(); assertEquals(Token.Type.NUM_LIT, t.getType());  assertEquals("1", t.getValue());
