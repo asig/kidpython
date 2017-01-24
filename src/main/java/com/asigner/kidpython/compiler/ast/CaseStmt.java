@@ -27,8 +27,8 @@ public class CaseStmt extends Stmt {
         }
     }
 
-    private ExprNode cond;
-    private List<Case> parts;
+    private final ExprNode cond;
+    private final List<Case> parts;
 
     public CaseStmt(Position pos, ExprNode cond, List<Case> parts) {
         super(pos);
