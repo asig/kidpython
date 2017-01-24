@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.asigner.kidpython.runtime.Value.Type.RANGE;
-import static com.asigner.kidpython.runtime.Value.Type.STRING;
 
 public class RangeValue extends Value {
 
@@ -82,13 +81,8 @@ public class RangeValue extends Value {
     }
 
     public boolean contains(Value v) {
-        if (start.getType() == STRING) {
-            String s = v.asString();
-            return start.asString().compareTo(s) <= 0 && s.compareTo(end.asString()) <= 0;
-        } else {
-            BigDecimal num = v.asNumber();
-            return start.asNumber().compareTo(num) <= 0 && num.compareTo(end.asNumber()) <= 0;
-        }
+        BigDecimal num = v.asNumber();
+        return start.asNumber().compareTo(num) <= 0 && num.compareTo(end.asNumber()) <= 0;
     }
 
     @Override

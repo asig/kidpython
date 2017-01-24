@@ -389,11 +389,11 @@ public class VirtualMachine {
                 case IN: {
                     Value right = load(valueStack.pop());
                     Value left = load(valueStack.pop());
-                    if (left.getType() != RANGE) {
+                    if (right.getType() != RANGE) {
                         throw new ExecutionException(instr.getSourceNode().getPos(), "Value is not a range!");
                     }
-                    RangeValue rv = (RangeValue)left;
-                    valueStack.push(new BooleanValue(rv.contains(right)));
+                    RangeValue rv = (RangeValue)right;
+                    valueStack.push(new BooleanValue(rv.contains(left)));
                 }
                 break;
 

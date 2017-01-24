@@ -17,7 +17,6 @@ import org.eclipse.swt.custom.PaintObjectEvent;
 import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
@@ -289,6 +288,8 @@ public class CodeLineStyler implements LineStyleListener {
         protected int startToken;
 
         private Set<String> keywords = Sets.newHashSet(
+                "case",
+                "of",
                 "function",
                 "for",
                 "end",

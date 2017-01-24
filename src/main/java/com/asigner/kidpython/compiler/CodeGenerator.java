@@ -247,11 +247,11 @@ public class CodeGenerator implements NodeVisitor {
         for (CaseStmt.Case c : stmt.getCases()) {
             List<Integer> jumpsToBody = Lists.newArrayList();
             for (ExprNode e : c.getLabelRanges()) {
-                emit(new Instruction(stmt, DUP));
+                emit(new Instruction(e, DUP));
                 e.accept(this);
-                emit(new Instruction(stmt, e instanceof RangeNode ? IN : EQ));
+                emit(new Instruction(e, e instanceof RangeNode ? IN : EQ));
                 jumpsToBody.add(instrs.size());
-                emit(new Instruction(stmt, BT, 0)); // will be patched later
+                emit(new Instruction(e, BT, 0)); // will be patched later
             }
             int jumpToNextCase = instrs.size();
             emit(new Instruction(stmt, B, 0));
