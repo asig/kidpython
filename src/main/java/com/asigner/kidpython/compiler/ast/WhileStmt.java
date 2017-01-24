@@ -7,8 +7,8 @@ import com.asigner.kidpython.compiler.ast.expr.ExprNode;
 
 public class WhileStmt extends Stmt {
 
-    private ExprNode cond;
-    private Stmt body;
+    private final ExprNode cond;
+    private final Stmt body;
 
     public WhileStmt(Position pos, ExprNode cond, Stmt body) {
         super(pos);

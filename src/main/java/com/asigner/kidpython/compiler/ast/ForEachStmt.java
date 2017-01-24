@@ -7,9 +7,9 @@ import com.asigner.kidpython.compiler.ast.expr.ExprNode;
 
 public class ForEachStmt extends Stmt {
 
-    private ExprNode ctrlVar;
-    private ExprNode range;
-    private Stmt body;
+    private final ExprNode ctrlVar;
+    private final ExprNode range;
+    private final Stmt body;
 
     public ForEachStmt(Position pos, ExprNode ctrlVar, ExprNode range, Stmt body) {
         super(pos);

@@ -7,8 +7,8 @@ import com.asigner.kidpython.compiler.ast.expr.ExprNode;
 
 public class IfStmt extends Stmt {
 
-    private ExprNode cond;
-    private Stmt trueBranch;
+    private final ExprNode cond;
+    private final Stmt trueBranch;
     private Stmt falseBranch;
 
     public IfStmt(Position pos, ExprNode cond, Stmt trueBranch) {
@@ -29,16 +29,8 @@ public class IfStmt extends Stmt {
         return trueBranch;
     }
 
-    public void setCond(ExprNode cond) {
-        this.cond = cond;
-    }
-
     public void setFalseBranch(Stmt falseBranch) {
         this.falseBranch = falseBranch;
-    }
-
-    public void setTrueBranch(Stmt trueBranch) {
-        this.trueBranch = trueBranch;
     }
 
     @Override

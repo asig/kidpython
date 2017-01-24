@@ -7,11 +7,11 @@ import com.asigner.kidpython.compiler.ast.expr.ExprNode;
 
 public class ForStmt extends Stmt {
 
-    private ExprNode ctrlVar;
-    private ExprNode start;
-    private ExprNode end;
-    private ExprNode step;
-    private Stmt body;
+    private final ExprNode ctrlVar;
+    private final ExprNode start;
+    private final ExprNode end;
+    private final ExprNode step;
+    private final Stmt body;
 
     public ForStmt(Position pos, ExprNode ctrlVar, ExprNode start, ExprNode end, ExprNode step, Stmt body) {
         super(pos);

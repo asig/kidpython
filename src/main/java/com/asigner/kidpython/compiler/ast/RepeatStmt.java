@@ -7,8 +7,8 @@ import com.asigner.kidpython.compiler.ast.expr.ExprNode;
 
 public class RepeatStmt extends Stmt {
 
-    private ExprNode cond;
-    private Stmt body;
+    private final ExprNode cond;
+    private final Stmt body;
 
     public RepeatStmt(Position pos, ExprNode cond, Stmt body) {
         super(pos);

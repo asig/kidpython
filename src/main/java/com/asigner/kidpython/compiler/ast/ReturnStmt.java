@@ -7,7 +7,7 @@ import com.asigner.kidpython.compiler.ast.expr.ExprNode;
 
 public class ReturnStmt extends Stmt {
 
-    private ExprNode expr;
+    private final ExprNode expr;
 
     public ReturnStmt(Position pos, ExprNode expr) {
         super(pos);

@@ -121,11 +121,6 @@ public class Parser {
             LPAREN
     );
 
-    private Set<Token.Type> CASE_LABEL_SET = Sets.newHashSet(
-            NUM_LIT,
-            STRING_LIT
-    );
-
     private final Scanner scanner;
     private Token lookahead;
     private int inFunction;
@@ -324,6 +319,7 @@ public class Parser {
             match(BAR);
             cases.add(casePart());
         }
+        match(END);
         return new CaseStmt(pos, expr, cases);
     }
 
