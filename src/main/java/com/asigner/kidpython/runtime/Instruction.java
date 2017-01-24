@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.joining;
 
 public class Instruction {
     public enum OpCode {
+        DUP,   // Duplicates the top value on the stack
         PUSH,  // Push a value to the stack
         POP,
         ASSIGN, // Store from stack to variable
@@ -21,8 +22,8 @@ public class Instruction {
 
         MKLIST,
         MKMAP,
-        MKITER,
-        MKRANGE,
+        MKITER,  // Create an iterator for the top value on the stack
+        MKRANGE, // Create a range from the top 2 values on the stack
 
         BT,
         BF,
@@ -46,7 +47,8 @@ public class Instruction {
         LE,
         LT,
         GE,
-        GT
+        GT,
+        IN, // check whether a value is within a range.
     }
 
     private final OpCode opCode;

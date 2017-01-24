@@ -28,6 +28,7 @@ import static com.asigner.kidpython.runtime.Value.Type.BOOLEAN;
 import static com.asigner.kidpython.runtime.Value.Type.ITERATOR;
 import static com.asigner.kidpython.runtime.Value.Type.MAP;
 import static com.asigner.kidpython.runtime.Value.Type.NUMBER;
+import static com.asigner.kidpython.runtime.Value.Type.RANGE;
 import static com.asigner.kidpython.runtime.Value.Type.REFERENCE;
 import static com.asigner.kidpython.runtime.Value.Type.STRING;
 import static com.asigner.kidpython.runtime.VirtualMachine.State.PAUSED;
@@ -160,6 +161,12 @@ public class VirtualMachine {
                 case POP:
                     valueStack.pop();
                     break;
+
+                case DUP: {
+                    Value v = valueStack.peek();
+                    valueStack.push(v);
+                }
+                break;
 
                 case ASSIGN: {
                     Value rhs = load(valueStack.pop());
@@ -379,6 +386,19 @@ public class VirtualMachine {
                     valueStack.push(new BooleanValue(res.isPresent() && res.get() > 0));
                 }
                 break;
+                case IN: {
+                    Value right = load(valueStack.pop());
+                    Value left = load(valueStack.pop());
+                    if (left.getType() != RANGE) {
+                        throw new ExecutionException(instr.getSourceNode().getPos(), "Value is not a range!");
+                    }
+                    RangeValue rv = (RangeValue)left;
+                    valueStack.push(new BooleanValue(rv.contains(right)));
+                }
+                break;
+
+                default:
+                    throw new IllegalStateException("Executing unimplemented op-code " + instr.getOpCode());
             }
         }
     }
@@ -623,6 +643,4 @@ public class VirtualMachine {
         }
         return Optional.empty();
     }
-
-
 }

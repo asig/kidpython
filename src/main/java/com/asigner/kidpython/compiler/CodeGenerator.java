@@ -45,9 +45,11 @@ import static com.asigner.kidpython.runtime.Instruction.OpCode.BF;
 import static com.asigner.kidpython.runtime.Instruction.OpCode.BT;
 import static com.asigner.kidpython.runtime.Instruction.OpCode.CALL;
 import static com.asigner.kidpython.runtime.Instruction.OpCode.DIV;
+import static com.asigner.kidpython.runtime.Instruction.OpCode.DUP;
 import static com.asigner.kidpython.runtime.Instruction.OpCode.EQ;
 import static com.asigner.kidpython.runtime.Instruction.OpCode.GE;
 import static com.asigner.kidpython.runtime.Instruction.OpCode.GT;
+import static com.asigner.kidpython.runtime.Instruction.OpCode.IN;
 import static com.asigner.kidpython.runtime.Instruction.OpCode.ITER_HAS_NEXT;
 import static com.asigner.kidpython.runtime.Instruction.OpCode.ITER_NEXT;
 import static com.asigner.kidpython.runtime.Instruction.OpCode.LE;
@@ -239,7 +241,33 @@ public class CodeGenerator implements NodeVisitor {
 
     @Override
     public void visit(CaseStmt stmt) {
-        throw new IllegalStateException("Not implemented yet!");
+        stmt.getCond().accept(this);
+
+        List<Integer> jumpsToEnd = Lists.newArrayList();
+        for (CaseStmt.Case c : stmt.getCases()) {
+            List<Integer> jumpsToBody = Lists.newArrayList();
+            for (ExprNode e : c.getLabelRanges()) {
+                emit(new Instruction(stmt, DUP));
+                e.accept(this);
+                emit(new Instruction(stmt, e instanceof RangeNode ? IN : EQ));
+                jumpsToBody.add(instrs.size());
+                emit(new Instruction(stmt, BT, 0)); // will be patched later
+            }
+            int jumpToNextCase = instrs.size();
+            emit(new Instruction(stmt, B, 0));
+
+            int bodyStart = instrs.size();
+            patch(jumpsToBody, new Instruction(stmt, BT, bodyStart));
+            c.getBody().accept(this);
+            jumpsToEnd.add(instrs.size());
+            emit(new Instruction(stmt, B, 0));
+
+            int nextCasePc = instrs.size();
+            patch(jumpToNextCase, new Instruction(stmt, B, nextCasePc));
+        }
+        int endPc = instrs.size();
+        emit(new Instruction(stmt, POP));
+        patch(jumpsToEnd, new Instruction(stmt, B, endPc));
     }
 
     @Override
@@ -396,6 +424,10 @@ public class CodeGenerator implements NodeVisitor {
     private int emit(Instruction instr) {
         instrs.add(instr);
         return instrs.size() - 1;
+    }
+
+    private void patch(List<Integer> p, Instruction instr) {
+        p.forEach(pos -> patch(pos, instr));
     }
 
     private void patch(int pos, Instruction instr) {
