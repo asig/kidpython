@@ -22,6 +22,8 @@ import java.util.Stack;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static com.asigner.kidpython.runtime.Value.Type.BOOLEAN;
@@ -37,6 +39,8 @@ import static com.asigner.kidpython.runtime.VirtualMachine.State.STOPPED;
 
 public class VirtualMachine {
 
+    private static final Logger logger = Logger.getLogger(VirtualMachine.class.getName());
+    
     public interface EventListener {
         void vmStateChanged();
         void newStatementReached(Node stmt);
@@ -152,7 +156,9 @@ public class VirtualMachine {
                 lastStmt = stmt;
                 cloneListeners().forEach(l -> l.newStatementReached(stmt));
             }
-            System.err.println(String.format("Executing: %04d (Line %02d) %s", pc - 1, instr.getSourceNode().getPos().getLine(), instr));
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine(String.format("Executing: %04d (Line %02d) %s", pc - 1, instr.getSourceNode().getPos().getLine(), instr));
+            }
             switch (instr.getOpCode()) {
                 case PUSH:
                     valueStack.push(instr.getVal());
