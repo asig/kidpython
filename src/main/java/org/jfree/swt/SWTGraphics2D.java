@@ -1,64 +1,20 @@
-/* ===========================================
- * SWTGraphics2D : a bridge from Java2D to SWT
- * ===========================================
+/*
+ * Copyright (c) 2017 Andreas Signer <asigner@gmail.com>
  *
- * (C) Copyright 2006-2016, by Object Refinery Limited and Contributors.
+ * This file is part of programmablefun.
  *
- * Project Info:  https://github.com/jfree/swtgraphics2d
+ * programmablefun is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
+ * programmablefun is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- * License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
- * USA.
- *
- * [Oracle and Java are registered trademarks of Oracle and/or its affiliates.
- * Other names may be trademarks of their respective owners.]
- *
- * ------------------
- * SWTGraphics2D.java
- * ------------------
- * (C) Copyright 2006-2016, by Henry Proudhon and Contributors.
- *
- * Original Author:  Henry Proudhon (henry.proudhon AT ensmp.fr);
- * Contributor(s):   Cedric Chabanois (cchabanois AT no-log.org);
- *                   David Gilbert (for Object Refinery Limited);
- *                   Ronnie Duan (see bug report 2583891);
- *                   Kevin Xu (parts of patch 3506228);
- *
- * Changes
- * -------
- * 14-Jun-2006 : New class (HP);
- * 29-Jan-2007 : Fixed the fillRect method (HP);
- * 31-Jan-2007 : Moved the dummy JPanel to SWTUtils.java,
- *               implemented the drawLine method (HP);
- * 07-Apr-2007 : Dispose some of the SWT resources,
- *               thanks to silent for pointing this out (HP);
- * 23-May-2007 : Removed resource leaks by adding a resource pool (CC);
- * 15-Jun-2007 : Fixed compile error for JDK 1.4 (DG);
- * 22-Oct-2007 : Implemented clipping (HP);
- * 22-Oct-2007 : Implemented some AlphaComposite support (HP);
- * 23-Oct-2007 : Added mechanism for storing RenderingHints (which are
- *               still ignored at this point) (DG);
- * 23-Oct-2007 : Implemented drawPolygon(), drawPolyline(), drawOval(),
- *               fillOval(), drawArc() and fillArc() (DG);
- * 27-Nov-2007 : Implemented a couple of drawImage() methods (DG);
- * 18-Nov-2008 : Check for GradientPaint in setPaint() method (DG);
- * 27-Feb-2009 : Implemented fillPolygon() - see bug 2583891 (DG);
- * 04-Jul-2012 : Fixed get/setStroke() - see bug 3514487 (DG);
- * 18-Sep-2012 : Fixed missing text - see bug 3482106 and patch 3506228 (DG);
- * 03-Jul-2013 : Use ParamChecks (DG);
- * 19-Feb-2016 : Move to project separate from JFreeChart (DG);
- *
+ * You should have received a copy of the GNU General Public License
+ * along with programmablefun.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.jfree.swt;

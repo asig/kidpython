@@ -1,53 +1,20 @@
-/* ===========================================
- * SWTGraphics2D : a bridge from Java2D to SWT
- * ===========================================
+/*
+ * Copyright (c) 2017 Andreas Signer <asigner@gmail.com>
  *
- * (C) Copyright 2006-2016, by Object Refinery Limited and Contributors.
+ * This file is part of programmablefun.
  *
- * Project Info:  https://github.com/jfree/swtgraphics2d
+ * programmablefun is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
+ * programmablefun is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- * License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
- * USA.
- *
- * [Oracle and Java are registered trademarks of Oracle and/or its affiliates.
- * Other names may be trademarks of their respective owners.]
- *
- * -------------
- * SWTUtils.java
- * -------------
- * (C) Copyright 2006-2013, by Henry Proudhon and Contributors.
- *
- * Original Author:  Henry Proudhon (henry.proudhon AT ensmp.fr);
- * Contributor(s):   Rainer Blessing;
- *                   David Gilbert (david.gilbert@object-refinery.com);
- *                   Christoph Beck.
- *
- * Changes
- * -------
- * 01-Aug-2006 : New class (HP);
- * 16-Jan-2007 : Use FontData.getHeight() instead of direct field access (RB);
- * 31-Jan-2007 : Moved the dummy JPanel from SWTGraphics2D.java,
- *               added a new convert method for mouse events (HP);
- * 12-Jul-2007 : Improved the mouse event conversion with buttons
- *               and modifiers handling, patch sent by Christoph Beck (HP);
- * 27-Aug-2007 : Modified toAwtMouseEvent signature (HP);
- * 27-Nov-2007 : Moved convertToSWT() method from SWTGraphics2D and added
- *               convertAWTImageToSWT() (DG);
- * 01-Jul-2008 : Simplify AWT/SWT font style conversions (HP);
- * 03-Jul-2012 : Use ParamChecks (DG);
- *
+ * You should have received a copy of the GNU General Public License
+ * along with programmablefun.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.jfree.swt;

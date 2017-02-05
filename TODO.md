@@ -62,16 +62,20 @@ TODO
     [X] implement \n special codes
     [X] implement "len" function
     [X] implement math functions
-
-[ ] Turtle
-    [X] Slow mode that moves the Turtle pixel by pixel
-    [ ] Support background images
-    [X] Zoom buttons
-    [X] Reset buttons
-    [X] Make canvas draggable
-    [X] implement "clear"
-    [X] implement "home"
-    [X] Implement "Double Buffering"
+    [ ] Graphics
+        [ ] draw lines
+        [ ] draw circles
+        [ ] ...
+    [ ] Turtle
+        [X] Slow mode that moves the Turtle pixel by pixel
+        [ ] Support background images
+        [X] Zoom buttons
+        [X] Reset buttons
+        [X] Make canvas draggable
+        [X] implement "clear"
+        [X] implement "home"
+        [X] Implement "Double Buffering"
+    [ ] Standalone environment
 
 [ ] Manual
     [ ] explain turtle
@@ -81,12 +85,13 @@ TODO
 [ ] Language
     [ ] Default parameters
     [X] range operator "..":  a..b == range(a,b)
-    [ ] implement case statement (analog to Oberon)
+    [X] implement case statement (analog to Oberon)
     
 [ ] Stylesheets:
-    [ ] Load style sheets dynamically from files
-    [ ] Load style sheets dynamically from textmate themes
+    [X] Load style sheets dynamically from files
+    [X] Load style sheets dynamically from textmate themes
     [X] Add TextMate converter
+    [ ] Import textmate styles
     [ ] Add additional colors:
         [ ] lineHighlight background
         [X] gutter foreground
