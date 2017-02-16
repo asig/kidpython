@@ -2,7 +2,6 @@
 .idea/workspace.xml
 .idea/libraries/
 build
-kidpython.iws
 bin/
 
 # generated deb package files
