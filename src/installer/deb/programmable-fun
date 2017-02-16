@@ -19,4 +19,4 @@
 # along with programmablefun.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-USE_GTK3=0 java -cp "/usr/share/programmable-fun/jars/*" com.asigner.kidpython.ide.App
+USE_GTK3=0 java -cp "/usr/share/programmable-fun/jars/*" com.programmablefun.ide.App
