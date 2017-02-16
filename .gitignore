@@ -4,4 +4,24 @@
 build
 kidpython.iws
 bin/
-src/installer/deb/debian
+
+# generated deb package files
+src/installer/deb/debian/debhelper-build-stamp
+src/installer/deb/debian/files
+src/installer/deb/debian/init.d.ex
+src/installer/deb/debian/manpage.1.ex
+src/installer/deb/debian/manpage.sgml.ex
+src/installer/deb/debian/manpage.xml.ex
+src/installer/deb/debian/menu.ex
+src/installer/deb/debian/postinst.ex
+src/installer/deb/debian/postrm.ex
+src/installer/deb/debian/preinst.ex
+src/installer/deb/debian/prerm.ex
+src/installer/deb/debian/programmable-fun.cron.d.ex
+src/installer/deb/debian/programmable-fun.debhelper.log
+src/installer/deb/debian/programmable-fun.default.ex
+src/installer/deb/debian/programmable-fun.doc-base.EX
+src/installer/deb/debian/programmable-fun.substvars
+src/installer/deb/debian/programmable-fun/
+src/installer/deb/debian/watch.ex
+src/installer/programmable-fun_*_amd64.changes
