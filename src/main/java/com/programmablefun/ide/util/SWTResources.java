@@ -68,15 +68,15 @@ public class SWTResources {
     }
 
     static {
-        loadFont("/com/asigner/kidpython/ide/fonts/elusiveicons-webfont.ttf");
-        loadFont("/com/asigner/kidpython/ide/fonts/UbuntuMono-Regular.ttf");
-        loadFont("/com/asigner/kidpython/ide/fonts/UbuntuMono-Bold.ttf");
-        loadFont("/com/asigner/kidpython/ide/fonts/UbuntuMono-Italic.ttf");
-        loadFont("/com/asigner/kidpython/ide/fonts/UbuntuMono-BoldItalic.ttf");
-        loadFont("/com/asigner/kidpython/ide/fonts/RobotoMono-Regular.ttf");
-        loadFont("/com/asigner/kidpython/ide/fonts/RobotoMono-Bold.ttf");
-        loadFont("/com/asigner/kidpython/ide/fonts/RobotoMono-Italic.ttf");
-        loadFont("/com/asigner/kidpython/ide/fonts/RobotoMono-BoldItalic.ttf");
+        loadFont("/com/programmablefun/ide/fonts/elusiveicons-webfont.ttf");
+        loadFont("/com/programmablefun/ide/fonts/UbuntuMono-Regular.ttf");
+        loadFont("/com/programmablefun/ide/fonts/UbuntuMono-Bold.ttf");
+        loadFont("/com/programmablefun/ide/fonts/UbuntuMono-Italic.ttf");
+        loadFont("/com/programmablefun/ide/fonts/UbuntuMono-BoldItalic.ttf");
+        loadFont("/com/programmablefun/ide/fonts/RobotoMono-Regular.ttf");
+        loadFont("/com/programmablefun/ide/fonts/RobotoMono-Bold.ttf");
+        loadFont("/com/programmablefun/ide/fonts/RobotoMono-Italic.ttf");
+        loadFont("/com/programmablefun/ide/fonts/RobotoMono-BoldItalic.ttf");
     }
 
     private static void loadFont(String path) {

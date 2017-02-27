@@ -346,15 +346,15 @@ public class App {
     }
 
     private void createActions() {
-        vmStartAction = new BaseAction(Messages.get(Action_Run), SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/nav_go@2x.png"), this::runCode);
-        vmPauseAction = new BaseAction(Messages.get(Action_Pause), SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/suspend_co@2x.png"), () -> virtualMachine.pause() );
-        vmResumeAction = new BaseAction(Messages.get(Action_Resume), SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/resume_co@2x.png"), () -> virtualMachine.start() );
-        vmStopAction = new BaseAction(Messages.get(Action_Stop), SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stop@2x.png"), () -> virtualMachine.stop());
-        vmStepIntoAction = new BaseAction(Messages.get(Action_Step_Into), SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepinto_co@2x.png"), this::stepInto);
-        vmStepOverAction = new BaseAction(Messages.get(Action_Step_Over), SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/stepover_co@2x.png"), this::stepOver);
+        vmStartAction = new BaseAction(Messages.get(Action_Run), SWTResources.getImage("/com/programmablefun/ide/toolbar/nav_go@2x.png"), this::runCode);
+        vmPauseAction = new BaseAction(Messages.get(Action_Pause), SWTResources.getImage("/com/programmablefun/ide/toolbar/suspend_co@2x.png"), () -> virtualMachine.pause() );
+        vmResumeAction = new BaseAction(Messages.get(Action_Resume), SWTResources.getImage("/com/programmablefun/ide/toolbar/resume_co@2x.png"), () -> virtualMachine.start() );
+        vmStopAction = new BaseAction(Messages.get(Action_Stop), SWTResources.getImage("/com/programmablefun/ide/toolbar/stop@2x.png"), () -> virtualMachine.stop());
+        vmStepIntoAction = new BaseAction(Messages.get(Action_Step_Into), SWTResources.getImage("/com/programmablefun/ide/toolbar/stepinto_co@2x.png"), this::stepInto);
+        vmStepOverAction = new BaseAction(Messages.get(Action_Step_Over), SWTResources.getImage("/com/programmablefun/ide/toolbar/stepover_co@2x.png"), this::stepOver);
         aboutAction = new BaseAction(Messages.get(Action_About), this::showAbout);
         preferencesAction = new BaseAction(Messages.get(Action_Preferences), this::showPreferences);
-        helpAction = new BaseAction(Messages.get(Action_Help), SWTResources.getImage("/com/asigner/kidpython/ide/toolbar/help@2x.png"), this::showHelp);
+        helpAction = new BaseAction(Messages.get(Action_Help), SWTResources.getImage("/com/programmablefun/ide/toolbar/help@2x.png"), this::showHelp);
     }
 
     private void createMenu(Display display) {

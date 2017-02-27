@@ -136,7 +136,7 @@ public class CodeLineStyler implements LineStyleListener {
         scanner = new CodeScanner();
         multiLineComments = new ArrayList<>();
         lineNumberFont = new Font(Display.getDefault(), "Roboto Mono", SWTUtils.scaleFont(8), SWT.NONE);
-        errorIcon = SWTResources.getImage("/com/asigner/kidpython/ide/editor/error.png");
+        errorIcon = SWTResources.getImage("/com/programmablefun/ide/editor/error.png");
 
         // Figure out bullet width
         GC gc = new GC(styledText);
