@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
-        classpath 'gradle.plugin.edu.sc.seis.gradle:launch4j:1.6.2'
+        classpath 'gradle.plugin.edu.sc.seis.gradle:launch4j:2.4.3'
     }
 }
 
@@ -16,7 +16,7 @@ plugins {
     id 'application'
     id 'idea'
     id 'com.github.johnrengelman.shadow' version '1.2.3'
-    id 'edu.sc.seis.launch4j' version '1.6.2'
+    id 'edu.sc.seis.launch4j' version '2.4.3'
 }
 
 mainClassName = "com.programmablefun.ide.App"
