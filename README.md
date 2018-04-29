@@ -1,14 +1,12 @@
-# kidpython
+# ProgrammableFun
 
 ## How to run from command line
-`gradle run`
+`./gradlew run`
 
 ## How to build installer
-1. Install NSIS and snapcraft
-   `sudo apt install nsis`
-2. `./gradlew createExe makePackages`
-3. `(cd src/installer/win; makensis ProgrammableFun.nsi`)
-4. `(cd src/installer/deb; dpkg-buildpackage -b)`)
+1. Install NSIS and debhelper
+   `sudo apt install nsis debhelper`
+2. `./gradlew makePackages`
 
 ## How to push a release
 1. Install python requests package
