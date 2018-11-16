@@ -19,6 +19,7 @@
 
 package com.programmablefun.runtime.nativecode;
 
+import com.programmablefun.ide.turtle.Turtle;
 import com.programmablefun.runtime.UndefinedValue;
 import com.programmablefun.runtime.Value;
 import com.programmablefun.ide.turtle.TurtleCanvas;
@@ -29,80 +30,82 @@ import java.util.List;
 @Export(name = "turtle")
 public class TurtleWrapper {
 
-    private final TurtleCanvas turtleCanvas;
+    private final Turtle turtle;
+    private final TurtleCanvas canvas;
 
-    public TurtleWrapper(TurtleCanvas turtleCanvas) {
-        this.turtleCanvas = turtleCanvas;
+    public TurtleWrapper(TurtleCanvas canvas) {
+        this.turtle = new Turtle(canvas);
+        this.canvas = canvas;
     }
 
     @Export
     public Value turn(List<Value> values) {
         NativeCodeUtils.checkArgs(values, 1);
-        turtleCanvas.turn(values.get(0).asNumber().doubleValue());
+        turtle.turn(values.get(0).asNumber().doubleValue());
         return UndefinedValue.INSTANCE;
     }
 
     @Export
     public Value show(List<Value> values) {
         NativeCodeUtils.checkArgs(values, 0);
-        turtleCanvas.showTurtle(true);
+        turtle.showTurtle(true);
         return UndefinedValue.INSTANCE;
     }
 
     @Export
     public Value hide(List<Value> values) {
         NativeCodeUtils.checkArgs(values, 0);
-        turtleCanvas.showTurtle(false);
+        turtle.showTurtle(false);
         return UndefinedValue.INSTANCE;
     }
 
     @Export
     public Value penDown(List<Value> values) {
         NativeCodeUtils.checkArgs(values, 0);
-        turtleCanvas.usePen(true);
+        turtle.usePen(true);
         return UndefinedValue.INSTANCE;
     }
 
     @Export
     public Value penColor(List<Value> values) {
         NativeCodeUtils.checkArgs(values, 3);
-        turtleCanvas.setPenColor(new RGB(values.get(0).asNumber().intValue(), values.get(1).asNumber().intValue(), values.get(2).asNumber().intValue()));
+        turtle.setPenColor(new RGB(values.get(0).asNumber().intValue(), values.get(1).asNumber().intValue(), values.get(2).asNumber().intValue()));
         return UndefinedValue.INSTANCE;
     }
 
     @Export
     public Value penWidth(List<Value> values) {
         NativeCodeUtils.checkArgs(values, 1);
-        turtleCanvas.setPenWidth(values.get(0).asNumber().intValue());
+        turtle.setPenWidth(values.get(0).asNumber().intValue());
         return UndefinedValue.INSTANCE;
     }
 
     @Export
     public Value penUp(List<Value> values) {
         NativeCodeUtils.checkArgs(values, 0);
-        turtleCanvas.usePen(false);
+        turtle.usePen(false);
         return UndefinedValue.INSTANCE;
     }
 
     @Export
     public Value move(List<Value> values) {
         NativeCodeUtils.checkArgs(values, 1);
-        turtleCanvas.move(values.get(0).asNumber().doubleValue());
+        turtle.move(values.get(0).asNumber().doubleValue());
         return UndefinedValue.INSTANCE;
     }
 
     @Export
     public Value home(List<Value> values) {
         NativeCodeUtils.checkArgs(values, 0);
-        turtleCanvas.moveTo(0, 0);
-        turtleCanvas.turnTo(0);
+        turtle.moveTo(0, 0);
+        turtle.turnTo(0);
         return UndefinedValue.INSTANCE;
     }
 
     @Export
     public Value clear(List<Value> values) {
         NativeCodeUtils.checkArgs(values, 0);
-        turtleCanvas.clear();
+        canvas.clear();
         return UndefinedValue.INSTANCE;
     }
 

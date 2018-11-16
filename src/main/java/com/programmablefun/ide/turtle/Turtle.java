@@ -29,7 +29,6 @@ public class Turtle {
     private double angle;
     private double posX, posY;
     private boolean penDown;
-    private boolean turtleVisible;
     private RGB penColor;
     private int penWidth;
     private boolean slowMotion = false;
@@ -43,23 +42,22 @@ public class Turtle {
         penDown = true;
         penColor = new RGB(0,0,0);
         penWidth = 1;
-        turtleVisible = true;
         this.slowMotion = false;
+        canvas.setTurtleVisible(true);
     }
 
     public void turnTo(double angle) {
         this.angle = angle;
-        if (turtleVisible) {
-            canvas.redrawAsync();
-        }
+
+        canvas.setTurtleAngle(angle);
+        canvas.redrawTurtleAsync();
     }
 
     public void moveTo(double x, double y) {
         this.posX = x;
         this.posY = y;
-        if (turtleVisible) {
-            canvas.redrawAsync();
-        }
+        canvas.setTurtlePos(posX, posY);
+        canvas.redrawTurtleAsync();
     }
 
     public void move(double len) {
@@ -95,7 +93,8 @@ public class Turtle {
             }
             posX = newPosX;
             posY = newPosY;
-            if (penDown || turtleVisible) {
+            canvas.setTurtlePos(posX, posY);
+            if (penDown || canvas.isTurtleVisible()) {
                 canvas.redrawAsync();
             }
 
@@ -112,18 +111,15 @@ public class Turtle {
 
     public void turn(double angle) {
         this.angle = (this.angle + angle) % 360;
-        if (turtleVisible) {
-            canvas.redrawAsync();
-        }
+        canvas.setTurtleAngle(angle);
+        canvas.redrawTurtleAsync();
     }
 
     public void showTurtle(boolean show) {
-        boolean oldTurtle = turtleVisible;
-        turtleVisible = show;
-        if (oldTurtle != turtleVisible) {
-            canvas.redrawAsync();
-        }
+        canvas.setTurtleVisible(show);
+        canvas.redrawTurtleAsync();
     }
+
     public void usePen(boolean use) {
         penDown = use;
     }

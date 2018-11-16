@@ -189,14 +189,14 @@ public class App {
         // Upper part of toplevel sash
         SashForm sashForm2 = new SashForm(sashForm, SWT.HORIZONTAL);
         sashForm2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-        
+
         SashForm sashForm3 = new SashForm(sashForm2, SWT.VERTICAL);
         sashForm3.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         sourceCodeComposite = new SourceCodeComposite(sashForm3, SWT.NONE, codeRepository);
         sourceCodeComposite.setStylesheet(stylesheetRepository.get(settings.getSelectedStylesheet()));
         callStackComposite = new CallStackComposite(sashForm3, SWT.NONE);
         sashForm3.setWeights(new int[]{18,2});
-        
+
         turtleCanvas = new TurtleCanvas(sashForm2, SWT.NONE);
         sashForm2.setWeights(new int[]{10,10});
 

@@ -84,6 +84,11 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
     private int offsetX;
     private int offsetY;
 
+    private boolean turtleVisible;
+    private double turtleX;
+    private double turtleY;
+    private double turtleAngle;
+
     private boolean lmbDown = false;
     private int lastMouseX;
     private int lastMouseY;
@@ -118,6 +123,23 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         });
         addMouseListener(this);
         addMouseMoveListener(this);
+    }
+
+    public boolean isTurtleVisible() {
+        return turtleVisible;
+    }
+
+    public void setTurtleVisible(boolean turtleVisible) {
+        this.turtleVisible = turtleVisible;
+    }
+
+    public void setTurtlePos(double turtleX, double turtleY) {
+        this.turtleX = turtleX;
+        this.turtleY = turtleY;
+    }
+
+    public void setTurtleAngle(double turtleAngle) {
+        this.turtleAngle = turtleAngle;
     }
 
     @Override
@@ -242,6 +264,12 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         this.getDisplay().asyncExec(this::redraw);
     }
 
+    public void redrawTurtleAsync() {
+        if (turtleVisible) {
+            redrawAsync();
+        }
+    }
+
     private void draw(PaintEvent e) {
         // Create the image to fill the canvas
         Image image = new Image(this.getDisplay(), this.getBounds());
@@ -293,11 +321,11 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         }
         AffineTransform orig = g2d.getTransform();
         AffineTransform t = new AffineTransform();
-        t.translate(posX, posY);
+        t.translate(turtleX, turtleY);
         t.scale(.25,.25);
         // HACK: SWT (at least under Linux and macOs) seems to have issues drawing paths if the rotation is a multiple
         // of 45 degrees... Therefore, let's adjust it a little.
-        double a = angle;
+        double a = turtleAngle;
         if (a % 45.0 < 0.01) {
             a += .01;
         }
