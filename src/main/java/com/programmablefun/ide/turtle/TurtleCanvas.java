@@ -38,7 +38,6 @@ import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.jfree.swt.SWTGraphics2D;
 
@@ -80,13 +79,7 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
     }
 
     private final List<Line> lines = Lists.newArrayList();
-    private boolean slowMotion;
-    private double angle;
-    private double posX, posY;
-    private boolean penDown;
-    private boolean turtleVisible;
-    private RGB penColor;
-    private int penWidth;
+
     private float zoom;
     private int offsetX;
     private int offsetY;
@@ -169,10 +162,6 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         }
     }
 
-    public void setSlowMotion(boolean slowMotion) {
-        this.slowMotion = slowMotion;
-    }
-
     public void reset() {
         try {
             linesLock.lock();
@@ -180,12 +169,6 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         } finally {
             linesLock.unlock();
         }
-        slowMotion = false;
-        posX = posY = angle = 0;
-        penDown = true;
-        penColor = new RGB(0,0,0);
-        penWidth = 1;
-        turtleVisible = true;
         zoom = 1;
         offsetX = offsetY = 0;
         getDisplay().asyncExec(this::redraw);
@@ -236,108 +219,27 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         buttons.add(button);
     }
 
-    public void turnTo(double angle) {
-        this.angle = angle;
-        if (turtleVisible) {
-            this.getDisplay().asyncExec(this::redraw);
-        }
-    }
 
-    public void moveTo(double x, double y) {
-        this.posX = x;
-        this.posY = y;
-        if (turtleVisible) {
-            this.getDisplay().asyncExec(this::redraw);
-        }
-    }
-
-    public void move(double len) {
-        if (len <= 0) {
-            return;
-        }
-        double startLen;
-        int delay;
-        if (slowMotion) {
-            startLen = 1;
-            delay = 4;
-        } else {
-            startLen = len;
-            delay = 0;
-        }
-
-        if (penDown) {
-            addLine(new Point(0,0), new Point(0,0));
-        }
-        double origPosX = posX;
-        double origPosY = posY;
-        for (double i = startLen; i <= len; i ++) {
-            posX = origPosX;
-            posY = origPosY;
-            double newPosX = posX + Math.sin(Math.toRadians(angle)) * i;
-            double newPosY = posY - Math.cos(Math.toRadians(angle)) * i;
-            if (penDown) {
-                replaceLastLine(new Point((int) posX, (int) posY), new Point((int) newPosX, (int) newPosY));
-            }
-            posX = newPosX;
-            posY = newPosY;
-            if (penDown || turtleVisible) {
-                this.getDisplay().asyncExec(this::redraw);
-            }
-
-            try {
-                for (int j = 0; j < delay; j++) {
-                    Thread.sleep(1);
-                    this.getDisplay().readAndDispatch();
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void addLine(Point from, Point to) {
+    public void addLine(Line line) {
         try {
             linesLock.lock();
-            lines.add(new Line(from, to, penColor,penWidth));
+            lines.add(line);
         } finally {
             linesLock.unlock();
         }
     }
 
-    private void replaceLastLine(Point from, Point to) {
+    public void replaceLastLine(Line line) {
         try {
             linesLock.lock();
-            lines.set(lines.size() - 1, new Line(from, to, penColor,penWidth));
+            lines.set(lines.size() - 1, line);
         } finally {
             linesLock.unlock();
         }
     }
 
-    public void turn(double angle) {
-        this.angle = (this.angle + angle) % 360;
-        if (turtleVisible) {
-            this.getDisplay().asyncExec(this::redraw);
-        }
-    }
-
-    public void showTurtle(boolean show) {
-        boolean oldTurtle = turtleVisible;
-        turtleVisible = show;
-        if (oldTurtle != turtleVisible) {
-            this.getDisplay().asyncExec(this::redraw);
-        }
-    }
-
-    public void usePen(boolean use) {
-        penDown = use;
-    }
-
-    public void setPenWidth(int width) {
-        penWidth = width;
-    }
-
-    public void setPenColor(RGB color) {
-        penColor = color;
+    public void redrawAsync() {
+        this.getDisplay().asyncExec(this::redraw);
     }
 
     private void draw(PaintEvent e) {
@@ -401,7 +303,7 @@ public class TurtleCanvas extends Canvas implements MouseListener, MouseMoveList
         }
         t.rotate(Math.toRadians(a));
         g2d.transform(t);
-        Turtle.paint(g2d);
+        TurtleShape.paint(g2d);
         g2d.setTransform(orig);
     }
 

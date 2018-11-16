@@ -27,7 +27,7 @@ import static java.awt.Color.*;
  * This class has been automatically generated using
  * <a href="http://ebourg.github.io/flamingo-svg-transcoder/">Flamingo SVG transcoder</a>.
  */
-public class Turtle {
+public class TurtleShape {
 
     /**
      * Paints the transcoded SVG image on the specified graphics context. You
