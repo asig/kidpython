@@ -1,0 +1,58 @@
+<ivy-module version="2.0">
+    <info organisation="org.eclipse" module="platform-minimal" revision="4.9" status="release" />
+    <configurations>
+        <conf name="common" visibility="private"/>
+        <conf name="linux-gtk-x86" description="Linux specific dependencies" extends="common"/>
+        <conf name="linux-gtk-x86_64" description="Linux specific 64bit dependencies" extends="common"/>
+        <conf name="win32-x86" description="Windows specific dependencies" extends="common"/>
+        <conf name="win32-x86_64" description="Windows specific dependencies" extends="common"/>
+        <conf name="macosx-cocoa-x86_64" description="Mac OS X specific 64bit dependencies" extends="common"/>
+    </configurations>
+
+
+    <publications>
+<artifact name="org.eclipse.core.filesystem.linux.x86_1.4.300.v20180828-0158" conf="linux-gtk-x86" type="jar" ext="jar"/>
+<artifact name="org.eclipse.core.net.linux.x86_1.2.200.v20180827-1041" conf="linux-gtk-x86" type="jar" ext="jar"/>
+<artifact name="org.eclipse.swt.gtk.linux.x86_3.108.0.v20180904-1901" conf="linux-gtk-x86" type="jar" ext="jar"/>
+
+<artifact name="org.eclipse.core.filesystem.linux.x86_64_1.2.300.v20180828-0158" conf="linux-gtk-x86_64" type="jar" ext="jar"/>
+<artifact name="org.eclipse.core.net.linux.x86_64_1.2.200.v20180827-1041" conf="linux-gtk-x86_64" type="jar" ext="jar"/>
+<artifact name="org.eclipse.swt.gtk.linux.x86_64_3.108.0.v20180904-1901" conf="linux-gtk-x86_64" type="jar" ext="jar"/>
+
+<artifact name="org.eclipse.core.filesystem.win32.x86_1.4.100.v20180828-0158" conf="win32-x86" type="jar" ext="jar"/>
+<artifact name="org.eclipse.core.net.win32.x86_1.1.200.v20180827-1041" conf="win32-x86" type="jar" ext="jar"/>
+<artifact name="org.eclipse.swt.win32.win32.x86_3.108.0.v20180904-1901" conf="win32-x86" type="jar" ext="jar"/>
+
+<artifact name="org.eclipse.core.filesystem.win32.x86_64_1.4.100.v20180828-0158" conf="win32-x86_64" type="jar" ext="jar"/>
+<artifact name="org.eclipse.core.net.win32.x86_64_1.1.200.v20180827-1041" conf="win32-x86_64" type="jar" ext="jar"/>
+<artifact name="org.eclipse.swt.win32.win32.x86_64_3.108.0.v20180904-1901" conf="win32-x86_64" type="jar" ext="jar"/>
+
+<artifact name="org.eclipse.core.filesystem.macosx_1.3.100.v20180828-0158" conf="macosx-cocoa-x86_64" type="jar" ext="jar"/>
+<artifact name="org.eclipse.swt.cocoa.macosx.x86_64_3.108.0.v20180904-1901" conf="macosx-cocoa-x86_64" type="jar" ext="jar"/>
+
+
+<artifact name="org.eclipse.core.commands_3.9.200.v20180827-1727" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.core.contenttype_3.7.100.v20180817-1401" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.core.databinding_1.7.0.v20180827-2028" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.core.databinding.beans_1.4.200.v20180827-2028" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.core.databinding.observable_1.6.300.v20180827-2028" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.core.databinding.property_1.6.300.v20180827-2028" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.core.expressions_3.6.200.v20180817-1401" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.core.externaltools_1.1.200.v20180821-1744" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.core.filebuffers_3.6.300.v20180822-1339" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.core.filesystem_1.7.200.v20180828-0158" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.core.jobs_3.10.100.v20180817-1215" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.core.net_1.3.300.v20180827-1041" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.core.runtime_3.15.0.v20180817-1401" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.core.variables_3.4.200.v20180821-1744" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.equinox.common_3.10.100.v20180827-1235" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.jface_3.14.100.v20180828-0836" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.jface.databinding_1.8.300.v20180828-0836" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.jface.text_3.14.0.v20180824-1140" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.swt_3.108.0.v20180904-1901" conf="common" type="jar" ext="jar"/>
+<artifact name="org.eclipse.text_3.7.0.v20180822-1511" conf="common" type="jar" ext="jar"/>
+    </publications>
+</ivy-module>
+
+
+

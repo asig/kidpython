@@ -79,9 +79,9 @@ dependencies {
     compile 'xmlwise:xmlwise:1.2.11'
 
     // OS-dependent runtimes
-    runtimeLinux group: 'org.eclipse', name: 'platform-minimal', version: '4.7.1a', configuration: 'linux-gtk-x86_64'
-    runtimeMac group: 'org.eclipse', name: 'platform-minimal', version: '4.7.1a', configuration: 'macosx-cocoa-x86_64'
-    runtimeWin group: 'org.eclipse', name: 'platform-minimal', version: '4.7.1a', configuration: 'win32-x86'
+    runtimeLinux group: 'org.eclipse', name: 'platform-minimal', version: '4.9', configuration: 'linux-gtk-x86_64'
+    runtimeMac group: 'org.eclipse', name: 'platform-minimal', version: '4.9', configuration: 'macosx-cocoa-x86_64'
+    runtimeWin group: 'org.eclipse', name: 'platform-minimal', version: '4.9', configuration: 'win32-x86'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.9.5'
