@@ -35,7 +35,7 @@ public class Instruction {
         ASSIGN, // Store from stack to variable
         STOP,
 
-        MKFIELDREF,
+        MKFLDREF,
 
         MKLIST,
         MKMAP,

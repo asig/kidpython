@@ -33,7 +33,7 @@ import java.io.Writer;
 
 public class DownloadAction extends TurtleAction {
 
-    public DownloadAction(TurtleCanvas canvas) {
+    public DownloadAction(Canvas canvas) {
         super(canvas);
     }
 

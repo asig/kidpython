@@ -32,13 +32,14 @@ import com.programmablefun.ide.preferences.RepositoryPrefPage;
 import com.programmablefun.ide.sync.LocalPersistenceStrategy;
 import com.programmablefun.ide.sync.PersistenceStrategy;
 import com.programmablefun.ide.sync.SyncService;
-import com.programmablefun.ide.turtle.TurtleCanvas;
+import com.programmablefun.ide.turtle.Canvas;
 import com.programmablefun.ide.util.AnsiEscapeCodes;
 import com.programmablefun.ide.util.OS;
 import com.programmablefun.ide.util.SWTResources;
 import com.programmablefun.runtime.FuncValue;
 import com.programmablefun.runtime.Instruction;
 import com.programmablefun.runtime.VirtualMachine;
+import com.programmablefun.runtime.nativecode.CanvasWrapper;
 import com.programmablefun.runtime.nativecode.Export;
 import com.programmablefun.runtime.nativecode.MathWrapper;
 import com.programmablefun.runtime.nativecode.TurtleWrapper;
@@ -101,7 +102,7 @@ public class App {
     private CodeRepository codeRepository;
     private Set<String> wellKnownWords;
 
-    private TurtleCanvas turtleCanvas;
+    private Canvas canvas;
     private SourceCodeComposite sourceCodeComposite;
     private CallStackComposite callStackComposite;
     private ConsoleComposite consoleComposite;
@@ -197,14 +198,17 @@ public class App {
         callStackComposite = new CallStackComposite(sashForm3, SWT.NONE);
         sashForm3.setWeights(new int[]{18,2});
 
-        turtleCanvas = new TurtleCanvas(sashForm2, SWT.NONE);
+        canvas = new Canvas(sashForm2, SWT.NONE);
         sashForm2.setWeights(new int[]{10,10});
 
         // Lower part of toplevel sash
         consoleComposite = new ConsoleComposite(sashForm, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 
         List<Object> nativeCodeWrappers = Lists.newArrayList(
-                new TurtleWrapper(turtleCanvas), new MathWrapper(), new UtilsWrapper(consoleComposite)
+                new CanvasWrapper(canvas),
+                new TurtleWrapper(canvas),
+                new MathWrapper(),
+                new UtilsWrapper(consoleComposite)
         );
         wellKnownWords = Sets.newHashSet();
         for (Object wrapper : nativeCodeWrappers) {
@@ -450,11 +454,11 @@ public class App {
 
         CodeGenerator codeGen = new CodeGenerator(stmt);
         List<Instruction> program = codeGen.generate();
-        int i = 0;
-        for (Instruction instr : program) {
-            System.out.println(String.format("%04d: %s", i++, instr));
-        }
-        System.out.flush();
+//        int i = 0;
+//        for (Instruction instr : program) {
+//            System.out.println(String.format("%04d: %s", i++, instr));
+//        }
+//        System.out.flush();
 
         virtualMachine.setProgram(program);
         return true;

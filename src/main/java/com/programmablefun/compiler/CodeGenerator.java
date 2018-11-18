@@ -71,7 +71,7 @@ import static com.programmablefun.runtime.Instruction.OpCode.ITER_HAS_NEXT;
 import static com.programmablefun.runtime.Instruction.OpCode.ITER_NEXT;
 import static com.programmablefun.runtime.Instruction.OpCode.LE;
 import static com.programmablefun.runtime.Instruction.OpCode.LT;
-import static com.programmablefun.runtime.Instruction.OpCode.MKFIELDREF;
+import static com.programmablefun.runtime.Instruction.OpCode.MKFLDREF;
 import static com.programmablefun.runtime.Instruction.OpCode.MKITER;
 import static com.programmablefun.runtime.Instruction.OpCode.MKLIST;
 import static com.programmablefun.runtime.Instruction.OpCode.MKMAP;
@@ -423,7 +423,7 @@ public class CodeGenerator implements NodeVisitor {
     public void visit(MapAccessNode node) {
         node.getMapExpr().accept(this);
         node.getKeyExpr().accept(this);
-        emit(new Instruction(node, MKFIELDREF));
+        emit(new Instruction(node, MKFLDREF));
     }
 
     @Override

@@ -21,7 +21,7 @@ package com.programmablefun.ide.turtle;
 
 public class ZoomInAction extends TurtleAction {
 
-    public ZoomInAction(TurtleCanvas canvas) {
+    public ZoomInAction(Canvas canvas) {
         super(canvas);
     }
 

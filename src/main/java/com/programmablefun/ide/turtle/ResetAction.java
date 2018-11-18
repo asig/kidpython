@@ -21,7 +21,7 @@ package com.programmablefun.ide.turtle;
 
 public class ResetAction extends TurtleAction {
 
-    public ResetAction(TurtleCanvas canvas) {
+    public ResetAction(Canvas canvas) {
         super(canvas);
     }
 

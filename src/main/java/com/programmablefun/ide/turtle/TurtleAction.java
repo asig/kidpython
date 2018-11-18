@@ -23,9 +23,9 @@ import org.eclipse.jface.action.Action;
 
 public class TurtleAction extends Action {
 
-    protected final TurtleCanvas canvas;
+    protected final Canvas canvas;
 
-    public TurtleAction(TurtleCanvas canvas) {
+    public TurtleAction(Canvas canvas) {
         this.canvas = canvas;
     }
 }

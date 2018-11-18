@@ -21,7 +21,7 @@ package com.programmablefun.ide.turtle;
 
 public class CenterAction extends TurtleAction {
 
-    public CenterAction(TurtleCanvas canvas) {
+    public CenterAction(Canvas canvas) {
         super(canvas);
     }
 

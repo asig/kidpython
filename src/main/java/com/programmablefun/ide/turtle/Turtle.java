@@ -24,7 +24,7 @@ import org.eclipse.swt.graphics.RGB;
 
 public class Turtle {
 
-    private final TurtleCanvas canvas;
+    private final Canvas canvas;
 
     private double angle;
     private double posX, posY;
@@ -33,8 +33,9 @@ public class Turtle {
     private int penWidth;
     private boolean slowMotion = false;
 
-    public Turtle(TurtleCanvas canvas) {
+    public Turtle(Canvas canvas) {
         this.canvas = canvas;
+        reset();
     }
 
     public void reset() {
@@ -44,6 +45,7 @@ public class Turtle {
         penWidth = 1;
         this.slowMotion = false;
         canvas.setTurtleVisible(true);
+        canvas.redrawTurtleAsync();
     }
 
     public void turnTo(double angle) {
@@ -77,7 +79,7 @@ public class Turtle {
         if (penDown) {
             Point from = new Point(0,0);
             Point to = new Point(0,0);
-            canvas.addLine(new TurtleCanvas.Line(from, to, penColor,penWidth));
+            canvas.addShape(new Canvas.Line(from, to, penColor,penWidth));
         }
         double origPosX = posX;
         double origPosY = posY;
@@ -89,7 +91,7 @@ public class Turtle {
             if (penDown) {
                 Point from =new Point((int) posX, (int) posY);
                 Point to = new Point((int) newPosX, (int) newPosY);
-                canvas.replaceLastLine(new TurtleCanvas.Line(from, to, penColor,penWidth));
+                canvas.replaceLastShape(new Canvas.Line(from, to, penColor,penWidth));
             }
             posX = newPosX;
             posY = newPosY;

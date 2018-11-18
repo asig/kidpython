@@ -22,7 +22,7 @@ package com.programmablefun.runtime.nativecode;
 import com.programmablefun.ide.turtle.Turtle;
 import com.programmablefun.runtime.UndefinedValue;
 import com.programmablefun.runtime.Value;
-import com.programmablefun.ide.turtle.TurtleCanvas;
+import com.programmablefun.ide.turtle.Canvas;
 import org.eclipse.swt.graphics.RGB;
 
 import java.util.List;
@@ -31,9 +31,9 @@ import java.util.List;
 public class TurtleWrapper {
 
     private final Turtle turtle;
-    private final TurtleCanvas canvas;
+    private final Canvas canvas;
 
-    public TurtleWrapper(TurtleCanvas canvas) {
+    public TurtleWrapper(Canvas canvas) {
         this.turtle = new Turtle(canvas);
         this.canvas = canvas;
     }

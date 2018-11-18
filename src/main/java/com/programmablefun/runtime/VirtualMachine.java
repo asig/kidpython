@@ -59,7 +59,7 @@ import static com.programmablefun.runtime.VirtualMachine.State.STOPPED;
 public class VirtualMachine {
 
     private static final Logger logger = Logger.getLogger(VirtualMachine.class.getName());
-    
+
     public interface EventListener {
         void vmStateChanged();
         void newStatementReached(Node stmt);
@@ -214,7 +214,7 @@ public class VirtualMachine {
                     VirtualMachine.this.stop();
                     break;
 
-                case MKFIELDREF: {
+                case MKFLDREF: {
                     Value key = load(valueStack.pop());
                     Value mapRef = valueStack.pop();
                     Value mapValue = load(mapRef);
